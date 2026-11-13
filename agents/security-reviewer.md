@@ -20,7 +20,8 @@ git diff main...HEAD                     # what changed
 just tools-check                         # provenance, fixture hashes, pinned dependency versions
 npm audit --prefix tools --omit=dev      # Node dev tooling only (Package.swift has no Swift dependencies);
                                          # sends the lockfile to the npm registry: confirm first (rule 2)
-# secret scanner: not adopted (gitleaks not installed); review manually
+gitleaks git --no-banner --redact .     # secrets in git history (local only); exit 1 = findings
+gitleaks git --pre-commit --no-banner --redact .   # secrets in uncommitted changes to tracked files
 # static security analysis: not adopted (semgrep not installed); review manually
 ```
 If a tool is not installed, do not install it without asking: do the review manually and say so in the report.
