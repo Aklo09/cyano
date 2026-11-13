@@ -19,7 +19,7 @@ An empty entry path identifies the root.
 An internal path such as `[5, 0]` follows stored indices, independently of array positions.
 Invalid paths fail without selecting a different entry.
 
-The [native CLI](Native-Library-CLI.md) uses these interfaces for imports and exports.
+The [native CLI](Library-CLI.md) uses these interfaces for imports and exports.
 
 ## Input admission
 
@@ -86,4 +86,4 @@ just codec-test
 ```
 
 Run all native checks with `just test`.
-See [codec validation](../validation/Native-Codec.md) for completed cases and limitations.
+See [codec validation](../validation/Codec.md) for completed cases and limitations.

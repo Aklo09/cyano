@@ -1,13 +1,13 @@
 # Resume native implementation
 
-The owner approved the [native plan](planning/Native-macOS-Plan.md) on 2026-11-13.
+The owner approved the [native plan](planning/macOS-Plan.md) on 2026-11-13.
 Milestone 1's independent foundation is implemented and validated.
-The bounded native codec is implemented, with [focused validation](validation/Native-Codec.md).
-Minimal storage and CLI workflows are implemented, with [process-interruption evidence](validation/Native-Storage.md).
-The owner then prioritized [complete library commands](validation/Native-Library-Commands.md) before renderer feasibility; those are implemented.
-The standalone [native renderer harness](validation/Native-Renderer.md) now paints real images through a supervised helper.
-The renderer checkpoint is committed as `75aec1c`; [owned library previews and caches](validation/Native-Library-Previews.md) are implemented next.
-Milestone 1 is [accepted](validation/Native-Milestone-1.md): all criteria re-verified on `8daa40e` and the representative images approved by the owner.
+The bounded native codec is implemented, with [focused validation](validation/Codec.md).
+Minimal storage and CLI workflows are implemented, with [process-interruption evidence](validation/Storage.md).
+The owner then prioritized [complete library commands](validation/Library-Commands.md) before renderer feasibility; those are implemented.
+The standalone [native renderer harness](validation/Renderer.md) now paints real images through a supervised helper.
+The renderer checkpoint is committed as `75aec1c`; [owned library previews and caches](validation/Library-Previews.md) are implemented next.
+Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative images approved by the owner.
 
 ## Current state
 
@@ -25,7 +25,7 @@ Milestone 1 is [accepted](validation/Native-Milestone-1.md): all criteria re-ver
 - **Reuse derived previews:** complete cache metadata binds identities, PNG bytes, and stored reports without changing source metadata.
 - **Keep tooling local:** preparation sources, dependency locks, and notices live here.
 - **Keep artwork private:** copied sprites and prototype data remain ignored.
-- **Read the evidence:** [foundation validation](validation/Native-Foundation.md) records checks and limitations.
+- **Read the evidence:** [foundation validation](validation/Foundation.md) records checks and limitations.
 
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
 Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
@@ -35,13 +35,13 @@ Application scheduling, the macOS UI, and native statistics remain pending.
 
 ## Next implementation
 
-The approved [core revisions](planning/Native-Core-Revisions.md) after milestone 1 are implemented.
+The approved [core revisions](planning/Core-Revisions.md) after milestone 1 are implemented.
 Then continue the complete-core milestone with the native construction-statistics port using the retained reference cases.
 Keep application scheduling/progress/retry and UI work separate from the completed library preview command.
 Preserve inherited kernel ownership, sticky cancellation, and owner-only cache publication.
 Connected-rail/full-corpus review (milestone 4) and workload measurements remain outstanding.
 
-Preserve the [native storage contract](contracts/Native-Storage.md) when integrating rendering.
+Preserve the [native storage contract](contracts/Storage.md) when integrating rendering.
 Helpers must not retain write access after ownership is released.
 Unpublished staging remains preserved; automatic cleanup is deferred.
 Listings currently validate full sources; large-library performance is not qualified.
@@ -56,6 +56,6 @@ Use `just codec-test` for focused codec admission and export checks.
 Use `just storage-test` for metadata, exclusion, CLI, and crash-recovery checks.
 Use `just asset-test` for inventory/profile/hash and packed-frame admission checks.
 Use `just renderer-test` for composition, complete jobs, and helper lifecycle checks.
-Use `just preview --help` and the [preview guide](development/Native-Preview.md) for rendering commands.
-Use the [library preview guide](development/Native-Library-Previews.md) for saved-item reuse and refresh.
+Use `just preview --help` and the [preview guide](development/Preview.md) for rendering commands.
+Use the [library preview guide](development/Library-Previews.md) for saved-item reuse and refresh.
 Use `just library --help` for available native commands.

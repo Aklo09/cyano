@@ -12,7 +12,7 @@ Design and review flows, layouts and interface states from the user's point of v
 
 ## Project context
 - Design system and tokens (colors, spacing, typography): none custom. Use Apple's Human Interface Guidelines with
-  SwiftUI system semantic colors, Dynamic Type text styles and SF Symbols (SwiftUI + AppKit per `docs/planning/Native-macOS-Plan.md`).
+  SwiftUI system semantic colors, Dynamic Type text styles and SF Symbols (SwiftUI + AppKit per `docs/planning/macOS-Plan.md`).
 - Design tool: text specs only, using the screen-spec template below.
 
 ## Screen spec

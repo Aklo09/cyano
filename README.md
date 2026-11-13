@@ -62,15 +62,15 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 
 ## Documentation
 
-- **Read the roadmap:** [approved native plan](docs/planning/Native-macOS-Plan.md).
-- **Inspect evidence:** [foundation validation](docs/validation/Native-Foundation.md).
-- **Use the codec:** [native interfaces](docs/development/Native-Codec.md) and [validation](docs/validation/Native-Codec.md).
-- **Manage a library:** [CLI guide](docs/development/Native-Library-CLI.md), [storage contract](docs/contracts/Native-Storage.md), and [validation](docs/validation/Native-Storage.md).
-- **Inspect command completion:** [organization and maintenance validation](docs/validation/Native-Library-Commands.md).
+- **Read the roadmap:** [approved native plan](docs/planning/macOS-Plan.md).
+- **Inspect evidence:** [foundation validation](docs/validation/Foundation.md).
+- **Use the codec:** [native interfaces](docs/development/Codec.md) and [validation](docs/validation/Codec.md).
+- **Manage a library:** [CLI guide](docs/development/Library-CLI.md), [storage contract](docs/contracts/Storage.md), and [validation](docs/validation/Storage.md).
+- **Inspect command completion:** [organization and maintenance validation](docs/validation/Library-Commands.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
-- **Render previews:** [native harness guide](docs/development/Native-Preview.md) and [renderer validation](docs/validation/Native-Renderer.md).
-- **Cache saved-item previews:** [library preview guide](docs/development/Native-Library-Previews.md), [contract](docs/contracts/Native-Preview-Cache.md), and [validation](docs/validation/Native-Library-Previews.md).
-- **Check milestone 1:** [acceptance record](docs/validation/Native-Milestone-1.md).
+- **Render previews:** [native harness guide](docs/development/Preview.md) and [renderer validation](docs/validation/Renderer.md).
+- **Cache saved-item previews:** [library preview guide](docs/development/Library-Previews.md), [contract](docs/contracts/Preview-Cache.md), and [validation](docs/validation/Library-Previews.md).
+- **Check milestone 1:** [acceptance record](docs/validation/Milestone-1.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).
 

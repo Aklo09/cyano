@@ -5,7 +5,7 @@ The caller publishes the cache after the worker exits; the worker receives sourc
 
 ## Generate and reuse a preview
 
-Prepare a verified asset release using the [standalone preview guide](Native-Preview.md#prepare-a-private-release).
+Prepare a verified asset release using the [standalone preview guide](Preview.md#prepare-a-private-release).
 The examples below use that guide's `.cache/renderer-assets` release and a disposable library:
 
 ```sh
@@ -81,5 +81,5 @@ Interrupted preview writes can leave `.tmp-<UUID>` files or an uncommitted image
 A late cancellation may leave an already completed, valid cache entry.
 Do not edit library or asset files concurrently with a live owner.
 
-See the [preview cache contract](../contracts/Native-Preview-Cache.md) and [validation](../validation/Native-Library-Previews.md).
+See the [preview cache contract](../contracts/Preview-Cache.md) and [validation](../validation/Library-Previews.md).
 The macOS interface, visible-item scheduling, native statistics, and workload qualification remain separate work.

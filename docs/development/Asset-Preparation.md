@@ -54,7 +54,7 @@ private-assets/
 These files are ignored by Git and excluded from native package resources.
 Native build and planner-loading checks do not require them.
 For native image rendering, assemble these inputs into a new private release using the
-[preview harness guide](Native-Preview.md#prepare-a-private-release).
+[preview harness guide](Preview.md#prepare-a-private-release).
 Run the retained statistics cases when the map is present:
 
 ```sh

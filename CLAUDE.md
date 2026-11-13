@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Native macOS (Swift 6.4, macOS 27+, Apple Silicon) port of a Factorio blueprint library web app.
 It stores original blueprint strings in an ordinary local directory, with no authoritative database.
-Current state and next steps are in `docs/Session-Notes.md`. The roadmap is in `docs/planning/Native-macOS-Plan.md`.
+Current state and next steps are in `docs/Session-Notes.md`. The roadmap is in `docs/planning/macOS-Plan.md`.
 Read the session notes before you start milestone work.
 
 ## Commands

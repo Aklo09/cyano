@@ -2,7 +2,7 @@
 
 The standalone harness produces real PNG previews through JavaScriptCore, Core Graphics, Core Text, and Image I/O.
 The completed library-command checkpoint was committed as `ee564db` before this work began.
-Recorded: 2026-11-13, in the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13, in the [foundation environment](Foundation.md#environment).
 This completes the standalone painter/worker checkpoint; the whole application and milestone 1 acceptance remain in progress.
 
 ## Verified implementation
@@ -105,7 +105,7 @@ The test now observes the PID immediately after process launch and retains the s
 
 This is a standalone-source harness. Library-bound helper lease retention, owner-controlled cache publication,
 render scheduling, retry/progress UI, and integration with library close are still pending.
-The subsequent [library preview checkpoint](Native-Library-Previews.md) implements the helper lease, cache, and close integration.
+The subsequent [library preview checkpoint](Library-Previews.md) implements the helper lease, cache, and close integration.
 No helper receives a library path/lease or authoritative write interface in this checkpoint.
 Terrain/space backgrounds and coordinate overlays remain outside the native painter's current options.
 Source operations continue to work without assets.

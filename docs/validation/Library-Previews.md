@@ -2,7 +2,7 @@
 
 Saved-item rendering now retains kernel ownership and publishes validated derived caches through the storage owner.
 The standalone renderer checkpoint was committed as `75aec1c` before this work began.
-Recorded: 2026-11-13 in the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 
 ## Completed checks
 
@@ -75,7 +75,7 @@ The workflow ran through `just library` against a generated `.cache/Preview-Libr
 | Same selected leaf, validated reuse | ~2.81 s |
 
 These debug-build measurements include parent asset verification, source selection, validation, and publication;
-they are broader than the standalone worker timings recorded in [renderer validation](Native-Renderer.md).
+they are broader than the standalone worker timings recorded in [renderer validation](Renderer.md).
 Cache hits still validate complete sources/assets and decode the PNG. They are not indexing-cache latency measurements.
 The large leaf retains its explicit warning for eight unsupported `ee-infinity-loader` entities.
 Exact RS source/metadata bytes remained unchanged across first render, reuse, and refresh.
@@ -89,7 +89,7 @@ alias refusal, exclusive/checked replacement, and source/asset separation.
 No additional security scanner was installed or run.
 Tests operate on generated temporary libraries or the task's ignored demo library, never a real user library.
 
-The [contract](../contracts/Native-Preview-Cache.md) and [usage guide](../development/Native-Library-Previews.md) describe the implemented boundary.
+The [contract](../contracts/Preview-Cache.md) and [usage guide](../development/Library-Previews.md) describe the implemented boundary.
 Native statistics, application scheduling/progress/retry, cache quotas, the macOS UI,
 owner visual approval, connected-rail/full-corpus image review, and the 1,000-root workload remain pending.
 Process termination tests do not establish hardware power-loss durability.

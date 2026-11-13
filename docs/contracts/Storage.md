@@ -129,7 +129,7 @@ Concurrent comments therefore append without losing another accepted comment.
 Closing drains earlier queued work, rejects later operations, and releases the lease.
 Closing again is harmless.
 Closing also cancels every in-flight preview and waits for its worker cleanup before the owner lease closes.
-See the [preview lifetime/cache contract](Native-Preview-Cache.md) for the worker process boundary and derived publication.
+See the [preview lifetime/cache contract](Preview-Cache.md) for the worker process boundary and derived publication.
 
 Separate app/CLI instances cannot open the same live library, including through aliases.
 Ordinary reads and exports require ownership too.
@@ -267,7 +267,7 @@ Disk usage counts quarantined operations with `operations`.
 | Listing entries | 100,000 across the hierarchy |
 | Listing source/metadata bytes | 256 MiB |
 
-The [codec ceilings](../development/Native-Codec.md#input-admission) govern TXT decoding.
+The [codec ceilings](../development/Codec.md#input-admission) govern TXT decoding.
 Directory scans and file reads stop at their limits rather than returning silent partial success.
 Listings hash saved sources without decoding them. Release-build measurement on local APFS: listing 888 roots
 takes 0.24 s with a warm source index and 0.69 s when rebuilding it; one CLI comment takes 0.06 s.

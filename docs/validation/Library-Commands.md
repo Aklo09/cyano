@@ -2,13 +2,13 @@
 
 Organization and maintenance commands now share the native library's ownership and recovery rules.
 The prior storage checkpoint was committed as `aa6d5e5` before this implementation began.
-Recorded: 2026-11-13, in the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13, in the [foundation environment](Foundation.md#environment).
 Native statistics, real-image painting, and the macOS application remain pending.
 
 ## Command coverage
 
 The comparison used the original `fb` CLI command inventory and storage behavior.
-Native commands use explicit library-path arguments; folder and entry selectors follow the [CLI guide](../development/Native-Library-CLI.md).
+Native commands use explicit library-path arguments; folder and entry selectors follow the [CLI guide](../development/Library-CLI.md).
 
 | Capability | Native command | Result |
 | --- | --- | --- |
@@ -97,7 +97,7 @@ Inputs are not interpolated into executed shell commands. No external dependency
 No additional security scanner was installed or run; the repository has no adopted scanner command.
 
 Library/item format remains version 1; new file/tree intents use version 2 alongside version 1 replay.
-See the [storage contract](../contracts/Native-Storage.md) for synchronization and work limits.
+See the [storage contract](../contracts/Storage.md) for synchronization and work limits.
 Process-kill coverage does not establish power-loss durability or concurrent external-edit support.
 Unpublished operations staging remains preserved; cache cleanup never discards recovery evidence.
 Allocated usage is an inode-based estimate, not an APFS clone-sharing measurement or guaranteed reclaim figure.

@@ -3,7 +3,7 @@
 Native libraries now preserve originals and comments through ownership conflicts and interrupted publication.
 This checkpoint implements the minimal milestone 1 storage workflow, without completing renderer acceptance.
 
-Recorded: 2026-11-13, in the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13, in the [foundation environment](Foundation.md#environment).
 Library format, item metadata, and journal versions are `1`.
 The codec checkpoint was committed as `0f9b777` before storage implementation began.
 
@@ -91,5 +91,5 @@ The 1,000-root latency and memory targets remain unqualified.
 
 Unpublished staging is preserved; automated cleanup is deferred to maintenance work.
 Replacement, organization mutations, deletion, unpacking, and cache maintenance were pending at this checkpoint;
-the subsequent [command checkpoint](Native-Library-Commands.md) implements them. Native statistics integration remains pending.
+the subsequent [command checkpoint](Library-Commands.md) implements them. Native statistics integration remains pending.
 No native image painting, renderer-worker lifecycle, or macOS UI is qualified here.

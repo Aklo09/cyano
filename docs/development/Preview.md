@@ -96,9 +96,9 @@ just planner-check
 Renderer tests generate their own tiny assets and need no private artwork.
 They exercise successful subprocess rendering, pixel composition, bounds, crash/oversize rejection,
 timeout, memory-limit enforcement, cancellation, parent death, and exclusive publication.
-See [validation and image coverage](../validation/Native-Renderer.md) for measurements and remaining work.
+See [validation and image coverage](../validation/Renderer.md) for measurements and remaining work.
 
-This harness operates on standalone source files. The separate [library preview command](Native-Library-Previews.md)
+This harness operates on standalone source files. The separate [library preview command](Library-Previews.md)
 implements saved-item ownership and derived caching.
 Visible-item scheduling, the macOS UI, and full-corpus visual approval remain pending.
 Terrain/space backgrounds and coordinate overlays are not part of this painter checkpoint.

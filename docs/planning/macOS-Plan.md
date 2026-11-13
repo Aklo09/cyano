@@ -1,7 +1,7 @@
 # Native macOS port: roadmap and first milestone
 
 Date: 2026-11-13. Status: approved by the owner; milestone 1 is accepted.
-Based on the [initial assessment](Native-macOS-Assessment.md), with the scope decisions recorded below.
+Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
 
@@ -13,15 +13,15 @@ Based on the [initial assessment](Native-macOS-Assessment.md), with the scope de
 - [x] Complete library commands: organization, replacement, deletion, unpacking, cache maintenance, usage, and offline asset verification.
 - [x] Standalone real-image renderer feasibility, bounded native workers, process deadlines, and independent PNG decoding.
 - [x] Library-bound helper lease retention, close/cancellation, and owned derived-cache publication/reuse.
-- [x] Owner visual approval and complete milestone 1 acceptance ([acceptance record](../validation/Native-Milestone-1.md)).
+- [x] Owner visual approval and complete milestone 1 acceptance ([acceptance record](../validation/Milestone-1.md)).
 
-See [foundation validation](../validation/Native-Foundation.md) for evidence and limitations.
-The [codec validation](../validation/Native-Codec.md) records the next completed checkpoint.
-The [storage validation](../validation/Native-Storage.md) records native ownership and publication evidence.
-The [command validation](../validation/Native-Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
+See [foundation validation](../validation/Foundation.md) for evidence and limitations.
+The [codec validation](../validation/Codec.md) records the next completed checkpoint.
+The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
+The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
 Native statistics and application rendering scheduling remain pending; milestone 2 is not complete.
-The [renderer validation](../validation/Native-Renderer.md) records the standalone painter/worker checkpoint.
-The [library preview validation](../validation/Native-Library-Previews.md) records the subsequent ownership/cache integration.
+The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
+The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
 
 ## Summary

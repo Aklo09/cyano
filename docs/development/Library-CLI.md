@@ -111,7 +111,7 @@ Use ordinary `import` to preserve a whole book exactly.
 `preview <library> <item-id> --assets <release>` renders under ownership and reuses validated images.
 Use `--entry` for selected book leaves and `--refresh` for explicit regeneration.
 Results include a library-relative cache path rather than raw image bytes.
-See the [library preview guide](Native-Library-Previews.md) for the complete workflow and lifetime rules.
+See the [library preview guide](Library-Previews.md) for the complete workflow and lifetime rules.
 
 ## Maintenance
 
@@ -181,7 +181,7 @@ just library staging-cleanup "$library"
 just library staging-cleanup "$library" --apply
 ```
 
-See the [storage contract](../contracts/Native-Storage.md) before investigating interrupted operations.
+See the [storage contract](../contracts/Storage.md) before investigating interrupted operations.
 
 ## Structured results
 
@@ -218,5 +218,5 @@ just storage-test
 ```
 
 The test driver is package test support, with no failure-injection flags in the ordinary CLI.
-See [storage validation](../validation/Native-Storage.md) for completed checks and limitations.
-The [complete-command validation](../validation/Native-Library-Commands.md) covers organization, maintenance, and asset verification.
+See [storage validation](../validation/Storage.md) for completed checks and limitations.
+The [complete-command validation](../validation/Library-Commands.md) covers organization, maintenance, and asset verification.

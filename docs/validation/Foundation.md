@@ -2,8 +2,8 @@
 
 The native scaffold builds without access to the original web project.
 This evidence covers the first foundation checkpoint, not complete milestone 1 acceptance.
-The subsequent [codec checkpoint](Native-Codec.md) adds native admission and selected-entry export.
-The [storage checkpoint](Native-Storage.md) adds persistent libraries, CLI commands, and interrupted-operation recovery.
+The subsequent [codec checkpoint](Codec.md) adds native admission and selected-entry export.
+The [storage checkpoint](Storage.md) adds persistent libraries, CLI commands, and interrupted-operation recovery.
 
 Recorded: 2026-11-13.
 
@@ -63,7 +63,7 @@ python3 tools/check-independence.py --deny-path ../fb
 ```
 
 At this checkpoint, the relocated build passed all five tests and ran both native executables.
-The [codec checkpoint](Native-Codec.md) extends this isolation check to all 21 native tests.
+The [codec checkpoint](Codec.md) extends this isolation check to all 21 native tests.
 The script removes only its own temporary checkout afterward.
 This check uses macOS `sandbox-exec` as a development qualification tool.
 It does not define the finished application's sandbox or distribution design.

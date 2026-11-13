@@ -1,9 +1,9 @@
 # Milestone 1 acceptance
 
 Milestone 1 (foundation and feasibility) is accepted.
-Every criterion in the [native plan](../planning/Native-macOS-Plan.md#acceptance-and-validation) was re-verified on commit `8daa40e`,
+Every criterion in the [native plan](../planning/macOS-Plan.md#acceptance-and-validation) was re-verified on commit `8daa40e`,
 after the swift-format reformat (`a337ee1`), and the owner approved the representative images.
-Recorded: 2026-11-13 in the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 
 ## Final checks on `8daa40e`
 
@@ -25,16 +25,16 @@ The isolation command is `python3 tools/check-independence.py --deny-path /Users
 
 | Criterion | Evidence |
 | --- | --- |
-| Empty directory initializes; unknown nonempty directories stay unchanged | [Storage validation](Native-Storage.md); `just test` |
-| CRLF and surrounding whitespace survive import → comment → close → reopen → export | [Codec](Native-Codec.md) and [storage](Native-Storage.md) validation; `just test` |
-| Sparse nested indices and unknown fields keep their meaning on selection and export | [Codec validation](Native-Codec.md); `just test` |
-| Competing processes and path aliases: one owner, refusal changes nothing | [Storage validation](Native-Storage.md); `just test` |
-| Termination at every import publication boundary is recoverable | [Storage validation](Native-Storage.md); `just test` |
-| Conflicting recovery bytes stop recovery without overwriting evidence | [Storage validation](Native-Storage.md); `just test` |
-| Source operations succeed without assets | [Renderer validation](Native-Renderer.md); `just test` |
+| Empty directory initializes; unknown nonempty directories stay unchanged | [Storage validation](Storage.md); `just test` |
+| CRLF and surrounding whitespace survive import → comment → close → reopen → export | [Codec](Codec.md) and [storage](Storage.md) validation; `just test` |
+| Sparse nested indices and unknown fields keep their meaning on selection and export | [Codec validation](Codec.md); `just test` |
+| Competing processes and path aliases: one owner, refusal changes nothing | [Storage validation](Storage.md); `just test` |
+| Termination at every import publication boundary is recoverable | [Storage validation](Storage.md); `just test` |
+| Conflicting recovery bytes stop recovery without overwriting evidence | [Storage validation](Storage.md); `just test` |
+| Source operations succeed without assets | [Renderer validation](Renderer.md); `just test` |
 | RS, rails/wires, both planners, and the 6,814-entity leaf render decodable PNGs within the deadline | Representative renders below |
 | Representative images reviewed for layering, connections, transparency, and clipping | Owner approval below |
-| Timeout, cancellation, worker crash, and parent termination leave no writer outside ownership | [Renderer](Native-Renderer.md) and [library preview](Native-Library-Previews.md) validation; `just test` |
+| Timeout, cancellation, worker crash, and parent termination leave no writer outside ownership | [Renderer](Renderer.md) and [library preview](Library-Previews.md) validation; `just test` |
 | Builds use only this repository; prepared executables run offline without Node | Relocated isolation above |
 
 ## Representative renders

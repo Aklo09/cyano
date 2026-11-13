@@ -1,9 +1,9 @@
 # Bounded native codec validation
 
 Native decoding preserves exact originals and supports lossless selected-entry exports.
-This checkpoint completed codec admission before the separately recorded [storage checkpoint](Native-Storage.md).
+This checkpoint completed codec admission before the separately recorded [storage checkpoint](Storage.md).
 
-Recorded: 2026-11-13, using the [foundation environment](Native-Foundation.md#environment).
+Recorded: 2026-11-13, using the [foundation environment](Foundation.md#environment).
 The foundation was committed separately as `f0389ab` before codec implementation began.
 
 ## Completed checks
@@ -53,5 +53,5 @@ The codec uses Apple's SDK-provided zlib module.
 ## Remaining work
 
 Metadata, bounded reads, ownership, comments, CLI commands, and journaled publication were subsequently implemented.
-See [storage validation](Native-Storage.md) for their evidence and remaining qualification.
+See [storage validation](Storage.md) for their evidence and remaining qualification.
 No native image painting or power-loss durability is established by these codec tests.

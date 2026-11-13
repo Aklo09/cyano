@@ -1,8 +1,8 @@
 # Core revisions after milestone 1
 
 Date: 2026-11-13. Status: approved by the owner; implemented.
-These decisions come from the review of the accepted milestone 1 work ([acceptance record](../validation/Native-Milestone-1.md)).
-They change the [storage](../contracts/Native-Storage.md) and [preview cache](../contracts/Native-Preview-Cache.md) contracts
+These decisions come from the review of the accepted milestone 1 work ([acceptance record](../validation/Milestone-1.md)).
+They change the [storage](../contracts/Storage.md) and [preview cache](../contracts/Preview-Cache.md) contracts
 and precede milestone 2, because milestones 3–5 build on the affected interfaces.
 
 ## Measurements that motivated the review
