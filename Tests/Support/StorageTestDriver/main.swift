@@ -14,7 +14,8 @@ do {
         _ = FileHandle.standardInput.readDataToEndOfFile()
     case "probe":
         print(try NativeLibrary.inspectOwnership(at: url).rawValue)
-    case "initialize-crash", "import-crash", "comment-crash", "rename-crash", "move-crash", "delete-crash", "update-crash", "comment-delete-crash", "folder-move-crash", "folder-delete-crash", "unpack-crash":
+    case "initialize-crash", "import-crash", "comment-crash", "rename-crash", "move-crash", "delete-crash",
+        "update-crash", "comment-delete-crash", "folder-move-crash", "folder-delete-crash", "unpack-crash":
         guard let phase = LibraryWritePhase(rawValue: args.last!) else { exit(2) }
         let library = try NativeLibrary.testingOpen(at: url, initializing: args[0] == "initialize-crash") { current in
             if current == phase { kill(getpid(), SIGKILL) }
@@ -22,7 +23,8 @@ do {
         defer { library.close() }
         if args[0] == "import-crash" {
             guard args.count == 4 else { exit(2) }
-            _ = try library.importSource(NativeLibrary.readSourceFile(at: URL(fileURLWithPath: args[2])), name: "Interrupted")
+            _ = try library.importSource(
+                NativeLibrary.readSourceFile(at: URL(fileURLWithPath: args[2])), name: "Interrupted")
         } else if args[0] == "comment-crash" {
             guard args.count == 4 else { exit(2) }
             _ = try library.addComment(id: args[2], text: "Interrupted comment")
@@ -33,7 +35,8 @@ do {
         } else if args[0] == "delete-crash" {
             try library.deleteItem(id: args[2])
         } else if args[0] == "update-crash" {
-            _ = try library.updateSource(id: args[2], bytes: NativeLibrary.readSourceFile(at: URL(fileURLWithPath: args[3])))
+            _ = try library.updateSource(
+                id: args[2], bytes: NativeLibrary.readSourceFile(at: URL(fileURLWithPath: args[3])))
         } else if args[0] == "comment-delete-crash" {
             _ = try library.deleteComment(id: args[2], commentId: args[3])
         } else if args[0] == "folder-move-crash" {

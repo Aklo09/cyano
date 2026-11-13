@@ -42,7 +42,8 @@ enum ZlibCodec {
 
     static func compress(_ input: Data, maximum: Int) throws -> Data {
         var stream = z_stream()
-        guard deflateInit_(&stream, Z_DEFAULT_COMPRESSION, ZLIB_VERSION, Int32(MemoryLayout<z_stream>.size)) == Z_OK else {
+        guard deflateInit_(&stream, Z_DEFAULT_COMPRESSION, ZLIB_VERSION, Int32(MemoryLayout<z_stream>.size)) == Z_OK
+        else {
             throw BlueprintCodecError.compressionFailure
         }
         defer { deflateEnd(&stream) }

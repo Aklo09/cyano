@@ -18,15 +18,19 @@ public struct BlueprintEntry: Sendable {
 
     public var description: String {
         if kind == .upgradePlanner || kind == .deconstructionPlanner,
-           let text = body["settings"]?["description"]?.string { return text }
+            let text = body["settings"]?["description"]?.string
+        {
+            return text
+        }
         return body["description"]?.string ?? ""
     }
 
     init(value: JSONValue, path: [Int]) throws {
         let kinds = BlueprintEntryKind.allCases.filter { value[$0.rawValue] != nil }
         guard value.isObject, kinds.count == 1,
-              let kind = kinds.first, let body = value[kind.rawValue], body.isObject,
-              let version = body["version"]?.safeInteger else {
+            let kind = kinds.first, let body = value[kind.rawValue], body.isObject,
+            let version = body["version"]?.safeInteger
+        else {
             throw BlueprintCodecError.invalidSource("Expected one versioned blueprint, book, or planner object.")
         }
         self.value = value
@@ -50,13 +54,15 @@ public struct BlueprintDocument: Sendable {
 
     public func entry(at path: [Int]) throws -> BlueprintEntry {
         guard path.count <= limits.bookDepth,
-              path.allSatisfy({ $0 >= 0 && $0 <= 9_007_199_254_740_991 }) else {
+            path.allSatisfy({ $0 >= 0 && $0 <= 9_007_199_254_740_991 })
+        else {
             throw BlueprintCodecError.invalidEntryPath
         }
         var current = root
         for (offset, index) in path.enumerated() {
             guard current.kind == .book,
-                  let child = current.body["blueprints"]?.array?.first(where: { $0["index"]?.safeInteger == index }) else {
+                let child = current.body["blueprints"]?.array?.first(where: { $0["index"]?.safeInteger == index })
+            else {
                 throw BlueprintCodecError.invalidEntryPath
             }
             current = try BlueprintEntry(value: child, path: Array(path.prefix(offset + 1)))
@@ -96,7 +102,8 @@ public enum BlueprintCodec {
         }
         let payload = String(encoded.dropFirst())
         guard !payload.isEmpty, payload.utf8.count.isMultiple(of: 4),
-              let compressed = Data(base64Encoded: payload), compressed.base64EncodedString() == payload else {
+            let compressed = Data(base64Encoded: payload), compressed.base64EncodedString() == payload
+        else {
             throw BlueprintCodecError.invalidSource("Blueprint base64 must be valid and canonical.")
         }
         let json = try ZlibCodec.decompress(compressed, maximum: limits.decodedBytes)
@@ -129,7 +136,8 @@ public enum BlueprintCodec {
                     var indices = Set<Int>()
                     for child in children {
                         guard let index = child["index"]?.safeInteger, indices.insert(index).inserted else {
-                            throw BlueprintCodecError.invalidSource("Book entry indices must be unique nonnegative safe integers.")
+                            throw BlueprintCodecError.invalidSource(
+                                "Book entry indices must be unique nonnegative safe integers.")
                         }
                         pending.append((try BlueprintEntry(value: child, path: []), depth + 1))
                     }
@@ -146,9 +154,11 @@ public enum BlueprintCodec {
                     }
                     for row in rows {
                         guard row.isObject, row["name"]?.string != nil,
-                              let position = row["position"], position.isObject,
-                              position["x"]?.isFiniteNumber == true, position["y"]?.isFiniteNumber == true else {
-                            throw BlueprintCodecError.invalidSource("Entity and tile names and finite positions are required.")
+                            let position = row["position"], position.isObject,
+                            position["x"]?.isFiniteNumber == true, position["y"]?.isFiniteNumber == true
+                        else {
+                            throw BlueprintCodecError.invalidSource(
+                                "Entity and tile names and finite positions are required.")
                         }
                     }
                 }

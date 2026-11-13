@@ -67,7 +67,8 @@ public final class LibraryPreviewService: @unchecked Sendable {
         try LibraryDirectory.validateURL(assetsURL)
         let verified = try AssetRelease.verify(at: assetsURL)
         try token.check()
-        return try library.withPreviewContext(id: id, entryPath: entryPath, onCancel: { token.cancel() }) { context in
+        let cancel: @Sendable () -> Void = { token.cancel() }
+        return try library.withPreviewContext(id: id, entryPath: entryPath, onCancel: cancel) { context in
             try token.check()
             try context.checkAssets(assetsURL)
             let identity = LibraryCacheIdentity(

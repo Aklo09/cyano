@@ -77,7 +77,8 @@ enum LibraryRecords {
 
     static func validUUID(_ value: String) -> Bool {
         guard value.utf8.count == 36,
-              value.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) || $0 == 45 }) else { return false }
+            value.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) || $0 == 45 })
+        else { return false }
         return UUID(uuidString: value)?.uuidString.lowercased() == value
     }
 
@@ -123,7 +124,9 @@ enum LibraryRecords {
 
     static func fields(_ value: JSONValue, required: Set<String>, optional: Set<String> = []) throws {
         guard case .object(let members) = value else { throw NativeLibraryError.invalidMetadata }
-        guard members.allSatisfy({ $0.key.utf8.allSatisfy({ $0 < 128 }) }) else { throw NativeLibraryError.invalidMetadata }
+        guard members.allSatisfy({ $0.key.utf8.allSatisfy({ $0 < 128 }) }) else {
+            throw NativeLibraryError.invalidMetadata
+        }
         let keys = Set(members.map(\.key))
         guard required.isSubset(of: keys), keys.isSubset(of: required.union(optional)) else {
             throw NativeLibraryError.invalidMetadata
@@ -136,13 +139,16 @@ enum LibraryRecords {
         guard value["format"]?.string == "fb-native-library" else { throw NativeLibraryError.invalidFormat }
         guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
         guard let record = try? JSONDecoder().decode(LibraryFormat.self, from: data),
-              validUUID(record.id), validDate(record.createdAt) else { throw NativeLibraryError.invalidFormat }
+            validUUID(record.id), validDate(record.createdAt)
+        else { throw NativeLibraryError.invalidFormat }
         return record
     }
 
     static func metadata(_ data: Data) throws -> LibraryItemMetadata {
         let value = try parse(data, maximum: LibraryBounds.metadata)
-        try fields(value, required: ["schemaVersion", "id", "createdAt", "updatedAt", "sourceSha256", "comments"], optional: ["displayNameOverride"])
+        try fields(
+            value, required: ["schemaVersion", "id", "createdAt", "updatedAt", "sourceSha256", "comments"],
+            optional: ["displayNameOverride"])
         guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
         guard let comments = value["comments"]?.array, comments.count <= LibraryBounds.comments else {
             throw NativeLibraryError.invalidMetadata
@@ -151,17 +157,20 @@ enum LibraryRecords {
         for comment in comments {
             try fields(comment, required: ["id", "entryPath", "text", "createdAt"])
             guard let path = comment["entryPath"]?.array, path.count <= LibraryBounds.folderDepth,
-                  path.allSatisfy({ $0.safeInteger != nil }) else { throw NativeLibraryError.invalidMetadata }
+                path.allSatisfy({ $0.safeInteger != nil })
+            else { throw NativeLibraryError.invalidMetadata }
         }
         guard let record = try? JSONDecoder().decode(LibraryItemMetadata.self, from: data),
-              validUUID(record.id), validHash(record.sourceSha256),
-              validDate(record.createdAt), validDate(record.updatedAt), record.updatedAt >= record.createdAt,
-              record.comments.allSatisfy({ validUUID($0.id) }),
-              Set(record.comments.map(\.id)).count == record.comments.count else { throw NativeLibraryError.invalidMetadata }
+            validUUID(record.id), validHash(record.sourceSha256),
+            validDate(record.createdAt), validDate(record.updatedAt), record.updatedAt >= record.createdAt,
+            record.comments.allSatisfy({ validUUID($0.id) }),
+            Set(record.comments.map(\.id)).count == record.comments.count
+        else { throw NativeLibraryError.invalidMetadata }
         for comment in record.comments {
             guard validUUID(comment.id), validDate(comment.createdAt),
-                  !comment.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-                  comment.text.utf8.count <= LibraryBounds.comment else { throw NativeLibraryError.invalidMetadata }
+                !comment.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                comment.text.utf8.count <= LibraryBounds.comment
+            else { throw NativeLibraryError.invalidMetadata }
         }
         return record
     }
@@ -171,21 +180,28 @@ enum LibraryRecords {
         try fields(value, required: ["schemaVersion", "comment", "createdAt"])
         guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
         guard let record = try? JSONDecoder().decode(LibraryFolderMetadata.self, from: data),
-              !record.comment.isEmpty, record.comment.utf8.count <= LibraryBounds.comment,
-              validDate(record.createdAt) else { throw NativeLibraryError.invalidMetadata }
+            !record.comment.isEmpty, record.comment.utf8.count <= LibraryBounds.comment,
+            validDate(record.createdAt)
+        else { throw NativeLibraryError.invalidMetadata }
         return record
     }
 
     static func intent(_ data: Data, operationId: String) throws -> LibraryIntent {
         let value = try parse(data, maximum: LibraryBounds.journal)
-        try fields(value, required: ["schemaVersion", "operationId", "kind", "folder", "basename", "itemId", "sourceSha256", "metadataSha256"], optional: ["beforeMetadataSha256"])
+        try fields(
+            value,
+            required: [
+                "schemaVersion", "operationId", "kind", "folder", "basename", "itemId", "sourceSha256",
+                "metadataSha256",
+            ], optional: ["beforeMetadataSha256"])
         guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
         guard let record = try? JSONDecoder().decode(LibraryIntent.self, from: data),
-              record.operationId == operationId, validUUID(operationId), validUUID(record.itemId),
-              validHash(record.sourceSha256), validHash(record.metadataSha256),
-              ["import", "comment"].contains(record.kind),
-              (record.kind == "import" && value["beforeMetadataSha256"] == nil) ||
-              (record.kind == "comment" && record.beforeMetadataSha256.map(validHash) == true) else {
+            record.operationId == operationId, validUUID(operationId), validUUID(record.itemId),
+            validHash(record.sourceSha256), validHash(record.metadataSha256),
+            ["import", "comment"].contains(record.kind),
+            (record.kind == "import" && value["beforeMetadataSha256"] == nil)
+                || (record.kind == "comment" && record.beforeMetadataSha256.map(validHash) == true)
+        else {
             throw NativeLibraryError.recoveryRequired
         }
         try LibraryNames.validateBasename(record.basename)
@@ -203,8 +219,9 @@ enum LibraryNames {
         let forbidden = CharacterSet.controlCharacters.union(CharacterSet(charactersIn: "<>:\"/\\|?*"))
         let reserved = ["con", "prn", "aux", "nul", "clock$"] + (1...9).flatMap { ["com\($0)", "lpt\($0)"] }
         guard !value.isEmpty, value.utf8.count <= 220, !value.hasPrefix("."), !value.hasSuffix("."),
-              !value.hasSuffix(" "), value.unicodeScalars.allSatisfy({ !forbidden.contains($0) }),
-              !reserved.contains(key(String(value.split(separator: ".").first ?? ""))) else {
+            !value.hasSuffix(" "), value.unicodeScalars.allSatisfy({ !forbidden.contains($0) }),
+            !reserved.contains(key(String(value.split(separator: ".").first ?? "")))
+        else {
             throw NativeLibraryError.invalidInput
         }
     }
@@ -230,7 +247,8 @@ enum LibraryNames {
         let prefix = String(decoding: (label ?? fallback).utf8.prefix(4096), as: UTF8.self)
         let stripped = prefix.replacingOccurrences(of: "\\[[^\\]]*\\]", with: "", options: .regularExpression)
         let forbidden = CharacterSet.controlCharacters.union(CharacterSet(charactersIn: "<>:\"/\\|?*"))
-        var clean = String(String.UnicodeScalarView(stripped.unicodeScalars.map { forbidden.contains($0) ? UnicodeScalar(32)! : $0 }))
+        var clean = String(
+            String.UnicodeScalarView(stripped.unicodeScalars.map { forbidden.contains($0) ? UnicodeScalar(32)! : $0 }))
         clean = clean.precomposedStringWithCanonicalMapping.trimmingCharacters(in: .whitespacesAndNewlines)
         while clean.hasPrefix(".") { clean.removeFirst() }
         while clean.hasSuffix(".") || clean.hasSuffix(" ") { clean.removeLast() }

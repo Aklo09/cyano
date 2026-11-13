@@ -33,9 +33,15 @@ package struct BoundedJSONParser {
         case 123: return try parseObject(depth: depth)
         case 91: return try parseArray(depth: depth)
         case 34: return .string(try parseString())
-        case 116: try consume("true"); return .bool(true)
-        case 102: try consume("false"); return .bool(false)
-        case 110: try consume("null"); return .null
+        case 116:
+            try consume("true")
+            return .bool(true)
+        case 102:
+            try consume("false")
+            return .bool(false)
+        case 110:
+            try consume("null")
+            return .null
         case 45, 48...57: return .number(try parseNumber())
         default: throw invalidJSON()
         }

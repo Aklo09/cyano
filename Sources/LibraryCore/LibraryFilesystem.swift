@@ -1,7 +1,7 @@
-import Darwin
-import Foundation
 import CLibraryPlatform
 import CryptoKit
+import Darwin
+import Foundation
 
 /// Descriptor-relative access keeps managed descendants from escaping through symlinks.
 package final class LibraryDirectory {
@@ -19,10 +19,16 @@ package final class LibraryDirectory {
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
         var info = stat()
         guard fstat(descriptor, &info) == 0 else {
-            let error = errno; Darwin.close(descriptor); throw NativeLibraryError.io(error)
+            let error = errno
+            Darwin.close(descriptor)
+            throw NativeLibraryError.io(error)
         }
-        fd = descriptor; device = info.st_dev; inode = info.st_ino
-        self.url = canonical; parent = nil; name = nil
+        fd = descriptor
+        device = info.st_dev
+        inode = info.st_ino
+        self.url = canonical
+        parent = nil
+        name = nil
     }
 
     private init(parent: LibraryDirectory, name: String) throws {
@@ -31,17 +37,23 @@ package final class LibraryDirectory {
         guard descriptor >= 0 else { throw NativeLibraryError.unsafePath }
         var info = stat()
         guard fstat(descriptor, &info) == 0, info.st_dev == parent.device else {
-            Darwin.close(descriptor); throw NativeLibraryError.unsafePath
+            Darwin.close(descriptor)
+            throw NativeLibraryError.unsafePath
         }
-        fd = descriptor; device = info.st_dev; inode = info.st_ino
-        self.parent = parent; self.name = name; url = parent.url.appendingPathComponent(name)
+        fd = descriptor
+        device = info.st_dev
+        inode = info.st_ino
+        self.parent = parent
+        self.name = name
+        url = parent.url.appendingPathComponent(name)
     }
 
     deinit { Darwin.close(fd) }
 
     package static func validateURL(_ url: URL) throws {
         guard url.isFileURL, !url.path(percentEncoded: false).contains("\0"),
-              url.host == nil || url.host == "" || url.host == "localhost" else {
+            url.host == nil || url.host == "" || url.host == "localhost"
+        else {
             throw NativeLibraryError.unsafePath
         }
     }
@@ -57,7 +69,8 @@ package final class LibraryDirectory {
             guard lstat(url.path, &info) == 0 else { throw NativeLibraryError.unsafePath }
         }
         guard info.st_dev == device, info.st_ino == inode,
-              info.st_mode & S_IFMT == S_IFDIR else { throw NativeLibraryError.unsafePath }
+            info.st_mode & S_IFMT == S_IFDIR
+        else { throw NativeLibraryError.unsafePath }
     }
 
     package func qualify() throws {
@@ -90,7 +103,8 @@ package final class LibraryDirectory {
     }
 
     package func info(_ name: String) throws -> stat? {
-        try component(name); try check()
+        try component(name)
+        try check()
         var value = stat()
         if fstatat(fd, name, &value, AT_SYMLINK_NOFOLLOW) != 0 {
             if errno == ENOENT { return nil }
@@ -104,7 +118,9 @@ package final class LibraryDirectory {
         let descriptor = openat(fd, ".", O_RDONLY | O_DIRECTORY | O_CLOEXEC)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
         guard let directory = fdopendir(descriptor) else {
-            let error = errno; Darwin.close(descriptor); throw NativeLibraryError.io(error)
+            let error = errno
+            Darwin.close(descriptor)
+            throw NativeLibraryError.io(error)
         }
         defer { closedir(directory) }
         var names: [String] = []
@@ -127,7 +143,8 @@ package final class LibraryDirectory {
     }
 
     package func read(_ name: String, maximum: Int) throws -> Data {
-        try component(name); try check()
+        try component(name)
+        try check()
         let descriptor = openat(fd, name, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
         defer { Darwin.close(descriptor) }
@@ -150,17 +167,19 @@ package final class LibraryDirectory {
         var after = stat()
         guard fstat(descriptor, &after) == 0 else { throw NativeLibraryError.io(errno) }
         guard before.st_size == after.st_size, data.count == before.st_size,
-              before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
-              before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
-              before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
-              before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec else {
+            before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
+            before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+            before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
+            before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec
+        else {
             throw NativeLibraryError.integrity
         }
         return data
     }
 
     package func fingerprint(_ name: String, maximum: Int) throws -> (sha256: String, bytes: Int) {
-        try component(name); try check()
+        try component(name)
+        try check()
         let descriptor = openat(fd, name, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
         defer { Darwin.close(descriptor) }
@@ -173,22 +192,28 @@ package final class LibraryDirectory {
         var total = 0
         while true {
             let count = buffer.withUnsafeMutableBytes { Darwin.read(descriptor, $0.baseAddress, $0.count) }
-            if count < 0 { if errno == EINTR { continue }; throw NativeLibraryError.io(errno) }
+            if count < 0 {
+                if errno == EINTR { continue }
+                throw NativeLibraryError.io(errno)
+            }
             if count == 0 { break }
             guard count <= maximum - total else { throw NativeLibraryError.limitExceeded }
-            hasher.update(data: buffer.prefix(count)); total += count
+            hasher.update(data: buffer.prefix(count))
+            total += count
         }
         var after = stat()
         guard fstat(descriptor, &after) == 0, before.st_size == after.st_size, total == before.st_size,
-              before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
-              before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
-              before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
-              before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec else { throw NativeLibraryError.integrity }
+            before.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
+            before.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+            before.st_ctimespec.tv_sec == after.st_ctimespec.tv_sec,
+            before.st_ctimespec.tv_nsec == after.st_ctimespec.tv_nsec
+        else { throw NativeLibraryError.integrity }
         return (hasher.finalize().map { String(format: "%02x", $0) }.joined(), total)
     }
 
     package func writeNew(_ name: String, data: Data) throws {
-        try component(name); try check()
+        try component(name)
+        try check()
         let descriptor = openat(fd, name, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
         defer { Darwin.close(descriptor) }
@@ -210,16 +235,22 @@ package final class LibraryDirectory {
         try sync()
     }
 
-    package func move(_ name: String, to directory: LibraryDirectory, as target: String, replacing: Bool = false) throws {
-        try component(name); try component(target); try check(); try directory.check()
+    package func move(_ name: String, to directory: LibraryDirectory, as target: String, replacing: Bool = false) throws
+    {
+        try component(name)
+        try component(target)
+        try check()
+        try directory.check()
         guard directory.device == device else { throw NativeLibraryError.unsafePath }
         let flags = replacing ? UInt32(0) : UInt32(RENAME_EXCL)
         guard renameatx_np(fd, name, directory.fd, target, flags) == 0 else { throw NativeLibraryError.io(errno) }
-        try directory.sync(); try sync()
+        try directory.sync()
+        try sync()
     }
 
     package func remove(_ name: String, directory: Bool = false) throws {
-        try component(name); try check()
+        try component(name)
+        try check()
         guard unlinkat(fd, name, directory ? AT_REMOVEDIR : 0) == 0 else { throw NativeLibraryError.io(errno) }
         try sync()
     }
@@ -230,7 +261,8 @@ package final class LibraryDirectory {
 
     private func component(_ name: String) throws {
         guard !name.isEmpty, name != ".", name != "..", !name.contains("/"), !name.contains("\0"),
-              name.utf8.count <= 255 else { throw NativeLibraryError.unsafePath }
+            name.utf8.count <= 255
+        else { throw NativeLibraryError.unsafePath }
     }
 }
 
@@ -246,22 +278,31 @@ final class LibraryLease {
         guard descriptor >= 0 else { throw NativeLibraryError.unsafePath }
         var info = stat()
         guard fstat(descriptor, &info) == 0, info.st_mode & S_IFMT == S_IFREG,
-              info.st_nlink == 1, info.st_size == 0, info.st_dev == directory.device else {
-            Darwin.close(descriptor); throw NativeLibraryError.unsafePath
+            info.st_nlink == 1, info.st_size == 0, info.st_dev == directory.device
+        else {
+            Darwin.close(descriptor)
+            throw NativeLibraryError.unsafePath
         }
         guard fb_library_flock(descriptor, LOCK_EX | LOCK_NB) == 0 else {
-            let error = errno; Darwin.close(descriptor)
+            let error = errno
+            Darwin.close(descriptor)
             if error == EWOULDBLOCK || error == EAGAIN { throw NativeLibraryError.inUse }
             throw NativeLibraryError.io(error)
         }
-        fd = descriptor; inode = info.st_ino
+        fd = descriptor
+        inode = info.st_ino
         do {
             try check()
             if create {
-                guard fsync(descriptor) == 0, fcntl(descriptor, F_FULLFSYNC) == 0 else { throw NativeLibraryError.io(errno) }
+                guard fsync(descriptor) == 0, fcntl(descriptor, F_FULLFSYNC) == 0 else {
+                    throw NativeLibraryError.io(errno)
+                }
                 try directory.sync()
             }
-        } catch { close(); throw error }
+        } catch {
+            close()
+            throw error
+        }
     }
 
     deinit { close() }
@@ -270,12 +311,16 @@ final class LibraryLease {
         guard fd >= 0 else { throw NativeLibraryError.closed }
         try directory.check()
         guard let info = try directory.info(".owner.lock"), info.st_ino == inode,
-              info.st_dev == directory.device, info.st_nlink == 1,
-              info.st_mode & S_IFMT == S_IFREG, info.st_size == 0 else { throw NativeLibraryError.unsafePath }
+            info.st_dev == directory.device, info.st_nlink == 1,
+            info.st_mode & S_IFMT == S_IFREG, info.st_size == 0
+        else { throw NativeLibraryError.unsafePath }
     }
 
     func close() {
-        if fd >= 0 { Darwin.close(fd); fd = -1 }
+        if fd >= 0 {
+            Darwin.close(fd)
+            fd = -1
+        }
     }
 
     func loan() throws -> LibraryOwnershipLoan {
@@ -291,5 +336,10 @@ package final class LibraryOwnershipLoan {
     package private(set) var descriptor: Int32
     init(descriptor: Int32) { self.descriptor = descriptor }
     deinit { close() }
-    func close() { if descriptor >= 0 { Darwin.close(descriptor); descriptor = -1 } }
+    func close() {
+        if descriptor >= 0 {
+            Darwin.close(descriptor)
+            descriptor = -1
+        }
+    }
 }

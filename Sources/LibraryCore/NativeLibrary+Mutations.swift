@@ -11,19 +11,23 @@ extension NativeLibrary {
         let existing = try parent.entries()
         for name in names {
             for actual in existing where LibraryNames.key(actual) == LibraryNames.key(name) {
-                guard allowing.contains(where: { $0.utf8.elementsEqual(actual.utf8) }) else { throw NativeLibraryError.nameCollision }
+                guard allowing.contains(where: { $0.utf8.elementsEqual(actual.utf8) }) else {
+                    throw NativeLibraryError.nameCollision
+                }
             }
         }
     }
 
     func named(_ name: String) throws {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              name.count <= 1024, name.utf8.count <= LibraryBounds.metadata else { throw NativeLibraryError.invalidInput }
+            name.count <= 1024, name.utf8.count <= LibraryBounds.metadata
+        else { throw NativeLibraryError.invalidInput }
     }
 
     public func createFolder(parent: String = "", name: String) throws -> String {
         try queue.sync {
-            try ready(); try LibraryNames.validateBasename(name)
+            try ready()
+            try LibraryNames.validateBasename(name)
             let path = MutationPath.join(parent, name)
             _ = try LibraryNames.folderComponents(path)
             try vacant(directory(at: parent), names: [name])
@@ -43,7 +47,8 @@ extension NativeLibrary {
             let destination = MutationPath.join(parent, newName)
             _ = try LibraryNames.folderComponents(destination)
             guard LibraryNames.key(parent) != LibraryNames.key(folder),
-                  !LibraryNames.key(parent).hasPrefix(LibraryNames.key(folder) + "/") else { throw NativeLibraryError.invalidInput }
+                !LibraryNames.key(parent).hasPrefix(LibraryNames.key(folder) + "/")
+            else { throw NativeLibraryError.invalidInput }
             if destination.utf8.elementsEqual(folder.utf8) { return folder }
             let oldParent = parts.dropLast().joined(separator: "/")
             try vacant(directory(at: parent), names: [newName], allowing: parent == oldParent ? [oldName] : [])
@@ -63,7 +68,8 @@ extension NativeLibrary {
             let selected = try directory(at: folder)
             for name in try selected.entries() {
                 switch name {
-                case ".folder.json": _ = try LibraryRecords.folderMetadata(selected.read(name, maximum: LibraryBounds.metadata))
+                case ".folder.json":
+                    _ = try LibraryRecords.folderMetadata(selected.read(name, maximum: LibraryBounds.metadata))
                 case ".DS_Store": _ = try selected.read(name, maximum: BlueprintCodecLimits.standard.sourceBytes)
                 default: throw NativeLibraryError.folderNotEmpty
                 }
@@ -76,34 +82,44 @@ extension NativeLibrary {
         try queue.sync {
             try ready()
             let (found, document, metadata) = try load(id: id)
-            return try relocate(found, document: document, originalMetadata: metadata, folder: folder,
-                                basename: found.basename, updatedMetadata: metadata)
+            return try relocate(
+                found, document: document, originalMetadata: metadata, folder: folder,
+                basename: found.basename, updatedMetadata: metadata)
         }
     }
 
     public func renameItem(id: String, name: String) throws -> LibraryItem {
         try queue.sync {
-            try ready(); try named(name)
+            try ready()
+            try named(name)
             let (found, document, before) = try load(id: id)
-            let metadata = LibraryItemMetadata(schemaVersion: 1, id: found.id, createdAt: found.metadata.createdAt,
-                updatedAt: max(LibraryRecords.now(), found.metadata.updatedAt), sourceSha256: found.metadata.sourceSha256,
+            let metadata = LibraryItemMetadata(
+                schemaVersion: 1, id: found.id, createdAt: found.metadata.createdAt,
+                updatedAt: max(LibraryRecords.now(), found.metadata.updatedAt),
+                sourceSha256: found.metadata.sourceSha256,
                 displayNameOverride: name, comments: found.metadata.comments)
             let after = try LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata)
-            return try relocate(found, document: document, originalMetadata: before, folder: found.folder,
-                                basename: LibraryNames.basename(label: name, kind: document.root.kind), updatedMetadata: after)
+            return try relocate(
+                found, document: document, originalMetadata: before, folder: found.folder,
+                basename: LibraryNames.basename(label: name, kind: document.root.kind), updatedMetadata: after)
         }
     }
 
-    func relocate(_ found: LibraryItem, document: BlueprintDocument, originalMetadata: Data,
-                  folder: String, basename: String, updatedMetadata: Data) throws -> LibraryItem {
+    func relocate(
+        _ found: LibraryItem, document: BlueprintDocument, originalMetadata: Data,
+        folder: String, basename: String, updatedMetadata: Data
+    ) throws -> LibraryItem {
         let destination = try directory(at: folder)
-        try vacant(destination, names: [basename + ".txt", basename + ".json"],
-                   allowing: folder == found.folder ? [found.basename + ".txt", found.basename + ".json"] : [])
+        try vacant(
+            destination, names: [basename + ".txt", basename + ".json"],
+            allowing: folder == found.folder ? [found.basename + ".txt", found.basename + ".json"] : [])
         let oldBase = MutationPath.join(found.folder, found.basename)
         let newBase = MutationPath.join(folder, basename)
         if oldBase.utf8.elementsEqual(newBase.utf8) {
             if originalMetadata != updatedMetadata {
-                try commitChanges([PreparedLibraryChange(path: oldBase + ".json", before: originalMetadata, after: updatedMetadata)])
+                try commitChanges([
+                    PreparedLibraryChange(path: oldBase + ".json", before: originalMetadata, after: updatedMetadata)
+                ])
             }
         } else {
             try commitChanges([
@@ -113,7 +129,9 @@ extension NativeLibrary {
                 PreparedLibraryChange(path: newBase + ".json", before: nil, after: updatedMetadata),
             ])
         }
-        return item(metadata: try LibraryRecords.metadata(updatedMetadata), document: document, folder: folder, basename: basename)
+        return item(
+            metadata: try LibraryRecords.metadata(updatedMetadata), document: document, folder: folder,
+            basename: basename)
     }
 
     public func deleteItem(id: String) throws {
@@ -121,10 +139,11 @@ extension NativeLibrary {
             try ready()
             let (found, document, metadata) = try load(id: id)
             let base = MutationPath.join(found.folder, found.basename)
-            try commitChanges([
-                PreparedLibraryChange(path: base + ".txt", before: document.original.bytes, after: nil),
-                PreparedLibraryChange(path: base + ".json", before: metadata, after: nil),
-            ], cacheIds: [id])
+            try commitChanges(
+                [
+                    PreparedLibraryChange(path: base + ".txt", before: document.original.bytes, after: nil),
+                    PreparedLibraryChange(path: base + ".json", before: metadata, after: nil),
+                ], cacheIds: [id])
         }
     }
 
@@ -135,19 +154,23 @@ extension NativeLibrary {
             let (found, oldDocument, before) = try load(id: id)
             let comments = try found.metadata.comments.map { comment -> LibraryComment in
                 if (try? document.entry(at: comment.entryPath)) != nil { return comment }
-                let text = "[Former book entry \(comment.entryPath.map(String.init).joined(separator: "."))]\n\n" + comment.text
+                let text =
+                    "[Former book entry \(comment.entryPath.map(String.init).joined(separator: "."))]\n\n"
+                    + comment.text
                 guard text.utf8.count <= LibraryBounds.comment else { throw NativeLibraryError.limitExceeded }
                 return LibraryComment(id: comment.id, entryPath: [], text: text, createdAt: comment.createdAt)
             }
-            let metadata = LibraryItemMetadata(schemaVersion: 1, id: found.id, createdAt: found.metadata.createdAt,
+            let metadata = LibraryItemMetadata(
+                schemaVersion: 1, id: found.id, createdAt: found.metadata.createdAt,
                 updatedAt: max(LibraryRecords.now(), found.metadata.updatedAt), sourceSha256: document.original.sha256,
                 displayNameOverride: found.metadata.displayNameOverride, comments: comments)
             let after = try LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata)
             let base = MutationPath.join(found.folder, found.basename)
-            try commitChanges([
-                PreparedLibraryChange(path: base + ".txt", before: oldDocument.original.bytes, after: bytes),
-                PreparedLibraryChange(path: base + ".json", before: before, after: after),
-            ], cacheIds: [id])
+            try commitChanges(
+                [
+                    PreparedLibraryChange(path: base + ".txt", before: oldDocument.original.bytes, after: bytes),
+                    PreparedLibraryChange(path: base + ".json", before: before, after: after),
+                ], cacheIds: [id])
             return item(metadata: metadata, document: document, folder: found.folder, basename: found.basename)
         }
     }
@@ -157,25 +180,33 @@ extension NativeLibrary {
             try ready()
             guard LibraryRecords.validUUID(commentId) else { throw NativeLibraryError.invalidInput }
             let (found, document, before) = try load(id: id)
-            guard found.metadata.comments.contains(where: { $0.id == commentId }) else { throw NativeLibraryError.notFound }
+            guard found.metadata.comments.contains(where: { $0.id == commentId }) else {
+                throw NativeLibraryError.notFound
+            }
             var metadata = found.metadata
             metadata.comments.removeAll { $0.id == commentId }
             metadata.updatedAt = max(LibraryRecords.now(), metadata.updatedAt)
-            try commitChanges([PreparedLibraryChange(path: MutationPath.join(found.folder, found.basename + ".json"), before: before,
-                after: LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata))])
+            try commitChanges([
+                PreparedLibraryChange(
+                    path: MutationPath.join(found.folder, found.basename + ".json"), before: before,
+                    after: LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata))
+            ])
             return item(metadata: metadata, document: document, folder: found.folder, basename: found.basename)
         }
     }
 
     public func export(id: String, entryPath: [Int] = [], to url: URL) throws -> Int {
         try queue.sync {
-            try ready(); try LibraryDirectory.validateURL(url)
+            try ready()
+            try LibraryDirectory.validateURL(url)
             let (_, document, _) = try load(id: id)
             let bytes = try document.export(at: entryPath)
             let parent = try LibraryDirectory(url: url.deletingLastPathComponent())
             // Export must not bypass authoritative storage or the asset/cache boundaries.
             let managed = root.url.path
-            guard parent.url.path != managed, !parent.url.path.hasPrefix(managed + "/") else { throw NativeLibraryError.unsafePath }
+            guard parent.url.path != managed, !parent.url.path.hasPrefix(managed + "/") else {
+                throw NativeLibraryError.unsafePath
+            }
             try parent.writeNew(url.lastPathComponent, data: bytes)
             return bytes.count
         }
@@ -189,15 +220,19 @@ extension NativeLibrary {
             let parent = try directory(at: folder)
             let base = LibraryNames.basename(label: document.root.label, kind: .book)
             let existing = Set(try parent.entries().map(LibraryNames.key))
-            var name = base, suffix = 2
+            var name = base
+            var suffix = 2
             while existing.contains(LibraryNames.key(name)) {
                 guard suffix <= LibraryBounds.directoryEntries else { throw NativeLibraryError.limitExceeded }
-                name = "\(base) (\(suffix))"; suffix += 1
+                name = "\(base) (\(suffix))"
+                suffix += 1
             }
             let destination = MutationPath.join(folder, name)
             _ = try LibraryNames.folderComponents(destination)
-            var directories: [String] = [], files: [String: Data] = [:]
-            var items = 0, total = 0
+            var directories: [String] = []
+            var files: [String: Data] = [:]
+            var items = 0
+            var total = 0
             let now = LibraryRecords.now()
             func put(_ data: Data, at path: String) throws {
                 total += data.count
@@ -230,16 +265,20 @@ extension NativeLibrary {
                     } else {
                         _ = try MutationPath.parts(MutationPath.join(destination, relative + ".txt"), file: true)
                         let source = try document.standaloneSource(for: child)
-                        let metadata = LibraryItemMetadata(schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: now,
-                            updatedAt: now, sourceSha256: OriginalSource(bytes: source).sha256, displayNameOverride: nil, comments: [])
+                        let metadata = LibraryItemMetadata(
+                            schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: now,
+                            updatedAt: now, sourceSha256: OriginalSource(bytes: source).sha256,
+                            displayNameOverride: nil, comments: [])
                         try put(source, at: relative + ".txt")
-                        try put(LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata), at: relative + ".json")
+                        try put(
+                            LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata), at: relative + ".json")
                         items += 1
                     }
                 }
             }
             try book(document.root, path: "")
-            try commitTree(kind: "tree-create", source: nil, destination: destination, directories: directories, files: files)
+            try commitTree(
+                kind: "tree-create", source: nil, destination: destination, directories: directories, files: files)
             return UnpackedImport(folder: destination, folderCount: directories.count + 1, itemCount: items)
         }
     }

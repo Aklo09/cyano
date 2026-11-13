@@ -24,7 +24,11 @@ public final class NativeLibrary: @unchecked Sendable {
     let lifecycleLock = NSLock()
     var closing = false
     var previewCancellation: (@Sendable () -> Void)?
-    package var isClosing: Bool { lifecycleLock.lock(); defer { lifecycleLock.unlock() }; return closing }
+    package var isClosing: Bool {
+        lifecycleLock.lock()
+        defer { lifecycleLock.unlock() }
+        return closing
+    }
 
     public convenience init(at url: URL) throws {
         try self.init(at: url, initializing: false, hook: nil)
@@ -46,7 +50,8 @@ public final class NativeLibrary: @unchecked Sendable {
         if initializing, !FileManager.default.fileExists(atPath: url.path) {
             let parent = try LibraryDirectory(url: url.deletingLastPathComponent())
             try parent.qualify()
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+            try FileManager.default.createDirectory(
+                at: url, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
             try parent.sync()
         }
         let root = try LibraryDirectory(url: url)
@@ -58,14 +63,20 @@ public final class NativeLibrary: @unchecked Sendable {
         }
         if !recognized {
             guard initializing, Set(initial).isSubset(of: [".owner.lock", ".format.pending"]),
-                  initial.isEmpty || initial.contains(".format.pending") else {
+                initial.isEmpty || initial.contains(".format.pending")
+            else {
                 throw NativeLibraryError.invalidFormat
             }
             // Bootstrap only a native identity before ownership, never library content.
             // A bare foreign .owner.lock cannot identify a native initialization.
             if initial.isEmpty {
-                do { try root.writeNew(".format.pending", data: LibraryRecords.encode(LibraryFormat.fresh(), maximum: LibraryBounds.journal)) }
-                catch NativeLibraryError.io(EEXIST) {} // A competing initializer published the same control location.
+                do {
+                    try root.writeNew(
+                        ".format.pending",
+                        data: LibraryRecords.encode(LibraryFormat.fresh(), maximum: LibraryBounds.journal))
+                } catch NativeLibraryError.io(EEXIST) {
+                    // A competing initializer published the same control location.
+                }
             }
             _ = try LibraryRecords.format(root.read(".format.pending", maximum: LibraryBounds.journal))
         }
@@ -83,9 +94,14 @@ public final class NativeLibrary: @unchecked Sendable {
             }
             let formatBytes = try root.read(".library-format.json", maximum: LibraryBounds.journal)
             _ = try LibraryRecords.format(formatBytes)
-            let allowed: Set<String> = [".owner.lock", ".library-format.json", "library", "operations", "cache", ".DS_Store"]
+            let allowed: Set<String> = [
+                ".owner.lock", ".library-format.json", "library", "operations", "cache", ".DS_Store",
+            ]
             guard Set(try root.entries()).isSubset(of: allowed) else { throw NativeLibraryError.invalidFormat }
-            self.root = root; self.lease = lease; self.formatBytes = formatBytes; self.hook = hook
+            self.root = root
+            self.lease = lease
+            self.formatBytes = formatBytes
+            self.hook = hook
             library = try root.child("library", create: true)
             operations = try root.child("operations", create: true)
             cache = try root.child("cache", create: true)
@@ -118,7 +134,11 @@ public final class NativeLibrary: @unchecked Sendable {
             _ = try LibraryRecords.format(directory.read(".library-format.json", maximum: LibraryBounds.journal))
         } else {
             let names = try directory.entries()
-            guard names.isEmpty || (names.contains(".format.pending") && Set(names).isSubset(of: [".format.pending", ".owner.lock"])) else {
+            guard
+                names.isEmpty
+                    || (names.contains(".format.pending")
+                        && Set(names).isSubset(of: [".format.pending", ".owner.lock"]))
+            else {
                 throw NativeLibraryError.invalidFormat
             }
             if names.contains(".format.pending") {
@@ -143,15 +163,23 @@ public final class NativeLibrary: @unchecked Sendable {
     }
 
     public func list() throws -> LibraryListing {
-        try queue.sync { try ready(); return try listing() }
+        try queue.sync {
+            try ready()
+            return try listing()
+        }
     }
 
     public func recover() throws {
         try queue.sync {
             guard !isClosing else { throw NativeLibraryError.closed }
             try checkControls()
-            do { try replay(); needsRecovery = false }
-            catch { needsRecovery = true; throw error }
+            do {
+                try replay()
+                needsRecovery = false
+            } catch {
+                needsRecovery = true
+                throw error
+            }
         }
     }
 
@@ -161,7 +189,8 @@ public final class NativeLibrary: @unchecked Sendable {
             let document = try BlueprintCodec.decode(bytes)
             if let name {
                 guard name.utf8.count <= LibraryBounds.metadata,
-                      !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, name.count <= 1024 else {
+                    !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, name.count <= 1024
+                else {
                     throw NativeLibraryError.invalidInput
                 }
             }
@@ -170,9 +199,12 @@ public final class NativeLibrary: @unchecked Sendable {
             let existing = Set(try parent.entries().map(LibraryNames.key))
             var basename = base
             var suffix = 2
-            while existing.contains(LibraryNames.key(basename + ".txt")) || existing.contains(LibraryNames.key(basename + ".json")) {
+            while existing.contains(LibraryNames.key(basename + ".txt"))
+                || existing.contains(LibraryNames.key(basename + ".json"))
+            {
                 guard suffix <= LibraryBounds.directoryEntries else { throw NativeLibraryError.limitExceeded }
-                basename = "\(base) (\(suffix))"; suffix += 1
+                basename = "\(base) (\(suffix))"
+                suffix += 1
             }
             let now = LibraryRecords.now()
             let metadata = LibraryItemMetadata(
@@ -180,7 +212,8 @@ public final class NativeLibrary: @unchecked Sendable {
                 sourceSha256: document.original.sha256, displayNameOverride: name, comments: []
             )
             let result = item(metadata: metadata, document: document, folder: folder, basename: basename)
-            try transact(kind: "import", folder: folder, basename: basename, metadata: metadata, source: bytes, before: nil)
+            try transact(
+                kind: "import", folder: folder, basename: basename, metadata: metadata, source: bytes, before: nil)
             return result
         }
     }
@@ -197,7 +230,8 @@ public final class NativeLibrary: @unchecked Sendable {
         try queue.sync {
             try ready()
             guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-                  text.utf8.count <= LibraryBounds.comment else { throw NativeLibraryError.invalidInput }
+                text.utf8.count <= LibraryBounds.comment
+            else { throw NativeLibraryError.invalidInput }
             let (found, document, metadataBytes) = try load(id: id)
             let original = found.metadata
             _ = try document.entry(at: entryPath)
@@ -205,15 +239,20 @@ public final class NativeLibrary: @unchecked Sendable {
             var metadata = original
             let now = max(LibraryRecords.now(), original.updatedAt)
             metadata.updatedAt = now
-            metadata.comments.append(LibraryComment(id: LibraryRecords.uuid(), entryPath: entryPath, text: text, createdAt: now))
-            try transact(kind: "comment", folder: found.folder, basename: found.basename, metadata: metadata,
-                         source: nil, before: OriginalSource(bytes: metadataBytes).sha256)
+            metadata.comments.append(
+                LibraryComment(id: LibraryRecords.uuid(), entryPath: entryPath, text: text, createdAt: now))
+            try transact(
+                kind: "comment", folder: found.folder, basename: found.basename, metadata: metadata,
+                source: nil, before: OriginalSource(bytes: metadataBytes).sha256)
             return item(metadata: metadata, document: document, folder: found.folder, basename: found.basename)
         }
     }
 
     func checkControls() throws {
-        try lease.check(); try library.check(); try operations.check(); try cache.check()
+        try lease.check()
+        try library.check()
+        try operations.check()
+        try cache.check()
         guard try root.read(".library-format.json", maximum: LibraryBounds.journal) == formatBytes else {
             throw NativeLibraryError.integrity
         }
@@ -232,7 +271,9 @@ public final class NativeLibrary: @unchecked Sendable {
         var result = library
         for part in try LibraryNames.folderComponents(folder) {
             let matches = try result.entries().filter { LibraryNames.key($0) == LibraryNames.key(part) }
-            guard matches.count == 1, matches[0].utf8.elementsEqual(part.utf8) else { throw NativeLibraryError.unsafePath }
+            guard matches.count == 1, matches[0].utf8.elementsEqual(part.utf8) else {
+                throw NativeLibraryError.unsafePath
+            }
             result = try result.child(part)
         }
         return result
@@ -247,15 +288,17 @@ public final class NativeLibrary: @unchecked Sendable {
         guard OriginalSource(bytes: bytes).sha256 == metadata.sourceSha256 else { throw NativeLibraryError.integrity }
         let document = try BlueprintCodec.decode(bytes)
         for comment in metadata.comments {
-            do { _ = try document.entry(at: comment.entryPath) }
-            catch { throw NativeLibraryError.invalidMetadata }
+            do { _ = try document.entry(at: comment.entryPath) } catch { throw NativeLibraryError.invalidMetadata }
         }
         return (metadata, document, data)
     }
 
-    func item(metadata: LibraryItemMetadata, document: BlueprintDocument, folder: String, basename: String) -> LibraryItem {
-        LibraryItem(id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
-                    kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata)
+    func item(metadata: LibraryItemMetadata, document: BlueprintDocument, folder: String, basename: String)
+        -> LibraryItem
+    {
+        LibraryItem(
+            id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
+            kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata)
     }
 
     func listing() throws -> LibraryListing {
@@ -282,7 +325,9 @@ public final class NativeLibrary: @unchecked Sendable {
                         let data = try parent.read(name, maximum: LibraryBounds.metadata)
                         let record = try LibraryRecords.folderMetadata(data)
                         scannedBytes += data.count
-                        guard scannedBytes <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
+                        guard scannedBytes <= LibraryBounds.transactionBytes else {
+                            throw NativeLibraryError.limitExceeded
+                        }
                         result.folderComments[folder] = record.comment
                     } else if name.hasSuffix(".json") {
                         let basename = String(name.dropLast(5))
@@ -295,19 +340,22 @@ public final class NativeLibrary: @unchecked Sendable {
                         if !identities.insert(metadata.id).inserted {
                             result.issues.append(LibraryIssue(path: path, code: NativeLibraryError.integrity.code))
                         }
-                        result.items.append(item(metadata: metadata, document: document, folder: folder, basename: basename))
+                        result.items.append(
+                            item(metadata: metadata, document: document, folder: folder, basename: basename))
                     } else if name.hasSuffix(".txt") {
                         let metadataName = String(name.dropLast(4)) + ".json"
                         guard names.contains(where: { $0.utf8.elementsEqual(metadataName.utf8) }) else {
                             throw NativeLibraryError.integrity
                         }
-                        guard info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1 else { throw NativeLibraryError.unsafePath }
+                        guard info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1 else {
+                            throw NativeLibraryError.unsafePath
+                        }
                     } else if name != ".DS_Store" {
                         throw NativeLibraryError.unsafePath
                     }
-                } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded }
-                catch {
-                    result.issues.append(LibraryIssue(path: path, code: (error as? NativeLibraryError)?.code ?? "INVALID_SOURCE"))
+                } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded } catch {
+                    result.issues.append(
+                        LibraryIssue(path: path, code: (error as? NativeLibraryError)?.code ?? "INVALID_SOURCE"))
                 }
             }
         }
@@ -341,8 +389,9 @@ public final class NativeLibrary: @unchecked Sendable {
                         guard bytes <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
                         let metadata = try LibraryRecords.metadata(data)
                         if metadata.id == id { matches.append((folder, String(name.dropLast(5)))) }
-                    } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded }
-                    catch { continue }
+                    } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded } catch {
+                        continue
+                    }
                 }
             }
         }
@@ -354,7 +403,9 @@ public final class NativeLibrary: @unchecked Sendable {
         } catch { throw NativeLibraryError.notFound }
     }
 
-    func transact(kind: String, folder: String, basename: String, metadata: LibraryItemMetadata, source: Data?, before: String?) throws {
+    func transact(
+        kind: String, folder: String, basename: String, metadata: LibraryItemMetadata, source: Data?, before: String?
+    ) throws {
         guard try operations.entries(maximum: LibraryBounds.operations).count < LibraryBounds.operations else {
             throw NativeLibraryError.limitExceeded
         }
@@ -363,12 +414,16 @@ public final class NativeLibrary: @unchecked Sendable {
         let id = LibraryRecords.uuid()
         let stage = try operations.child(id, create: true)
         do {
-            if let source { try stage.writeNew("source.txt", data: source); try hook?(.sourceStaged) }
+            if let source {
+                try stage.writeNew("source.txt", data: source)
+                try hook?(.sourceStaged)
+            }
             try stage.writeNew("metadata.json", data: metadataBytes)
             try hook?(.metadataStaged)
-            let intent = LibraryIntent(schemaVersion: 1, operationId: id, kind: kind, folder: folder, basename: basename,
-                                       itemId: metadata.id, sourceSha256: metadata.sourceSha256,
-                                       metadataSha256: OriginalSource(bytes: metadataBytes).sha256, beforeMetadataSha256: before)
+            let intent = LibraryIntent(
+                schemaVersion: 1, operationId: id, kind: kind, folder: folder, basename: basename,
+                itemId: metadata.id, sourceSha256: metadata.sourceSha256,
+                metadataSha256: OriginalSource(bytes: metadataBytes).sha256, beforeMetadataSha256: before)
             try stage.writeNew("intent.pending", data: LibraryRecords.encode(intent, maximum: LibraryBounds.journal))
             try stage.move("intent.pending", to: stage, as: "intent.json")
             needsRecovery = true
@@ -385,10 +440,13 @@ public final class NativeLibrary: @unchecked Sendable {
         let names = try stage.entries(maximum: 64)
         for name in names {
             let standard = ["source.txt", "metadata.json", "intent.pending", "intent.json"].contains(name)
-            let temporary = name.hasPrefix("publish-") && name.hasSuffix(".tmp") && LibraryRecords.validUUID(String(name.dropFirst(8).dropLast(4)))
+            let temporary =
+                name.hasPrefix("publish-") && name.hasSuffix(".tmp")
+                && LibraryRecords.validUUID(String(name.dropFirst(8).dropLast(4)))
             guard standard || temporary, let info = try stage.info(name),
-                  info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1,
-                  info.st_size <= BlueprintCodecLimits.standard.sourceBytes else { throw NativeLibraryError.recoveryRequired }
+                info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1,
+                info.st_size <= BlueprintCodecLimits.standard.sourceBytes
+            else { throw NativeLibraryError.recoveryRequired }
         }
         return names
     }
@@ -397,7 +455,10 @@ public final class NativeLibrary: @unchecked Sendable {
         for id in try operations.entries(maximum: LibraryBounds.operations) {
             guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.recoveryRequired }
             let stage = try operations.child(id)
-            guard try stage.info("intent.json") != nil else { try validateUnpublishedStage(stage); continue }
+            guard try stage.info("intent.json") != nil else {
+                try validateUnpublishedStage(stage)
+                continue
+            }
             let bytes = try stage.read("intent.json", maximum: LibraryBounds.transaction)
             let value = try LibraryRecords.parse(bytes, maximum: LibraryBounds.transaction)
             if value["schemaVersion"]?.safeInteger == 1 {
@@ -413,13 +474,16 @@ public final class NativeLibrary: @unchecked Sendable {
     func apply(_ intent: LibraryIntent, stage: LibraryDirectory) throws {
         let stagedNames = try validateStage(stage)
         guard !stagedNames.contains("intent.pending"),
-              stagedNames.contains("source.txt") == (intent.kind == "import") else {
+            stagedNames.contains("source.txt") == (intent.kind == "import")
+        else {
             throw NativeLibraryError.recoveryRequired
         }
         let data = try stage.read("metadata.json", maximum: LibraryBounds.metadata)
         guard OriginalSource(bytes: data).sha256 == intent.metadataSha256 else { throw NativeLibraryError.integrity }
         let metadata = try LibraryRecords.metadata(data)
-        guard metadata.id == intent.itemId, metadata.sourceSha256 == intent.sourceSha256 else { throw NativeLibraryError.integrity }
+        guard metadata.id == intent.itemId, metadata.sourceSha256 == intent.sourceSha256 else {
+            throw NativeLibraryError.integrity
+        }
         let destination = try directory(at: intent.folder)
         let names = try destination.entries()
         for ext in [".txt", ".json"] {
@@ -428,24 +492,38 @@ public final class NativeLibrary: @unchecked Sendable {
             guard matches.allSatisfy({ $0.utf8.elementsEqual(target.utf8) }) else { throw NativeLibraryError.integrity }
         }
         if try destination.info(intent.basename + ".json") != nil {
-            let current = OriginalSource(bytes: try destination.read(intent.basename + ".json", maximum: LibraryBounds.metadata)).sha256
-            guard current == intent.metadataSha256 || current == intent.beforeMetadataSha256 else { throw NativeLibraryError.integrity }
-        } else if intent.kind == "comment" { throw NativeLibraryError.integrity }
+            let current = OriginalSource(
+                bytes: try destination.read(intent.basename + ".json", maximum: LibraryBounds.metadata)
+            ).sha256
+            guard current == intent.metadataSha256 || current == intent.beforeMetadataSha256 else {
+                throw NativeLibraryError.integrity
+            }
+        } else if intent.kind == "comment" {
+            throw NativeLibraryError.integrity
+        }
         if intent.kind == "import" {
             let source = try stage.read("source.txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
-            guard OriginalSource(bytes: source).sha256 == intent.sourceSha256 else { throw NativeLibraryError.integrity }
+            guard OriginalSource(bytes: source).sha256 == intent.sourceSha256 else {
+                throw NativeLibraryError.integrity
+            }
             let document = try BlueprintCodec.decode(source)
             for comment in metadata.comments { _ = try document.entry(at: comment.entryPath) }
-            try install(source, target: intent.basename + ".txt", destination: destination, stage: stage, expected: intent.sourceSha256, before: nil)
+            try install(
+                source, target: intent.basename + ".txt", destination: destination, stage: stage,
+                expected: intent.sourceSha256, before: nil)
             try hook?(.sourcePublished)
         } else {
-            let source = try destination.read(intent.basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
-            guard OriginalSource(bytes: source).sha256 == intent.sourceSha256 else { throw NativeLibraryError.integrity }
+            let source = try destination.read(
+                intent.basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
+            guard OriginalSource(bytes: source).sha256 == intent.sourceSha256 else {
+                throw NativeLibraryError.integrity
+            }
             let document = try BlueprintCodec.decode(source)
             for comment in metadata.comments { _ = try document.entry(at: comment.entryPath) }
         }
-        try install(data, target: intent.basename + ".json", destination: destination, stage: stage,
-                    expected: intent.metadataSha256, before: intent.beforeMetadataSha256)
+        try install(
+            data, target: intent.basename + ".json", destination: destination, stage: stage,
+            expected: intent.metadataSha256, before: intent.beforeMetadataSha256)
         try hook?(.metadataPublished)
         try stage.remove("intent.json")
         try hook?(.intentRemoved)
@@ -453,10 +531,15 @@ public final class NativeLibrary: @unchecked Sendable {
         try operations.remove(intent.operationId, directory: true)
     }
 
-    func install(_ data: Data, target: String, destination: LibraryDirectory, stage: LibraryDirectory, expected: String, before: String?) throws {
+    func install(
+        _ data: Data, target: String, destination: LibraryDirectory, stage: LibraryDirectory, expected: String,
+        before: String?
+    ) throws {
         func currentHash() throws -> String? {
             guard try destination.info(target) != nil else { return nil }
-            return OriginalSource(bytes: try destination.read(target, maximum: BlueprintCodecLimits.standard.sourceBytes)).sha256
+            return OriginalSource(
+                bytes: try destination.read(target, maximum: BlueprintCodecLimits.standard.sourceBytes)
+            ).sha256
         }
         let current = try currentHash()
         if current == expected { return }

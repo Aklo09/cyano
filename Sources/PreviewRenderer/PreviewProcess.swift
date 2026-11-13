@@ -133,7 +133,9 @@ public final class PreviewProcess: @unchecked Sendable {
                 var length = UInt64(bytes.count).bigEndian
                 try withUnsafeBytes(of: &length) { try input.fileHandleForWriting.write(contentsOf: Data($0)) }
                 try input.fileHandleForWriting.write(contentsOf: bytes)
-            } catch { /* Exit/status and framed-result validation handle a closed worker pipe. */  }
+            } catch {
+                // Exit/status and framed-result validation handle a closed worker pipe.
+            }
         }
         var failure: PreviewError?
         while try process.running() {

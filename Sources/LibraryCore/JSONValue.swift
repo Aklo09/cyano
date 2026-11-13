@@ -95,7 +95,8 @@ public indirect enum JSONValue: Equatable, Sendable {
 
     var isFiniteNumber: Bool {
         guard case .number(let number) = self,
-              let value = Double(number.literal) else { return false }
+            let value = Double(number.literal)
+        else { return false }
         return value.isFinite
     }
 

@@ -138,7 +138,8 @@ package final class LibraryPreviewContext {
         let (current, _, _) = try owner.load(id: itemId)
         guard current.metadata.sourceSha256 == sourceSha256 else { throw NativeLibraryError.integrity }
         guard let directory = try directory(create: true) else { throw NativeLibraryError.integrity }
-        let metadataBefore = try manifest(directory, identity: identity).hash  // Bind the precondition to the validated bytes.
+        // Bind the precondition to the validated bytes.
+        let metadataBefore = try manifest(directory, identity: identity).hash
         let key = try identity.key()
         var before: [String: String] = [:]
         before[key + ".json"] = metadataBefore

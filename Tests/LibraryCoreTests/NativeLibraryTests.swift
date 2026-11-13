@@ -1,7 +1,8 @@
 import Darwin
 import Foundation
-@_spi(Testing) @testable import LibraryCore
 import Testing
+
+@_spi(Testing) @testable import LibraryCore
 
 private struct TemporaryLibrary {
     let parent: URL
@@ -30,8 +31,10 @@ private func child(_ name: String, _ args: [String]) throws -> (Int32, Data, Dat
     let process = Process()
     process.executableURL = binary(name)
     process.arguments = args
-    let output = Pipe(), errors = Pipe()
-    process.standardOutput = output; process.standardError = errors
+    let output = Pipe()
+    let errors = Pipe()
+    process.standardOutput = output
+    process.standardError = errors
     try process.run()
     let data = output.fileHandleForReading.readDataToEndOfFile()
     let stderr = errors.fileHandleForReading.readDataToEndOfFile()
@@ -43,7 +46,8 @@ private func child(_ name: String, _ args: [String]) throws -> (Int32, Data, Dat
 struct NativeLibraryTests {
     @Test("Initialize, import, comment, close, reopen, and export exact original bytes")
     func completeSourceWorkflow() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         #expect(try NativeLibrary.inspectOwnership(at: target.url) == .uninitialized)
         #expect(!FileManager.default.fileExists(atPath: target.url.path))
         let library = try NativeLibrary.initialize(at: target.url)
@@ -58,33 +62,42 @@ struct NativeLibraryTests {
         #expect(updated.metadata.createdAt == item.metadata.createdAt)
         #expect(updated.metadata.comments.count == 1)
         #expect(try library.export(id: item.id) == bytes)
-        library.close(); library.close()
+        library.close()
+        library.close()
         #expect(throws: NativeLibraryError.closed) { try library.list() }
         #expect(try NativeLibrary.inspectOwnership(at: target.url) == .idle)
-        let reopened = try NativeLibrary(at: target.url); defer { reopened.close() }
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
         let restored = try #require(reopened.list().items.first)
         #expect(restored.metadata == updated.metadata)
         #expect(try reopened.export(id: item.id) == bytes)
-        #expect(try FileManager.default.contentsOfDirectory(atPath: target.url.appendingPathComponent("operations").path).isEmpty)
+        #expect(
+            try FileManager.default.contentsOfDirectory(atPath: target.url.appendingPathComponent("operations").path)
+                .isEmpty)
     }
 
     @Test("Book entry comments and standalone exports use actual stored paths")
     func bookPaths() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
-        let library = try NativeLibrary.initialize(at: target.url); defer { library.close() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        defer { library.close() }
         let bytes = try blueprintFixture("v0.59.0.txt")
         let item = try library.importSource(bytes)
         let updated = try library.addComment(id: item.id, entryPath: [1, 1], text: "Large leaf")
         #expect(updated.metadata.comments.first?.entryPath == [1, 1])
         let entry = try BlueprintCodec.decode(library.export(id: item.id, entryPath: [1, 1]))
         #expect(entry.root.body["entities"]?.array?.count == 6814)
-        #expect(throws: BlueprintCodecError.self) { try library.addComment(id: item.id, entryPath: [99999], text: "Invalid") }
+        #expect(throws: BlueprintCodecError.self) {
+            try library.addComment(id: item.id, entryPath: [99999], text: "Invalid")
+        }
         #expect(try library.export(id: item.id) == bytes)
     }
 
     @Test("Unknown nonempty stores, unsupported formats, and missing permanent locks are untouched")
     func formatAdmission() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         try FileManager.default.createDirectory(at: target.url, withIntermediateDirectories: false)
         let foreign = target.url.appendingPathComponent("foreign.txt")
         try Data("Keep me".utf8).write(to: foreign)
@@ -115,12 +128,14 @@ struct NativeLibraryTests {
 
     @Test("Duplicate import names suffix safely and real empty folders remain visible")
     func namingAndFolders() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let initialized = try NativeLibrary.initialize(at: target.url)
         initialized.close()
         let empty = target.url.appendingPathComponent("library/Empty")
         try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: false)
-        let library = try NativeLibrary(at: target.url); defer { library.close() }
+        let library = try NativeLibrary(at: target.url)
+        defer { library.close() }
         let source = try blueprintFixture()
         let first = try library.importSource(source, name: "Same")
         let second = try library.importSource(source, name: "same")
@@ -138,12 +153,15 @@ struct NativeLibraryTests {
         let normalized = try library.importSource(source, name: "E\u{301}")
         #expect(unicode.basename == "É")
         #expect(normalized.basename == "É (2)")
-        #expect(LibraryNames.basename(label: String(repeating: "\u{301}", count: 10000), kind: .blueprint) == "Untitled Blueprint")
+        #expect(
+            LibraryNames.basename(label: String(repeating: "\u{301}", count: 10000), kind: .blueprint)
+                == "Untitled Blueprint")
     }
 
     @Test("Symlinks, hardlinks, FIFOs, and changed control inodes are refused")
     func unsafeFilesystemObjects() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let remote = try #require(URL(string: "file://remote.invalid/private/tmp/Library"))
         #expect(throws: NativeLibraryError.unsafePath) { try NativeLibrary.initialize(at: remote) }
         let nul = try #require(URL(string: target.parent.absoluteString + "/Unsafe%00tail"))
@@ -173,13 +191,17 @@ struct NativeLibraryTests {
 
     @Test("Another process and a symlink alias cannot overlap the live owner")
     func processExclusion() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
-        let initialized = try NativeLibrary.initialize(at: target.url); initialized.close()
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let initialized = try NativeLibrary.initialize(at: target.url)
+        initialized.close()
         let process = Process()
         process.executableURL = binary("StorageTestDriver")
         process.arguments = ["hold", target.url.path]
-        let input = Pipe(), output = Pipe()
-        process.standardInput = input; process.standardOutput = output
+        let input = Pipe()
+        let output = Pipe()
+        process.standardInput = input
+        process.standardOutput = output
         try process.run()
         defer {
             try? input.fileHandleForWriting.close()
@@ -198,8 +220,10 @@ struct NativeLibraryTests {
         let probe = try child("fb-native", ["owner", target.url.path])
         #expect(probe.0 == 0)
         #expect(String(decoding: probe.1, as: UTF8.self).contains("owned"))
-        process.terminate(); process.waitUntilExit()
-        let reopened = try NativeLibrary(at: target.url); reopened.close()
+        process.terminate()
+        process.waitUntilExit()
+        let reopened = try NativeLibrary(at: target.url)
+        reopened.close()
     }
 
     @Test("Real process kills at import publication boundaries recover deterministically")
@@ -207,8 +231,10 @@ struct NativeLibraryTests {
         let before: [LibraryWritePhase] = [.sourceStaged, .metadataStaged]
         let after: [LibraryWritePhase] = [.intentPublished, .sourcePublished, .metadataPublished, .intentRemoved]
         for phase in before + after {
-            let target = try TemporaryLibrary(); defer { target.cleanup() }
-            let initialized = try NativeLibrary.initialize(at: target.url); initialized.close()
+            let target = try TemporaryLibrary()
+            defer { target.cleanup() }
+            let initialized = try NativeLibrary.initialize(at: target.url)
+            initialized.close()
             let input = target.parent.appendingPathComponent("input.txt")
             let bytes = try blueprintFixture()
             try bytes.write(to: input)
@@ -216,14 +242,16 @@ struct NativeLibraryTests {
             #expect(killed.0 == SIGKILL, Comment(rawValue: phase.rawValue))
             let reopened = try NativeLibrary(at: target.url)
             let items = try reopened.list().items
-            if before.contains(phase) { #expect(items.isEmpty) }
-            else {
+            if before.contains(phase) {
+                #expect(items.isEmpty)
+            } else {
                 #expect(items.count == 1)
                 #expect(try reopened.export(id: #require(items.first?.id)) == bytes)
             }
             try reopened.recover()
             reopened.close()
-            let again = try NativeLibrary(at: target.url); defer { again.close() }
+            let again = try NativeLibrary(at: target.url)
+            defer { again.close() }
             #expect(try again.list().items.count == items.count)
         }
     }
@@ -231,14 +259,16 @@ struct NativeLibraryTests {
     @Test("Comments interrupted before or after their intent preserve identity and exact source")
     func commentInterruptions() throws {
         for phase in [LibraryWritePhase.metadataStaged, .intentPublished, .metadataPublished, .intentRemoved] {
-            let target = try TemporaryLibrary(); defer { target.cleanup() }
+            let target = try TemporaryLibrary()
+            defer { target.cleanup() }
             let initialized = try NativeLibrary.initialize(at: target.url)
             let bytes = try blueprintFixture()
             let item = try initialized.importSource(bytes)
             initialized.close()
             let killed = try child("StorageTestDriver", ["comment-crash", target.url.path, item.id, phase.rawValue])
             #expect(killed.0 == SIGKILL)
-            let reopened = try NativeLibrary(at: target.url); defer { reopened.close() }
+            let reopened = try NativeLibrary(at: target.url)
+            defer { reopened.close() }
             let updated = try #require(reopened.list().items.first)
             #expect(updated.id == item.id)
             #expect(updated.metadata.createdAt == item.metadata.createdAt)
@@ -249,8 +279,10 @@ struct NativeLibraryTests {
 
     @Test("Conflicting published bytes block recovery and preserve staged originals")
     func recoveryConflict() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
-        let initialized = try NativeLibrary.initialize(at: target.url); initialized.close()
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let initialized = try NativeLibrary.initialize(at: target.url)
+        initialized.close()
         let input = target.parent.appendingPathComponent("input.txt")
         let bytes = try blueprintFixture()
         try bytes.write(to: input)
@@ -261,14 +293,16 @@ struct NativeLibraryTests {
         #expect(throws: NativeLibraryError.integrity) { try NativeLibrary(at: target.url) }
         #expect(try Data(contentsOf: live) == foreign)
         let operations = target.url.appendingPathComponent("operations")
-        let stage = try #require(FileManager.default.contentsOfDirectory(at: operations, includingPropertiesForKeys: nil).first)
+        let stage = try #require(
+            FileManager.default.contentsOfDirectory(at: operations, includingPropertiesForKeys: nil).first)
         #expect(try Data(contentsOf: stage.appendingPathComponent("source.txt")) == bytes)
         #expect(FileManager.default.fileExists(atPath: stage.appendingPathComponent("intent.json").path))
     }
 
     @Test("Unknown sidecar fields, corrupt hashes, and oversized source reads remain non-mutating")
     func metadataAndReadLimits() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let library = try NativeLibrary.initialize(at: target.url)
         let item = try library.importSource(blueprintFixture(), name: "Metadata")
         library.close()
@@ -277,10 +311,13 @@ struct NativeLibraryTests {
         json["future"] = true
         let unknown = try JSONSerialization.data(withJSONObject: json)
         try unknown.write(to: sidecar)
-        let reopened = try NativeLibrary(at: target.url); defer { reopened.close() }
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
         #expect(try reopened.list().items.isEmpty)
         #expect(try reopened.list().issues.contains { $0.code == "INVALID_METADATA" })
-        #expect(throws: NativeLibraryError.notFound) { try reopened.addComment(id: item.id, text: "Must not overwrite") }
+        #expect(throws: NativeLibraryError.notFound) {
+            try reopened.addComment(id: item.id, text: "Must not overwrite")
+        }
         #expect(try Data(contentsOf: sidecar) == unknown)
         let large = target.parent.appendingPathComponent("large.txt")
         FileManager.default.createFile(atPath: large.path, contents: nil)
@@ -292,12 +329,14 @@ struct NativeLibraryTests {
 
     @Test("Initialization interrupted after marker publication resumes without changing its identity")
     func initializationInterruption() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let killed = try child("StorageTestDriver", ["initialize-crash", target.url.path, "formatPublished"])
         #expect(killed.0 == SIGKILL)
         let marker = target.url.appendingPathComponent(".library-format.json")
         let bytes = try Data(contentsOf: marker)
-        let reopened = try NativeLibrary(at: target.url); defer { reopened.close() }
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
         #expect(try reopened.list().items.isEmpty)
         #expect(try Data(contentsOf: marker) == bytes)
     }
@@ -307,15 +346,20 @@ struct NativeLibraryTests {
         final class Failures: @unchecked Sendable {
             let lock = NSLock()
             var values: [String] = []
-            func add(_ error: Error) { lock.lock(); defer { lock.unlock() }; values.append(String(describing: error)) }
+            func add(_ error: Error) {
+                lock.lock()
+                defer { lock.unlock() }
+                values.append(String(describing: error))
+            }
         }
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
-        let library = try NativeLibrary.initialize(at: target.url); defer { library.close() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        defer { library.close() }
         let item = try library.importSource(blueprintFixture())
         let failures = Failures()
         DispatchQueue.concurrentPerform(iterations: 8) { index in
-            do { _ = try library.addComment(id: item.id, text: "Comment \(index)") }
-            catch { failures.add(error) }
+            do { _ = try library.addComment(id: item.id, text: "Comment \(index)") } catch { failures.add(error) }
         }
         #expect(failures.values.isEmpty)
         let metadata = try #require(library.list().items.first?.metadata)
@@ -326,10 +370,12 @@ struct NativeLibraryTests {
 
     @Test("The CLI emits versioned JSON and exact-byte stdout exports")
     func cliWorkflow() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let input = target.parent.appendingPathComponent("input.txt")
         var bytes = Data("\r\n ".utf8)
-        bytes.append(try blueprintFixture()); bytes.append(Data("\r\n".utf8))
+        bytes.append(try blueprintFixture())
+        bytes.append(Data("\r\n".utf8))
         try bytes.write(to: input)
         let probe = try child("fb-native", ["owner", target.url.path])
         #expect(probe.0 == 0)
@@ -359,7 +405,8 @@ struct NativeLibraryTests {
 
     @Test("Damaged live hashes and unsupported metadata are reported without overwriting evidence")
     func damagedMetadataAndSources() throws {
-        let target = try TemporaryLibrary(); defer { target.cleanup() }
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
         let original = try NativeLibrary.initialize(at: target.url)
         let first = try original.importSource(blueprintFixture(), name: "Source")
         _ = try original.importSource(blueprintFixture(), name: "Version")
@@ -372,7 +419,8 @@ struct NativeLibraryTests {
         metadata["schemaVersion"] = 99
         let future = try JSONSerialization.data(withJSONObject: metadata)
         try future.write(to: metadataURL)
-        let library = try NativeLibrary(at: target.url); defer { library.close() }
+        let library = try NativeLibrary(at: target.url)
+        defer { library.close() }
         let listing = try library.list()
         #expect(listing.items.isEmpty)
         #expect(Set(listing.issues.map(\.code)).isSuperset(of: ["INTEGRITY_CONFLICT", "UNSUPPORTED_VERSION"]))
