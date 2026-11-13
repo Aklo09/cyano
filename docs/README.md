@@ -21,6 +21,7 @@ Use the approved plan for scope and validation records for completed work.
 | Inspect image and worker qualification | [Renderer validation](validation/Renderer.md) |
 | Render and reuse saved-item previews | [Library previews](development/Library-Previews.md) |
 | Understand helper leases and cache publication | [Preview cache contract](contracts/Preview-Cache.md) |
+| Understand construction statistics and footprints | [Statistics contract](contracts/Statistics.md) |
 | Inspect owned-render/cache validation | [Library preview validation](validation/Library-Previews.md) |
 | Inspect milestone 1 acceptance | [Milestone 1 acceptance](validation/Milestone-1.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |

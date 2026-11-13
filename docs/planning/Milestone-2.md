@@ -1,6 +1,6 @@
 # Milestone 2: complete library core
 
-Date: 2026-11-13. Status: approved by the owner; not started.
+Date: 2026-11-13. Status: approved by the owner; in progress.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 2.
 
 ## Scope
@@ -35,7 +35,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 
 | # | Subtask | Delivers | Done when | Depends on |
 | --- | --- | --- | --- | --- |
-| S1 | Native statistics contract | `docs/contracts/Statistics.md`: scope, requirement groups, footprint rules, completeness, result schema | Owner approves | — |
+| S1 | Done: native statistics contract | `docs/contracts/Statistics.md`: scope, requirement groups, footprint rules, completeness, result schema | Owner approves | — |
 | S2 | Golden reference outputs | Node script running the JS calculator over all synthetic cases and every blueprint leaf in the fixtures and vendored visual tests, writing one JSON file under `.cache/` | Generation is reproducible; `just statistics-test` still passes | — |
 | S3 | Prototype map in `FactorioData` | Strict `PrototypeMap` model loaded from a verified release and bound to its identity | Tests cover valid, malformed, wrong-version, unknown-field, and oversized maps | — |
 | S4 | Calculator port | `BlueprintStatistics.calculate(entry, map)`, a pure function over codec `JSONValue`s | Unit tests with a committed synthetic map cover every rule exercised by the Node tests | S1, S3 |
@@ -46,6 +46,9 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 | S9 | Milestone 2 acceptance | `docs/validation/Milestone-2.md`: exit condition per operation, statistics evidence, full checks, independence check | All checks pass; owner signs off on statistics for representative fixtures | S1–S8 |
 
 ## Reference behaviors the port must reproduce
+
+The reference is a starting point: where the [contract](../contracts/Statistics.md) records a better native behavior,
+that wins. Otherwise reproduce these details, each of which a careless port would silently change:
 
 - **Rounding:** JavaScript `Math.round` rounds halves toward +∞, including negatives; Swift's default rounds away
   from zero. Mirror the reference with `(x × 10⁹ + 0.5).rounded(.down) / 10⁹`.
@@ -58,4 +61,4 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 - **Rails:** secondary collision boxes contribute to the footprint; placement follows the first placement choice
   (curved rail 3 rail items, half-diagonal 2).
 - **Equipment and items:** `grid` equipment may be a string or an object; a legacy non-array `items` format warns.
-- **Warnings:** keep the reference's exact message text so parity compares them directly.
+- **Warnings:** natively they are grouped and coded (see the contract); parity maps reference strings to codes and counts.
