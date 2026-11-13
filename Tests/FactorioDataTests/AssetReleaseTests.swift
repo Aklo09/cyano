@@ -4,16 +4,19 @@ import Foundation
 import LibraryCore
 import Testing
 
-private func assetJSON(_ value: Any) throws -> Data {
+func assetJSON(_ value: Any) throws -> Data {
     var data = try JSONSerialization.data(withJSONObject: value, options: [.sortedKeys, .withoutEscapingSlashes])
     data.append(10)
     return data
 }
 
-private struct TestAssetRelease {
+struct TestAssetRelease {
     let root: URL
-    init(frameOutside: Bool = false, density: Int = 2, gameVersion: String = "2.1.23", packedFrame: Bool = false) throws
-    {
+    /// `prototypeMap` replaces the minimal map that asset verification alone needs.
+    init(
+        frameOutside: Bool = false, density: Int = 2, gameVersion: String = "2.1.23", packedFrame: Bool = false,
+        prototypeMap: Data? = nil
+    ) throws {
         root = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-assets-\(UUID().uuidString)")
         try FileManager.default.createDirectory(
             at: root.appendingPathComponent("sprites/fonts"), withIntermediateDirectories: true)
@@ -51,7 +54,8 @@ private struct TestAssetRelease {
         let members = [
             "sprites/atlas.webp": atlas, "sprites/fonts/font.ttf": font, "sprites/render-db.json": db,
             "sprites/manifest.json": manifest,
-            "statistics/prototype-map.json": try assetJSON(["schema": 1, "gameVersion": gameVersion, "mods": modMap]),
+            "statistics/prototype-map.json": try prototypeMap
+                ?? assetJSON(["schema": 1, "gameVersion": gameVersion, "mods": modMap]),
         ]
         let files: [[String: Any]] = members.keys.sorted().map { path in
             ["path": path, "bytes": members[path]!.count, "sha256": OriginalSource(bytes: members[path]!).sha256]

@@ -93,11 +93,12 @@ public indirect enum JSONValue: Equatable, Sendable {
         return number.safeInteger
     }
 
-    var isFiniteNumber: Bool {
-        guard case .number(let number) = self,
-            let value = Double(number.literal)
-        else { return false }
-        return value.isFinite
+    var isFiniteNumber: Bool { finiteDouble != nil }
+
+    /// Correctly rounded binary64 value (strtod, matching JavaScript number parsing), or nil if not finite.
+    package var finiteDouble: Double? {
+        guard case .number(let number) = self, let value = Double(number.literal), value.isFinite else { return nil }
+        return value
     }
 
     package var isObject: Bool {

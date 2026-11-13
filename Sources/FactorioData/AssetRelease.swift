@@ -20,6 +20,7 @@ public struct AssetReleaseReport: Encodable, Sendable {
     public let tiers: [String]
     public let imageDecodingPerformed = false
     package let spriteManifestSha256: String
+    package let prototypeMapSha256: String
 
     private enum CodingKeys: String, CodingKey {
         case id, identity, profile, files, totalBytes, tiers, imageDecodingPerformed
@@ -241,6 +242,7 @@ public enum AssetRelease {
         try root.check()
         return AssetReleaseReport(
             id: id, identity: identity, profile: initial, files: files.count, totalBytes: total,
-            tiers: tiers.map(\.key).sorted(), spriteManifestSha256: inventory["sprites/manifest.json"]!.sha256)
+            tiers: tiers.map(\.key).sorted(), spriteManifestSha256: inventory["sprites/manifest.json"]!.sha256,
+            prototypeMapSha256: inventory["statistics/prototype-map.json"]!.sha256)
     }
 }

@@ -26,7 +26,11 @@ Statistics use the prototype map in a verified asset release (`statistics/protot
 No other map source is accepted, and no game process runs.
 Every result records the release's asset identity and the map's game version, so a result is tied to exact data.
 
-The map must have `schema` 1 and a game version. The initial release profile is Factorio 2.1.23 with
+The map is read only after the release verifies, and only if its bytes still match the verified inventory.
+It must have `schema` 1 and a game version. Parsing is strict: every field has a known type, unknown fields are
+refused, and every placement item and equipment item must resolve within the map, so a statistics warning
+always concerns the blueprint, never the map. A direction entry's key is the requested blueprint direction;
+its `direction` field is the engine-resolved direction (a chest resolves all 16 to 0). The initial release profile is Factorio 2.1.23 with
 base, space-age, elevated-rails, quality, and recycler: 146 entity prototypes, 342 items, 23 placeable tiles,
 and 6 qualities. The map holds engine-resolved placement choices, item types, equipment items,
 and per-direction collision geometry; renderer sprite bounds are never used.

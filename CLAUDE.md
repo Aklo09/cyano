@@ -51,7 +51,8 @@ SwiftPM targets (`Package.swift`):
 - `CLibraryPlatform`: C shims for POSIX primitives (flock and descriptor handling, spawn).
 - `LibraryCore`: the bounded blueprint codec (`BlueprintCodec`, `BoundedJSONParser`, `ZlibCodec`) and the library store
   (`NativeLibrary*`, `LibraryTransactions`, `LibraryMaintenance`, `LibraryPreviewCache`).
-- `FactorioData`: verification of private asset releases (`AssetRelease`, `FactorioProfile`).
+- `FactorioData`: verification of private asset releases (`AssetRelease`, `FactorioProfile`) and the strict prototype map
+  for statistics (`PrototypeMap`), loaded only through a verified release.
 - `PreviewRenderer`: runs the bundled fpsr planner (`Resources/planner.js`) in system JavaScriptCore, then paints with Core Graphics (`NativePainter`).
   Rendering happens in a supervised child process (`PreviewProcess`, `PreviewChild`). `LibraryPreviewService` connects it to library ownership.
 - Executables: `fb-native` (CLI), `preview-worker` (helper process), `preview-probe` (standalone render harness).

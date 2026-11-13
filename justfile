@@ -17,16 +17,16 @@ format:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PrototypeMapTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
     python3 tools/test-asset-release.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
 storage-test:
     sh tools/swift.sh test --filter 'NativeLibraryTests|LibraryCommandTests'
 
-# Verify offline asset inventory, hashes, profiles, and declared frame bounds.
+# Verify offline asset inventory, hashes, profiles, declared frame bounds, and prototype maps.
 asset-test:
-    sh tools/swift.sh test --filter AssetReleaseTests
+    sh tools/swift.sh test --filter 'AssetReleaseTests|PrototypeMapTests'
 
 # Run native CLI commands; export stdout contains only source bytes.
 library *args:
