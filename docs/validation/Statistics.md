@@ -1,0 +1,40 @@
+# Statistics validation
+
+Evidence for the native construction statistics ([contract](../contracts/Statistics.md),
+[milestone 2](../planning/Milestone-2.md)). Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
+
+## Unit tests (S4)
+
+`BlueprintStatisticsTests`: 18 tests with a committed hand-written prototype map, so they run without private data.
+They cover every rule of the 13 reference Node tests (game-tile footprints, cardinal rotation, gaps and tiles,
+translation invariance, rail costs and oriented diagonal geometry, secondary collision boxes, qualities and modules,
+installed and requested equipment, fuel and logistics, off-grid vehicles, unknown prototypes, invalid data, robots)
+and the native behaviors: grouped warnings, byte-order sorting, not-applicable books and planners,
+JavaScript-compatible rounding, and the result JSON shape.
+
+Deliberately removing secondary collision boxes failed the rail test; removing tile snapping failed six tests.
+
+## Parity with the reference calculator (S5)
+
+`StatisticsParityTests` compares the native calculator with `.cache/statistics-golden.json`
+(`just statistics-golden`) on all 348 reference cases: 234 blueprint leaves from the supplied and vendored fpsr
+fixtures, and 114 synthetic cases. It first requires that the outputs were generated from the same prototype map.
+
+Each case is decoded from its standalone blueprint string and compared on the contract's semantics:
+every requirement group as an order-independent set, warnings mapped to codes and grouped with counts in
+first-occurrence order, completeness flags, entity and tile counts, game version, and footprint bounds, width,
+and height within 10⁻⁹ with nulls in the same places.
+
+| Result | Value |
+| --- | --- |
+| Cases compared | 348 |
+| Differences | 0 |
+| Footprint values | bit-identical in every case (checked once with the tolerance set to exact equality) |
+| Reference cases that are incomplete | 2: construction and logistic robots, and the modded `ee-infinity-loader` |
+
+Mutation checks: increasing one expected count in a copy of the reference outputs produced exactly one reported
+difference; removing footprint rounding produced 1,041.
+
+The parity test runs only where the private map and generated reference outputs exist; elsewhere it is reported
+as disabled. Comparison with the game's own `cost_to_build` was done in the original project and is not repeated
+in milestone 2.
