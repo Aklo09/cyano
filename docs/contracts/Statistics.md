@@ -110,7 +110,11 @@ Data that would make totals misleading is an error, and no result is returned:
 - an orientation that is not finite or lies outside 0 to 1;
 - a negative, fractional, or larger-than-2⁵³ − 1 count, or a total that would exceed 2⁵³ − 1;
 - non-finite positions or geometry;
+- malformed structure: an entity, tile, item request, or installed equipment without a name, a non-text quality,
+  an entity or tile without a position, or `entities`, `tiles`, `grid`, or `in_inventory` that is not an array;
 - an unsupported prototype map.
+
+Errors carry the code `STATISTICS_INVALID_INPUT`.
 
 ## Result
 
@@ -176,6 +180,7 @@ the native app departs from it wherever a different behavior makes more sense. C
 - Items sort by UTF-8 bytes, not JavaScript `localeCompare`.
 - Results add `schemaVersion`, `applicable`, `entryPath`, `entryKind`, and `assetIdentity`.
 - Errors are typed library errors rather than JavaScript exceptions.
+- Malformed structure is an error; the reference would instead warn about an item or quality named `undefined`.
 
 Parity with reference outputs generated from the private map (subtask S5) is checked on these native semantics:
 identical items, completeness, and footprint, and the same warnings once reference strings are mapped to codes and

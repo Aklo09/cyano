@@ -25,7 +25,7 @@ public struct BlueprintEntry: Sendable {
         return body["description"]?.string ?? ""
     }
 
-    init(value: JSONValue, path: [Int]) throws {
+    package init(value: JSONValue, path: [Int]) throws {
         let kinds = BlueprintEntryKind.allCases.filter { value[$0.rawValue] != nil }
         guard value.isObject, kinds.count == 1,
             let kind = kinds.first, let body = value[kind.rawValue], body.isObject,
