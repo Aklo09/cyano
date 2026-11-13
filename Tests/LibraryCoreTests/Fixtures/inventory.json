@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "sha256": "ef28b26547fa84f85863d39658432f9024649edbf745dd3b3fe161f2cf7acf5f",
+      "bytes": 2043,
+      "file": "2i-1f_Assembler.txt"
+    },
+    {
+      "sha256": "d264a1edf3667e6dd023576a8c5f2f32412bbdc62044ebf3e1758b6123322898",
+      "bytes": 975,
+      "file": "2i_Assembler.txt"
+    },
+    {
+      "sha256": "415fb091e15e919a4b2cd41ea1d004d02d8e557d62d35942e1b2856cd2bb1ddb",
+      "bytes": 1191,
+      "file": "4i_Assembler.txt"
+    },
+    {
+      "sha256": "0b2df260cbb3f5b3c25032b8d6e4146136b9af775b7241ede03014b79d2f376e",
+      "bytes": 1887,
+      "file": "4x_Rocket_Silo.txt"
+    },
+    {
+      "sha256": "c3c4fb578094ffca4cb6bd471bbcc21d66f84938bd2939974bc6c6b29031368a",
+      "bytes": 1651,
+      "file": "6i_Assembler.txt"
+    },
+    {
+      "sha256": "b6260c727bbc1cd9d39ac7d72244ef3f038165d743537e6a5e0b565dc211e5fc",
+      "bytes": 1927,
+      "file": "Hazard_Patterns.txt"
+    },
+    {
+      "sha256": "5e88965d83e75925a177c301780921128e1b93f1b84ca5961e96cfcd12660c45",
+      "bytes": 919,
+      "file": "RS.txt"
+    },
+    {
+      "sha256": "61c843bbd2c3ceebb375e5149e01168c17f5a8d2428e2083c58acd3cfd4cb701",
+      "bytes": 260005,
+      "file": "bp.txt"
+    },
+    {
+      "sha256": "0242f3975124629cad0b373e8b247e123be9bf2240f935c6787b92df7f7e74c9",
+      "bytes": 696189,
+      "file": "v0.59.0.txt"
+    }
+  ]
+}

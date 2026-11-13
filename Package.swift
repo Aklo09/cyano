@@ -1,0 +1,31 @@
+// swift-tools-version: 6.4
+import PackageDescription
+
+let package = Package(
+    name: "FBNative",
+    platforms: [.macOS("27.0")],
+    products: [
+        .library(name: "LibraryCore", targets: ["LibraryCore"]),
+        .library(name: "FactorioData", targets: ["FactorioData"]),
+        .library(name: "PreviewRenderer", targets: ["PreviewRenderer"]),
+        .executable(name: "fb-native", targets: ["FBNativeCLI"]),
+        .executable(name: "preview-probe", targets: ["PreviewProbe"]),
+    ],
+    targets: [
+        .target(name: "LibraryCore"),
+        .target(name: "FactorioData"),
+        .target(
+            name: "PreviewRenderer",
+            resources: [.copy("Resources")],
+            linkerSettings: [.linkedFramework("JavaScriptCore")]
+        ),
+        .executableTarget(name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData"]),
+        .executableTarget(name: "PreviewProbe", dependencies: ["PreviewRenderer"]),
+        .testTarget(
+            name: "LibraryCoreTests",
+            dependencies: ["LibraryCore"],
+            resources: [.copy("Fixtures")]
+        ),
+        .testTarget(name: "PreviewRendererTests", dependencies: ["PreviewRenderer"]),
+    ]
+)

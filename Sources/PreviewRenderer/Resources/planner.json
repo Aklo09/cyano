@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "plannerRevision": "2f7dc70f2681de530402556f757006e904e692d5",
+  "sha256": "164526ccd36873ba5cf50afa43ed2e28d4c18bf1027138e1d0db4621b91403b9",
+  "inputs": [
+    {
+      "file": "tools/planner-entry.ts",
+      "sha256": "a4546ff6db7459091bd4d805818ab21c424358fe691dd34c5ce2a43523e6df5f"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/alt-mode-request-pin.ts",
+      "sha256": "09f61e5f00c97a03d7e4c41d077d02f1ebfe89ac2dd49324b49c984f7fbd83e5"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/alt-mode-signals.ts",
+      "sha256": "1832415e55e0120ef3d41e8d548925a8be5fdc71ea8d6f2b8badae46029208df"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/alt-mode.ts",
+      "sha256": "c59639860c17aaecde9b39f10139ed7915a1f03a6fff2ee328b80ab1d4a61e93"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/blueprint-icons.ts",
+      "sha256": "18c7e8b49d6709a21eff9d38d45e9e31a39d14232e17bff48f304dc0db08c3f7"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/cargo-bay-connections.ts",
+      "sha256": "337b949dec852ed1a3357f868009e33029d815c6c4435cc906ca1ff8cc508fac"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/deconstruction-planner.ts",
+      "sha256": "4ab4320602e066a81356ccfb90fa044fbbdd5a3f5a7946b1f3701e800035cd2b"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/icon-resolve.ts",
+      "sha256": "23e75b4d279761345a9d45d464f454903d96da1e8f28f3be1b31ffda1baddbc3"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/icon-silhouette.ts",
+      "sha256": "a614c3b4dfe02095440479fcc309b25989b77f57d601894a83c90a6c2a20fc17"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/migrate.ts",
+      "sha256": "8b46c857a7ccf276413ac14b30db0abd643bb6037eaf2ff71668e758f0e3e729"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan-diagnostics.ts",
+      "sha256": "471172eeb82fcbacc5eb3f7dc916e681ef413ec7e51c14f54480d952e51f12c1"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan.ts",
+      "sha256": "ae9a582492ff67ed8d407f4e9dd9cfc74aa3fba839f17697dfe6d32f7d213b7f"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/belt-readers.ts",
+      "sha256": "ecfc1eb3e93b14bd39a674cacb8484db4f301210a9bbccc7aab4de1a5dd19891"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/bounds.ts",
+      "sha256": "b8ef82c9417a7a4b130ffda53d5f28bf812137bc2eab2296aad8674870168dd2"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/circuit-connectors.ts",
+      "sha256": "021238bbe53d1ac640715c4a97582d0cb8f8109e1fa4f45587bbfff09f9428a9"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/deconstruction-planner.ts",
+      "sha256": "29fb847c3ba38061906583a9846e14c02828c7ce90c49ec02ca430b0016462bb"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/index.ts",
+      "sha256": "01a027513e5cb1bf575c76fb1d5dfca2e1c8b7f22545970e392c06911abe0089"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/pipe-covers.ts",
+      "sha256": "82841932fbebc086b5bdb358544ba4698d4b53260b65239b1bdbaa23d3f26d31"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/snap-grid.ts",
+      "sha256": "940b06fcfe0ceded5ea4293f8a824827bc16ece538f15636c74da10ad3bde29c"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/tiles.ts",
+      "sha256": "787c4c5b84ac4a273efce6608c9b3f2be8a814a04026d312ff0f536eb67bc3a0"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/unsupported.ts",
+      "sha256": "0d24ddcc521487c3334c5fcbd0a0dc282e9ba769efedc676c736ee62f5533711"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/upgrade-planner.ts",
+      "sha256": "35ea2aff2d400fa230d076f995c711a73bf567655bc30b9bbd57e1fd080c36b8"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/plan/wires.ts",
+      "sha256": "fc2f7f759fdb126ff1fa249c11777b07a98326f0258e2323f7fd109bb9472484"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/planner.ts",
+      "sha256": "4633d6fb09b05ea33f184036996293cc61bda98f65278880b15c332d4462dcc5"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/pole-orientation.ts",
+      "sha256": "84aede769db391b97a149f941906fd64be2ebc526a4fde3b2b3934addb592fc2"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/profile.ts",
+      "sha256": "bb515403f6d16039a4a85774e3cd22774fb0a27d082d610483ca2f3df797651d"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve.ts",
+      "sha256": "71ccbb13cc887ac3162fc82b3745e945f071131ee7ab9a9988b63a8c85989974"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/belts.ts",
+      "sha256": "c2e47ff33f64aae426f5bd7f0c42e631f029f3c3187536f3ed5e5d848e3e6354"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/context.ts",
+      "sha256": "e38f38c75c5b166515ca942edf009a864cc2dd9f7c6da36eae371433503e27f1"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/fluid-ports.ts",
+      "sha256": "3c7a5a08cb0aa799c539f6595b822e7647d21d8ab7d4644686a990387e824999"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/index.ts",
+      "sha256": "86ccd775295f3c5b14539e0f43a73cd00a172b07cce02ab03d2c47def0dbc0cb"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/pipes.ts",
+      "sha256": "e9026569523b3cb591c62001e795e537a9a35afb6fd5a27019f03eabafbd448f"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/shared.ts",
+      "sha256": "6df51dfa23210566ccc2e2e8d8b3975ab4d3212bd4f113ca175e0bd13d803c96"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/trains.ts",
+      "sha256": "c691614655211260bdffbce2042d507dc14f86ba2875eff90e835cfee9b35dc0"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/resolve/walls.ts",
+      "sha256": "6a00757ace4cef222f988338803b55825d6827e4a2b851fa9c39b4699a3d2aac"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/snap-grid.ts",
+      "sha256": "cf31b31bf84edfa1fda6a41fdeabc50ffeed4ca7d6c69f70c3652a5d7a1b36c9"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/tiled-draw-list.ts",
+      "sha256": "615243d85c287c82e9bc955762524ef05962c09091869fd385bf72f5fefaf25a"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/train-chains.ts",
+      "sha256": "41bcffff82cfd1867cde31ce0af39ac76a6521dd53e7a316f927b32182d9d3ae"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/types/blueprint.ts",
+      "sha256": "811ed445d53e56b9f3cf850e45861e3bc0050f22eb0715a0f323d15b0b7ae99c"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/types/draw-list.ts",
+      "sha256": "b1c040cdac3a02c380d157be0760b22b69353d96d8c1ae090535803fa3cd7b76"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/upgrade-planner.ts",
+      "sha256": "48e04500f7c8cdcf4c111cbd0057d0d885015cdd8355dd02496962a436f73956"
+    },
+    {
+      "file": "tools/vendor/fpsr/packages/renderer/src/wire-connectors.ts",
+      "sha256": "3231f9f3a900edc59870306fda818a65470a580b0570ac76d55311485391dfa0"
+    }
+  ]
+}

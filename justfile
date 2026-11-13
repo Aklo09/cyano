@@ -1,0 +1,44 @@
+set positional-arguments
+
+default:
+    @just --list
+
+# Build the native libraries and executable scaffolds. No Node required.
+build:
+    sh tools/swift.sh build
+
+# Test fixture preservation and real JavaScriptCore planner execution.
+test:
+    sh tools/swift.sh test --filter 'OriginalSourceTests|PlannerRuntimeTests'
+
+# Print the currently available CLI capabilities.
+release:
+    sh tools/swift.sh run fb-native release
+
+# Run the planner loading/empty-diagram probe. Does not paint images.
+planner-test:
+    sh tools/swift.sh run preview-probe --self-test
+
+# Install locked development dependencies without package lifecycle scripts.
+tools-install:
+    npm ci --prefix tools --ignore-scripts --no-audit --no-fund --cache .cache/npm
+
+# Rebuild the committed JavaScriptCore resource from vendored source.
+planner-build:
+    npm run --prefix tools planner:build
+
+# Check that the committed resource matches pinned source and bundler output.
+planner-check:
+    npm run --prefix tools planner:check
+
+# Verify copied sources, fixture hashes, local dependency versions, and references.
+tools-check:
+    node tools/check-foundation.mjs
+
+# Import the local asset pipeline without launching Factorio.
+assets-check:
+    node tools/asset-preparation/build-assets.mjs --check
+
+# Run the retained statistics reference cases against the private prototype map.
+statistics-test:
+    npm test --prefix tools

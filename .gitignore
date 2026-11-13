@@ -1,0 +1,12 @@
+.build/
+.cache/
+.swiftpm/
+node_modules/
+private-assets/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example

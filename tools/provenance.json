@@ -1,0 +1,1100 @@
+{
+  "schema": 1,
+  "copiedOn": "2026-11-13",
+  "sources": {
+    "fb": {
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "license": "MIT"
+    },
+    "fpsr": {
+      "url": "https://github.com/rickyzhangca/fpsr",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "license": "MIT"
+    }
+  },
+  "files": [
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/2i-1f_Assembler.txt",
+      "source": "fb/test-bp/2i-1f_Assembler.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "ef28b26547fa84f85863d39658432f9024649edbf745dd3b3fe161f2cf7acf5f",
+      "bytes": 2043
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/2i_Assembler.txt",
+      "source": "fb/test-bp/2i_Assembler.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "d264a1edf3667e6dd023576a8c5f2f32412bbdc62044ebf3e1758b6123322898",
+      "bytes": 975
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/4i_Assembler.txt",
+      "source": "fb/test-bp/4i_Assembler.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "415fb091e15e919a4b2cd41ea1d004d02d8e557d62d35942e1b2856cd2bb1ddb",
+      "bytes": 1191
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/4x_Rocket_Silo.txt",
+      "source": "fb/test-bp/4x_Rocket_Silo.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "0b2df260cbb3f5b3c25032b8d6e4146136b9af775b7241ede03014b79d2f376e",
+      "bytes": 1887
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/6i_Assembler.txt",
+      "source": "fb/test-bp/6i_Assembler.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "c3c4fb578094ffca4cb6bd471bbcc21d66f84938bd2939974bc6c6b29031368a",
+      "bytes": 1651
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/Hazard_Patterns.txt",
+      "source": "fb/test-bp/Hazard_Patterns.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "b6260c727bbc1cd9d39ac7d72244ef3f038165d743537e6a5e0b565dc211e5fc",
+      "bytes": 1927
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/RS.txt",
+      "source": "fb/test-bp/RS.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "5e88965d83e75925a177c301780921128e1b93f1b84ca5961e96cfcd12660c45",
+      "bytes": 919
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/bp.txt",
+      "source": "fb/test-bp/bp.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "61c843bbd2c3ceebb375e5149e01168c17f5a8d2428e2083c58acd3cfd4cb701",
+      "bytes": 260005
+    },
+    {
+      "path": "Tests/LibraryCoreTests/Fixtures/Blueprints/v0.59.0.txt",
+      "source": "fb/test-bp/v0.59.0.txt",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "0242f3975124629cad0b373e8b247e123be9bf2240f935c6787b92df7f7e74c9",
+      "bytes": 696189
+    },
+    {
+      "path": "tools/asset-preparation/build-assets.mjs",
+      "source": "fb/tools/renderer-evaluation/build-assets.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "9d2916f957a3d689bd5fdd5be9261b40f9840da262690473f5b9cdf66f620581",
+      "bytes": 4002,
+      "sourceSha256": "409179f8e3896c7d80885806a178ab9acf9463a26572b026e5f99d39bfd896cd",
+      "sourceBytes": 3149,
+      "adapted": true
+    },
+    {
+      "path": "tools/asset-preparation/game-statistics-reference.mjs",
+      "source": "fb/tools/renderer-evaluation/game-statistics-reference.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "ef792224744c5e2955d1bd667f75261da543131fef491a5515e072b82948c419",
+      "bytes": 3767,
+      "sourceSha256": "52e0066cb770d6b2db68c84ff213817abbec3d8da4f4612ffad37f116c734916",
+      "sourceBytes": 3562,
+      "adapted": true
+    },
+    {
+      "path": "tools/asset-preparation/statistics-reference.lua",
+      "source": "fb/tools/renderer-evaluation/statistics-reference.lua",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "78dd8d3c901abc543b7c888e090199d72368d8d9c4df608121636f3fbaca84c4",
+      "bytes": 7273
+    },
+    {
+      "path": "tools/asset-preparation/prototype-map.mjs",
+      "source": "fb/tools/renderer-evaluation/prototype-map.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "86408e98c2280afbba62b6ed74c3d8098c46a0f2c71c9218c9e2f33d6843dab6",
+      "bytes": 750
+    },
+    {
+      "path": "tools/asset-preparation/evaluate-statistics.mjs",
+      "source": "fb/tools/renderer-evaluation/evaluate-statistics.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "763788656fbc97b6f4e14550e9d0c3e46336254b355bd082a235a87b99bb46d1",
+      "bytes": 5431,
+      "sourceSha256": "e138a935f196cd95f02b207af619aed02191cbc5b569f986038b28f0f176887d",
+      "sourceBytes": 5432,
+      "adapted": true
+    },
+    {
+      "path": "tools/asset-preparation/statistics-cases.mjs",
+      "source": "fb/tools/renderer-evaluation/statistics-cases.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "7494e39111c86a9f55c32c7e56358e5c60254a8bf8e5b019b0d6a48e14542367",
+      "bytes": 4310
+    },
+    {
+      "path": "tools/asset-preparation/blueprint-statistics.test.mjs",
+      "source": "fb/tools/renderer-evaluation/blueprint-statistics.test.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "05a43aae921cf56b8c0bb35eb7ce4f7a83446f4b0cec99c04c1dad0206e433fa",
+      "bytes": 5825,
+      "sourceSha256": "5f41de50c6cbe3405e71f91af66b9d0f47400d1742bc555881695776318c0463",
+      "sourceBytes": 5794,
+      "adapted": true
+    },
+    {
+      "path": "tools/reference/blueprint-statistics.mjs",
+      "source": "fb/runtime/blueprint-statistics.mjs",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "84672c1989320092e17c13c5aaeed89544f639c37f77dc590355e89e1140e06d",
+      "bytes": 7524
+    },
+    {
+      "path": "LICENSE",
+      "source": "fb/LICENSE",
+      "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
+      "sha256": "b80bf2b1c554f4c6f6881f1d423fb33071d9abf3fd559a6881587f9eb7c740a9",
+      "bytes": 1074
+    },
+    {
+      "path": "tools/vendor/fpsr/LICENSE",
+      "source": "fpsr/LICENSE",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "f527fe8162aba4c4cae283be9d4821479ca499ab6b9e790f554c42662e1daf36",
+      "bytes": 1068
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/01-minimal-chest.txt",
+      "source": "fpsr/fixtures/decode/01-minimal-chest.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "b3dfa8ab4d3def4d35a26b78f8280ff5abbce6e14a0f486bf7031fc92b0b0880",
+      "bytes": 185
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/02-entities-direction-quality.txt",
+      "source": "fpsr/fixtures/decode/02-entities-direction-quality.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "15af296afd778ca865a97314874b02b47a3f7cfb284676a4ca038002c4922f14",
+      "bytes": 265
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/03-tiles-snap-grid.txt",
+      "source": "fpsr/fixtures/decode/03-tiles-snap-grid.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "48597f1c8ff1e0cb8d36e57cb28e78a3878c97656cb5be39d9f05c19dc6d0dcb",
+      "bytes": 205
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/04-wires.txt",
+      "source": "fpsr/fixtures/decode/04-wires.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "71d35e472dd9d6a73fef1f3c0b5f21951b82782eb744fd77e879ebc87a21bd1a",
+      "bytes": 221
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/05-nested-book.txt",
+      "source": "fpsr/fixtures/decode/05-nested-book.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "cab41f64501f71dc1149391b256da4c1a415b994b25a39cc9e3fd92265d530c4",
+      "bytes": 333
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/decode/06-book-with-planner.txt",
+      "source": "fpsr/fixtures/decode/06-book-with-planner.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "96fd505595defec31cd13990c774794e1740237f8e3422326d01692c3dd2d94e",
+      "bytes": 305
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/visual-tests/base-game/book.bp.txt",
+      "source": "fpsr/fixtures/visual-tests/base-game/book.bp.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "d177ba34d7634af9f4193e42f4fbaafe86d438080b4254c339b6410e31272d87",
+      "bytes": 15554
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/visual-tests/official-mods/elevated-rails.bp.txt",
+      "source": "fpsr/fixtures/visual-tests/official-mods/elevated-rails.bp.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "914f97165c292cca82dfb01a0a87c96e4a415c6a61d18eb66526ca4672b4ffb1",
+      "bytes": 1026
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/visual-tests/official-mods/quality.bp.txt",
+      "source": "fpsr/fixtures/visual-tests/official-mods/quality.bp.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a324c563d2ec4f008a7ac5e2ecc270de1f6970ff399a62c939f2336585146dac",
+      "bytes": 206
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/visual-tests/official-mods/recycler.bp.txt",
+      "source": "fpsr/fixtures/visual-tests/official-mods/recycler.bp.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "de9a1e3b7cfe33595172307e850649f29024dbcf539e6ec01c70b0997c7372b4",
+      "bytes": 394
+    },
+    {
+      "path": "tools/vendor/fpsr/fixtures/visual-tests/official-mods/space-age.bp.txt",
+      "source": "fpsr/fixtures/visual-tests/official-mods/space-age.bp.txt",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "208c2acb2868d8091b31fad1c866a35f4ac5cb40cacb36eee633cbc0bc526755",
+      "bytes": 6198
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/abort.ts",
+      "source": "fpsr/packages/renderer/src/abort.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "394f9dc4abb71d7d730fa38f88d517bbd0c3b776c9e3c126ea5c9d1a7ce622cd",
+      "bytes": 1375
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/alt-mode-request-pin.ts",
+      "source": "fpsr/packages/renderer/src/alt-mode-request-pin.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "09f61e5f00c97a03d7e4c41d077d02f1ebfe89ac2dd49324b49c984f7fbd83e5",
+      "bytes": 9075
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/alt-mode-signals.ts",
+      "source": "fpsr/packages/renderer/src/alt-mode-signals.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "1832415e55e0120ef3d41e8d548925a8be5fdc71ea8d6f2b8badae46029208df",
+      "bytes": 5981
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/alt-mode.ts",
+      "source": "fpsr/packages/renderer/src/alt-mode.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c59639860c17aaecde9b39f10139ed7915a1f03a6fff2ee328b80ab1d4a61e93",
+      "bytes": 14972
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/assets.ts",
+      "source": "fpsr/packages/renderer/src/assets.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "96cc038ffa204a982846317d6c6e1a8b59391a2e036fc5e902e803d8cfed5688",
+      "bytes": 11762
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/background.ts",
+      "source": "fpsr/packages/renderer/src/background.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "8fcc0abf2fc70ad239295cf6eb0c43693220ccb5b4f5a9a3f80eaf56339a4fa7",
+      "bytes": 3287
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/base64.ts",
+      "source": "fpsr/packages/renderer/src/base64.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "098e643716d66a514ee8021862514554db09307846eb1bc782bd17755674acc0",
+      "bytes": 2147
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/blueprint-components.ts",
+      "source": "fpsr/packages/renderer/src/blueprint-components.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "795dd1bf810c4f8653fec9056a02f76b3bcbf7b77b89f25e14af7fbd1c2e7f93",
+      "bytes": 1585
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/blueprint-icons.ts",
+      "source": "fpsr/packages/renderer/src/blueprint-icons.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "18c7e8b49d6709a21eff9d38d45e9e31a39d14232e17bff48f304dc0db08c3f7",
+      "bytes": 5471
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/book.ts",
+      "source": "fpsr/packages/renderer/src/book.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ba03158f45d8e28a0437ca8ec59bd3a259ad84e2d900d76dadd3abd78e1828cb",
+      "bytes": 17116
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas.ts",
+      "source": "fpsr/packages/renderer/src/canvas.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "72b003a7984a93f07b2ec8608c7638f36acb0cad6a18089b109b2a6658c45bdc",
+      "bytes": 926
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "1c14fe2c852de319ddbec6b4803953ea1b4d652f15de802acdba739d530e351a",
+      "bytes": 172
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/draw-icon.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/draw-icon.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "111a2e4dfb7606ccb97321591fa2951b33856d56140ee880365feb5d195a848d",
+      "bytes": 5766
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/draw-snap-grid.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/draw-snap-grid.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "39417d9c28181e55766642834a87798acac43ed790d11ad627861b1ca131945f",
+      "bytes": 1788
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/draw-sprite.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/draw-sprite.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3e47840ac1392bf09a414865b59e78abacc09ab4e833d99e1d65432127878e63",
+      "bytes": 10006
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/draw-text.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/draw-text.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "dde1ef3c9f66abf701b4596cffab095866295fe059e9797f94feba7b8e83ff75",
+      "bytes": 619
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/draw-wire.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/draw-wire.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "50d0a817eb96bec3c0813c15b896ae0bfcaf1d85241ad1fc8cf393fff1a35e74",
+      "bytes": 2539
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/execute.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/execute.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "edcc98ed4dd692351b1303117d57b6c171b8cf7da27dffee7911776eb0247f4a",
+      "bytes": 9050
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/index.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a1a5ebe0b175e758d6726345258a9de06be0f47e8da9dae33bb3c1705f816b11",
+      "bytes": 149
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/types.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/types.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "9ec42c30e7f9949f488219a53dbb7fbe374740b2b8f3762a0318b34b3cd92983",
+      "bytes": 4281
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/canvas2d/util.ts",
+      "source": "fpsr/packages/renderer/src/canvas2d/util.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "89604a97fc1d077e3cb8a1f39ca4ba3efa30bcc54234865e0eb4daa68ef29f59",
+      "bytes": 376
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/cargo-bay-connections.ts",
+      "source": "fpsr/packages/renderer/src/cargo-bay-connections.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "337b949dec852ed1a3357f868009e33029d815c6c4435cc906ca1ff8cc508fac",
+      "bytes": 12559
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/checkerboard.ts",
+      "source": "fpsr/packages/renderer/src/checkerboard.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "4ed09b7933d0aef97952573a2692bb9ba9c7f53d01052b3e274c955beedd6367",
+      "bytes": 1727
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/coordinate-overlay.ts",
+      "source": "fpsr/packages/renderer/src/coordinate-overlay.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "97cb9fa479672f37d5ef1b1d63770a7c7efbc6624bd4602d30f6cc5acea6848d",
+      "bytes": 2399
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/decode.ts",
+      "source": "fpsr/packages/renderer/src/decode.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "2cfe11bf0ac9952dcb710ff22ee63d6e4c66ec4d12aef2610a43093d51951e35",
+      "bytes": 7912
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/deconstruction-planner.ts",
+      "source": "fpsr/packages/renderer/src/deconstruction-planner.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "4ab4320602e066a81356ccfb90fa044fbbdd5a3f5a7946b1f3701e800035cd2b",
+      "bytes": 7644
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/encode.ts",
+      "source": "fpsr/packages/renderer/src/encode.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "42944a2b4d3fcd268fc365842a0d92b32b50c082ed1aca866601f57c3ee15160",
+      "bytes": 481
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/frame.ts",
+      "source": "fpsr/packages/renderer/src/frame.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c7fc65a42186a47b08e571cec953d33e40bcc37ae4384c5a66fc93712486adf9",
+      "bytes": 873
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/host.ts",
+      "source": "fpsr/packages/renderer/src/host.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ec77f3962d42b552d85967cc26c88879be08900b147eaab3cf027fbe61f667b7",
+      "bytes": 1711
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/icon-resolve.ts",
+      "source": "fpsr/packages/renderer/src/icon-resolve.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "23e75b4d279761345a9d45d464f454903d96da1e8f28f3be1b31ffda1baddbc3",
+      "bytes": 548
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/icon-silhouette.ts",
+      "source": "fpsr/packages/renderer/src/icon-silhouette.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a614c3b4dfe02095440479fcc309b25989b77f57d601894a83c90a6c2a20fc17",
+      "bytes": 8361
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/index.ts",
+      "source": "fpsr/packages/renderer/src/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "19cc57f01554f511c3afdf75964cbdcfd7d7d34ad586960804bc476cde30b239",
+      "bytes": 4570
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/internal/prepared-viewport.ts",
+      "source": "fpsr/packages/renderer/src/internal/prepared-viewport.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "9d1d0cf3490be9d0b1934666c7067ad3d2548da9d6e48595ba9845ac73e29da4",
+      "bytes": 946
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/migrate.ts",
+      "source": "fpsr/packages/renderer/src/migrate.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "8b46c857a7ccf276413ac14b30db0abd643bb6037eaf2ff71668e758f0e3e729",
+      "bytes": 10389
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/node-browser.ts",
+      "source": "fpsr/packages/renderer/src/node-browser.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a38106d45d9c57a9033cde4a71d4725406800b4010ed1ac2ef3f2c21e577f45a",
+      "bytes": 375
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/node.ts",
+      "source": "fpsr/packages/renderer/src/node.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "5648c024ce49d27006c0fb54ced373750fc2e1de061fc4d7174f540bdcd3cfa8",
+      "bytes": 4904
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan-diagnostics.ts",
+      "source": "fpsr/packages/renderer/src/plan-diagnostics.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "471172eeb82fcbacc5eb3f7dc916e681ef413ec7e51c14f54480d952e51f12c1",
+      "bytes": 4496
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan.ts",
+      "source": "fpsr/packages/renderer/src/plan.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ae9a582492ff67ed8d407f4e9dd9cfc74aa3fba839f17697dfe6d32f7d213b7f",
+      "bytes": 282
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/belt-readers.ts",
+      "source": "fpsr/packages/renderer/src/plan/belt-readers.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ecfc1eb3e93b14bd39a674cacb8484db4f301210a9bbccc7aab4de1a5dd19891",
+      "bytes": 3595
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/bounds.ts",
+      "source": "fpsr/packages/renderer/src/plan/bounds.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "b8ef82c9417a7a4b130ffda53d5f28bf812137bc2eab2296aad8674870168dd2",
+      "bytes": 7083
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/circuit-connectors.ts",
+      "source": "fpsr/packages/renderer/src/plan/circuit-connectors.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "021238bbe53d1ac640715c4a97582d0cb8f8109e1fa4f45587bbfff09f9428a9",
+      "bytes": 10523
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/deconstruction-planner.ts",
+      "source": "fpsr/packages/renderer/src/plan/deconstruction-planner.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "29fb847c3ba38061906583a9846e14c02828c7ce90c49ec02ca430b0016462bb",
+      "bytes": 9209
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/index.ts",
+      "source": "fpsr/packages/renderer/src/plan/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "01a027513e5cb1bf575c76fb1d5dfca2e1c8b7f22545970e392c06911abe0089",
+      "bytes": 16622
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/pipe-covers.ts",
+      "source": "fpsr/packages/renderer/src/plan/pipe-covers.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "82841932fbebc086b5bdb358544ba4698d4b53260b65239b1bdbaa23d3f26d31",
+      "bytes": 8652
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/snap-grid.ts",
+      "source": "fpsr/packages/renderer/src/plan/snap-grid.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "940b06fcfe0ceded5ea4293f8a824827bc16ece538f15636c74da10ad3bde29c",
+      "bytes": 826
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/tiles.ts",
+      "source": "fpsr/packages/renderer/src/plan/tiles.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "787c4c5b84ac4a273efce6608c9b3f2be8a814a04026d312ff0f536eb67bc3a0",
+      "bytes": 2127
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/unsupported.ts",
+      "source": "fpsr/packages/renderer/src/plan/unsupported.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "0d24ddcc521487c3334c5fcbd0a0dc282e9ba769efedc676c736ee62f5533711",
+      "bytes": 2177
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/upgrade-planner.ts",
+      "source": "fpsr/packages/renderer/src/plan/upgrade-planner.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "35ea2aff2d400fa230d076f995c711a73bf567655bc30b9bbd57e1fd080c36b8",
+      "bytes": 5442
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/plan/wires.ts",
+      "source": "fpsr/packages/renderer/src/plan/wires.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "fc2f7f759fdb126ff1fa249c11777b07a98326f0258e2323f7fd109bb9472484",
+      "bytes": 4938
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/planner.ts",
+      "source": "fpsr/packages/renderer/src/planner.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "4633d6fb09b05ea33f184036996293cc61bda98f65278880b15c332d4462dcc5",
+      "bytes": 1160
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/png-stream.ts",
+      "source": "fpsr/packages/renderer/src/png-stream.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "23bca9370e53b39b9e88736f0b0b66a172c9c317fb83f2e03db2226ae0688c4e",
+      "bytes": 3986
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/pole-orientation.ts",
+      "source": "fpsr/packages/renderer/src/pole-orientation.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "84aede769db391b97a149f941906fd64be2ebc526a4fde3b2b3934addb592fc2",
+      "bytes": 3346
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/profile.ts",
+      "source": "fpsr/packages/renderer/src/profile.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "bb515403f6d16039a4a85774e3cd22774fb0a27d082d610483ca2f3df797651d",
+      "bytes": 3208
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/render-db.ts",
+      "source": "fpsr/packages/renderer/src/render-db.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "6818e20b41e04134e730d9f245ec161dd257315d8c82a187cc5f5dc45ec392ca",
+      "bytes": 815
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/renderer.ts",
+      "source": "fpsr/packages/renderer/src/renderer.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "2d5f9c6174290f6f71ca6c8c20f0b14313766a25be24beb486722c50ed6752fe",
+      "bytes": 36356
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve.ts",
+      "source": "fpsr/packages/renderer/src/resolve.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "71ccbb13cc887ac3162fc82b3745e945f071131ee7ab9a9988b63a8c85989974",
+      "bytes": 958
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/belts.ts",
+      "source": "fpsr/packages/renderer/src/resolve/belts.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c2e47ff33f64aae426f5bd7f0c42e631f029f3c3187536f3ed5e5d848e3e6354",
+      "bytes": 21679
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/context.ts",
+      "source": "fpsr/packages/renderer/src/resolve/context.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "e38f38c75c5b166515ca942edf009a864cc2dd9f7c6da36eae371433503e27f1",
+      "bytes": 2699
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/fluid-ports.ts",
+      "source": "fpsr/packages/renderer/src/resolve/fluid-ports.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3c7a5a08cb0aa799c539f6595b822e7647d21d8ab7d4644686a990387e824999",
+      "bytes": 7082
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/index.ts",
+      "source": "fpsr/packages/renderer/src/resolve/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "86ccd775295f3c5b14539e0f43a73cd00a172b07cce02ab03d2c47def0dbc0cb",
+      "bytes": 13292
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/pipes.ts",
+      "source": "fpsr/packages/renderer/src/resolve/pipes.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "e9026569523b3cb591c62001e795e537a9a35afb6fd5a27019f03eabafbd448f",
+      "bytes": 7177
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/shared.ts",
+      "source": "fpsr/packages/renderer/src/resolve/shared.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "6df51dfa23210566ccc2e2e8d8b3975ab4d3212bd4f113ca175e0bd13d803c96",
+      "bytes": 2198
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/trains.ts",
+      "source": "fpsr/packages/renderer/src/resolve/trains.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c691614655211260bdffbce2042d507dc14f86ba2875eff90e835cfee9b35dc0",
+      "bytes": 5046
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/resolve/walls.ts",
+      "source": "fpsr/packages/renderer/src/resolve/walls.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "6a00757ace4cef222f988338803b55825d6827e4a2b851fa9c39b4699a3d2aac",
+      "bytes": 1555
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/rich-text.ts",
+      "source": "fpsr/packages/renderer/src/rich-text.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a8beaeda41f73756185c88aa19c20ecc5faa198f7f7b6bb574e9c60d23259199",
+      "bytes": 5237
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/snap-grid.ts",
+      "source": "fpsr/packages/renderer/src/snap-grid.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "cf31b31bf84edfa1fda6a41fdeabc50ffeed4ca7d6c69f70c3652a5d7a1b36c9",
+      "bytes": 806
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/space-background.ts",
+      "source": "fpsr/packages/renderer/src/space-background.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "0d5c09a3d5bf6d83e1a6852cb14b1aef9cc1ca38cdaca4bc3b531ad85e498054",
+      "bytes": 7655
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/terrain-background.ts",
+      "source": "fpsr/packages/renderer/src/terrain-background.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "45c2d66959c7ee7c8a96222872f3e382d5fa8910af230cfd81559192b667f9fd",
+      "bytes": 9532
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/text-font.ts",
+      "source": "fpsr/packages/renderer/src/text-font.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "01adb6263aa9aa293b174138be835262ec68d6b5259955786ad81447672e8c61",
+      "bytes": 389
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/tiled-draw-list.ts",
+      "source": "fpsr/packages/renderer/src/tiled-draw-list.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "615243d85c287c82e9bc955762524ef05962c09091869fd385bf72f5fefaf25a",
+      "bytes": 1911
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/train-chains.ts",
+      "source": "fpsr/packages/renderer/src/train-chains.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "41bcffff82cfd1867cde31ce0af39ac76a6521dd53e7a316f927b32182d9d3ae",
+      "bytes": 9401
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/types/blueprint.ts",
+      "source": "fpsr/packages/renderer/src/types/blueprint.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "811ed445d53e56b9f3cf850e45861e3bc0050f22eb0715a0f323d15b0b7ae99c",
+      "bytes": 7613
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/types/draw-list.ts",
+      "source": "fpsr/packages/renderer/src/types/draw-list.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "b1c040cdac3a02c380d157be0760b22b69353d96d8c1ae090535803fa3cd7b76",
+      "bytes": 8951
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/types/render-db.ts",
+      "source": "fpsr/packages/renderer/src/types/render-db.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a6f72f3b6350ee4c66d1c815d3150c45a41c0a838e247e1c1f44cd5ba32cdaab",
+      "bytes": 24487
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/types/skia-canvas.d.ts",
+      "source": "fpsr/packages/renderer/src/types/skia-canvas.d.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "0729daf00dc8add0aa8d0dde61a138b8dd26d998238de14ac10a5bc9e8c3742e",
+      "bytes": 454
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/unstable-prepared-viewport.ts",
+      "source": "fpsr/packages/renderer/src/unstable-prepared-viewport.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "5510ddd611d8bc9e527958cb988d1730f2a7962d76b32b45a72af7a10336cf37",
+      "bytes": 568
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/upgrade-planner.ts",
+      "source": "fpsr/packages/renderer/src/upgrade-planner.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "48e04500f7c8cdcf4c111cbd0057d0d885015cdd8355dd02496962a436f73956",
+      "bytes": 3714
+    },
+    {
+      "path": "tools/vendor/fpsr/packages/renderer/src/wire-connectors.ts",
+      "source": "fpsr/packages/renderer/src/wire-connectors.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3231f9f3a900edc59870306fda818a65470a580b0570ac76d55311485391dfa0",
+      "bytes": 1286
+    },
+    {
+      "path": "tools/vendor/fpsr/pnpm-lock.yaml",
+      "source": "fpsr/pnpm-lock.yaml",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "9d7db067541258f07ba20c9aa6de104d6d3682788d819bed0ac4bca43f0c6620",
+      "bytes": 422067
+    },
+    {
+      "path": "tools/vendor/fpsr/pnpm-workspace.yaml",
+      "source": "fpsr/pnpm-workspace.yaml",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "cad9c043e3a4df96992a441d98fc07df9ebca3770776ab309f471c9274e2e889",
+      "bytes": 520
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/assets/unsupported-entity.png",
+      "source": "fpsr/tools/pipeline/assets/unsupported-entity.png",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "a7483ad4089404b7323436207bdabfcb7ca4dd86760577a7b2e1feac914686d6",
+      "bytes": 6820
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/atlas.ts",
+      "source": "fpsr/tools/pipeline/src/atlas.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "541c5c8728996e0f1af5a6d29d8e985ed03f3a9fa3a06a8a5dd797d5c173696d",
+      "bytes": 15338
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/belt-connector-split.ts",
+      "source": "fpsr/tools/pipeline/src/belt-connector-split.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "b4575692cc9beb39f82bc8be8c0d93ebf0d191111207b1ed03df9786c2a9c17e",
+      "bytes": 5062
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/bench.ts",
+      "source": "fpsr/tools/pipeline/src/bench.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "b3ff6dbcc3db4a14819cccc7de596b2bda11098a90503149de9979b2c08fd02f",
+      "bytes": 3012
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/cli.ts",
+      "source": "fpsr/tools/pipeline/src/cli.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ac672c9355b6e3bf7ec7f376793c19ce96d78157847b90a3ca05c147dd45bdc7",
+      "bytes": 5815
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/discover.ts",
+      "source": "fpsr/tools/pipeline/src/discover.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "92480ddc07c3a631130fa0fa7b772b5662e7c2f8799212bc3fc18a3d5f27c9b6",
+      "bytes": 6150
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill.ts",
+      "source": "fpsr/tools/pipeline/src/distill.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "87ce3c0e7c866fc5b199badda5d6906f32ccffa057223597e6c4e6dca412d9fe",
+      "bytes": 211
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/combat.ts",
+      "source": "fpsr/tools/pipeline/src/distill/combat.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "9668f0bb5c4bbfec99969479a9a0422438e8d3ac4507b17dad04a545a56e17fd",
+      "bytes": 7560
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/combat.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/combat.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "39311549ac4f924334bbe534a7973f60b6853e58d380ee35e9b20cee1be8b773",
+      "bytes": 503
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/index.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "7d9c897bbcc8e8997f95d4e6c1b2edadec6e3c5012903841cd38e7c4e9c9c015",
+      "bytes": 2344
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/logistics.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/logistics.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3e0b161521ccbff4579fc0367c815f5ed2147a11abd72649d5088a709c8ce7e0",
+      "bytes": 1883
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/other.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/other.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "77f44a327313835f26380b1bd37b127245e4832ffd5e97f8f1011f219b714c64",
+      "bytes": 320
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/production.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/production.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "47aa3c07ccdc71f2ad1b53c1fadef0986d2726aa7552c752a049f054d7a7f286",
+      "bytes": 840
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/space.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/space.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "0abc068da8baf12d8ea36522d13960fc3de1c64cf6eb2a5f7426f08ceddac24a",
+      "bytes": 430
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/domains/types.ts",
+      "source": "fpsr/tools/pipeline/src/distill/domains/types.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "9355269eec71b701d5891073108aec9e6c56aaaa1de7569fd68411de95cde9ef",
+      "bytes": 1170
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/index.ts",
+      "source": "fpsr/tools/pipeline/src/distill/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "d5c4352fc61cdb829f384307b1994711856481095dc48ec43cff0c844450ffdc",
+      "bytes": 28571
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/belts.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/belts.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "e313794248aabebb42ce6da41940fe3e0c535a651090324e07cb4aec44132d12",
+      "bytes": 7200
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/circuit.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/circuit.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "ec1f01f8a1ed2e47845e6404ad6adf69bf033ab694ff535077becc3be482eedd",
+      "bytes": 8150
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/fluids.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/fluids.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "20ec988e80ceec5f4b16799aa81c107adb46409bbc38e34e30c321fdb0c41ab3",
+      "bytes": 4020
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/index.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "222ca42dfa7c9a238aaa7b28e3c3e7d256b97de74034164b57aa21145797368a",
+      "bytes": 558
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/inserters.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/inserters.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "dd8333e0b1daaacbc67564607869fea41997b0f54f1ae9b0533df138d21149c1",
+      "bytes": 4662
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/rails.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/rails.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "8c2ba3a8fc1e5f385e401d5942f06afab63dffca768b5d6cbec411f19291dd79",
+      "bytes": 13602
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/logistics/trains.ts",
+      "source": "fpsr/tools/pipeline/src/distill/logistics/trains.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "10d47658d9eb87da28116840daf04fae3173e4baa8afae37513db2bef4010536",
+      "bytes": 5939
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/other.ts",
+      "source": "fpsr/tools/pipeline/src/distill/other.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "445ef913627b655de10d2038551050dec0ff150bbffa048a1a1942fa5ae59fb7",
+      "bytes": 26345
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/production.ts",
+      "source": "fpsr/tools/pipeline/src/distill/production.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "5e4d0449b606b072f0284b33c816266996361ed578ec484ac760b3683f82aa05",
+      "bytes": 21299
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/belt-connectors.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/belt-connectors.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "d5b86f7a73d10c36b84ffafbaeb26622a1a9171c699fe252c0019502e37aacb8",
+      "bytes": 8969
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/box.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/box.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "48741343351f9585b0ec29f807e7172238419fea93b6458066ec5bc6ed34f6a9",
+      "bytes": 696
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/color.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/color.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c249ac48104fdcc2ad9e1a234299d893389f1619c89f60446c1d2efa29674d0b",
+      "bytes": 693
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/finalize.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/finalize.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "16b6db935d81741bf0355b00bd60fc51a52c620b47e9d61e1d3bb755596e0b4c",
+      "bytes": 2863
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/index.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "61d0f422e408e3e49a42932f0a6f779c7a9b86b4f057da022aadd1be30f58bc4",
+      "bytes": 1168
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/layers.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/layers.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "30317a478e1a05a95bc70d78d8be36c01e7fa153f679f3f68748175ba5dba5fa",
+      "bytes": 13382
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/pipe.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/pipe.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "934ea90ac09845bd57df839f7f04564711ef741c7a7a4da9a826167f260042f8",
+      "bytes": 19063
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/shared/wire.ts",
+      "source": "fpsr/tools/pipeline/src/distill/shared/wire.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "1123beed386493be5888e51eb0ecd0393066b67652ddbec8bc290ed35ca91714",
+      "bytes": 8826
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/distill/space.ts",
+      "source": "fpsr/tools/pipeline/src/distill/space.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "162c4a0c83a3560669938b366d12209382f65b81423fff7146de7db829591e94",
+      "bytes": 14491
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/dump.ts",
+      "source": "fpsr/tools/pipeline/src/dump.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "cd900138afbb088bc318a5814273d3c6c63a31328000c02c25f438eef7a23ce1",
+      "bytes": 3060
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/index.ts",
+      "source": "fpsr/tools/pipeline/src/index.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "c0c8e78ff5590ef968c3c9fe694ef9c586ee6bd006f2b8a5ac2b0cfbbae30ed1",
+      "bytes": 281
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/paths.ts",
+      "source": "fpsr/tools/pipeline/src/paths.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "e26f92dcbd679edc484464f443ac91db6e011ce012f6cbdd78f74691ba7cff45",
+      "bytes": 6310
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/render-layers.ts",
+      "source": "fpsr/tools/pipeline/src/render-layers.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "91f78975be85b668ebb1ffc291276ea0f6f5f71e737a287ffdac27bd4e60f681",
+      "bytes": 4772
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/sprite.ts",
+      "source": "fpsr/tools/pipeline/src/sprite.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "42775679a647f880c7a8d39eddd225dddca6b3a792adbf53e497b04b7f0c6511",
+      "bytes": 20295
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/types.ts",
+      "source": "fpsr/tools/pipeline/src/types.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3076d3a207410cb2a190794059f215d768b3b2d940c9e25e71797bba8f5fe218",
+      "bytes": 2448
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/util.ts",
+      "source": "fpsr/tools/pipeline/src/util.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "8d1acc974c12bebce849ec4ad54d8abcbb2bc81c10ec6590c4f7baa87b2bb6d8",
+      "bytes": 1219
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/verify.ts",
+      "source": "fpsr/tools/pipeline/src/verify.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "12ecd58f3c6a4670fd3c738d8907e9d04f0d55c2770a2cd67c74a0d4b9c14411",
+      "bytes": 8874
+    },
+    {
+      "path": "tools/vendor/fpsr/tools/pipeline/src/water-effect.ts",
+      "source": "fpsr/tools/pipeline/src/water-effect.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "sha256": "3be678fa8d716a80dc3a908986222aca9a82569c90befe38dbd98522ccd8ec81",
+      "bytes": 9933
+    }
+  ]
+}

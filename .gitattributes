@@ -1,0 +1,3 @@
+# Blueprint fixtures are opaque source bytes, including their original line endings.
+/Tests/LibraryCoreTests/Fixtures/Blueprints/*.txt -text -diff
+/tools/vendor/fpsr/fixtures/**/*.txt -text -diff

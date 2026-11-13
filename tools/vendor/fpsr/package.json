@@ -1,0 +1,5 @@
+{
+  "name": "fb-native-vendored-fpsr-source",
+  "private": true,
+  "type": "module"
+}

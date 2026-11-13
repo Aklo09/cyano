@@ -1,0 +1,183 @@
+/**
+ * Stable root export surface for `@rickyzhangca/fpsr`.
+ *
+ * Prefer subpaths for deeper APIs:
+ * - `@rickyzhangca/fpsr/planner` — resolve / plan / draw-list diagnostics
+ * - `@rickyzhangca/fpsr/canvas` — Canvas2D execution and backgrounds
+ * - `@rickyzhangca/fpsr/render-db` — RenderDb / frame types
+ * - `@rickyzhangca/fpsr/node` — filesystem asset source (Node only)
+ * - `@rickyzhangca/fpsr/unstable-prepared-viewport` — experimental prepared paint
+ */
+
+export {
+  blueprintBookCover,
+  blueprintBookCoverIcons,
+  BlueprintSelectError,
+  buildBookTree,
+  listBlueprints,
+  resolveActivePath,
+  selectBlueprint,
+  selectBook,
+  selectDeconstructionPlanner,
+  selectUpgradePlanner,
+} from "./book.js";
+export type {
+  BlueprintBookCover,
+  BlueprintBookCoverNested,
+  BlueprintSelectReason,
+  BookTree,
+  BookTreeItem,
+  BookTreeItemKind,
+} from "./book.js";
+
+export {
+  asUpgradePlanner,
+  UPGRADE_PLANNER_SLOT_COUNT,
+  upgradePlannerIcons,
+  upgradePlannerMappers,
+} from "./upgrade-planner.js";
+export type {
+  UpgradeMapper,
+  UpgradeMapperDestination,
+  UpgradeMapperSource,
+  UpgradePlanner,
+} from "./upgrade-planner.js";
+
+export {
+  asDeconstructionPlanner,
+  DECONSTRUCTION_ENTITY_FILTER_SLOT_COUNT,
+  DECONSTRUCTION_TILE_FILTER_SLOT_COUNT,
+  deconstructionEntityFilterMode,
+  deconstructionEntityFilters,
+  deconstructionPlannerIcons,
+  deconstructionTileFilterMode,
+  deconstructionTileFilters,
+  deconstructionTileSelectionMode,
+  deconstructionTreesAndRocksOnly,
+  formatDeconstructionFilterMode,
+  formatDeconstructionTileSelectionMode,
+} from "./deconstruction-planner.js";
+export type {
+  DeconstructionEntityFilter,
+  DeconstructionFilterMode,
+  DeconstructionPlanner,
+  DeconstructionPlannerSettings,
+  DeconstructionTileFilter,
+  DeconstructionTileSelectionMode,
+} from "./deconstruction-planner.js";
+
+export { FPSR_TEXT_FONT_FALLBACK, FPSR_TEXT_FONT_FAMILY, fpsrTextFontCss } from "./text-font.js";
+
+export { BlueprintDecodeError, decode, decodeWithStats } from "./decode.js";
+export type { BlueprintDecodeReason } from "./decode.js";
+export { encode } from "./encode.js";
+
+export type {
+  AssetEvent,
+  AssetEventKind,
+  DecodeStats,
+  DrawListStats,
+  PlanProfile,
+  RenderProfile,
+} from "./profile.js";
+
+export {
+  BLUEPRINT_ADAPTERS,
+  legacyItemsObjectToInsertPlans,
+  migrateDocumentTo2x,
+  migrateTo2x,
+} from "./migrate.js";
+export type { BlueprintAdapter } from "./migrate.js";
+
+export { countBlueprintComponents } from "./blueprint-components.js";
+export type { BlueprintComponentCount } from "./blueprint-components.js";
+
+export {
+  BLUEPRINT_ICON_TILE_SIZE,
+  blueprintIconSignalCenter,
+  blueprintIconSignalScale,
+  blueprintIconSignalSizePx,
+  blueprintIconSignalYOffsetPx,
+  filledBlueprintIcons,
+  planBlueprintIcons,
+} from "./blueprint-icons.js";
+export type {
+  BlueprintIconPlan,
+  BlueprintIconSignalPlan,
+  BlueprintIconVariant,
+  PlanBlueprintIconsOptions,
+} from "./blueprint-icons.js";
+
+export { resolveIconFrameId } from "./icon-resolve.js";
+
+export {
+  parseRichText,
+  richTextIconKeys,
+  richTextIconQuality,
+  stripRichText,
+} from "./rich-text.js";
+export type { RichTextToken } from "./rich-text.js";
+
+export { cdnAssets } from "./assets.js";
+export type {
+  AssetManifest,
+  AssetSource,
+  AssetTier,
+  AssetTierManifest,
+  CdnAssetsOptions,
+  ManifestFont,
+} from "./assets.js";
+
+export { computeTileFrame } from "./frame.js";
+export type { TileFrame } from "./frame.js";
+
+export {
+  AssetDensityMismatchError,
+  createRenderer,
+  measureTileFrame,
+  UnknownTerrainBackgroundError,
+} from "./renderer.js";
+export type {
+  CanvasLike,
+  CreateCanvasFn,
+  CreateRendererOptions,
+  MaxOutputSize,
+  MeasureOptions,
+  RenderBackground,
+  Renderer,
+  RenderImageMimeType,
+  RenderImageOptions,
+  RenderMeasurement,
+  RenderOptions,
+  RenderProgressEvent,
+  RenderResult,
+  TiledPngOptions,
+  TiledPngResult,
+} from "./renderer.js";
+
+export { decodeVersion } from "./types/blueprint.js";
+export type {
+  Blueprint,
+  BlueprintBook,
+  BlueprintBookEntry,
+  BlueprintDocument,
+  BlueprintEntity,
+  BlueprintFilter,
+  BlueprintInsertPlan,
+  BlueprintInventory,
+  BlueprintInventoryPosition,
+  BlueprintItemInventoryPositions,
+  BlueprintRef,
+  BlueprintRollingStockConnection,
+  BlueprintWire,
+  Color,
+  Icon,
+  Position,
+  SignalId,
+  Tile,
+} from "./types/blueprint.js";
+
+export type { DrawCmd, DrawList, DrawListBounds } from "./types/draw-list.js";
+export type { FrameId, FrameMeta, RenderDb } from "./types/render-db.js";
+
+export type { AssetLoadOptions, ImageDataLike, ImageSource } from "./host.js";

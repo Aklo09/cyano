@@ -1,0 +1,328 @@
+import type { ImageSource } from "../host.js";
+import { RENDER_LAYERS, type RectCmd, type SpriteCmd } from "../types/draw-list.js";
+import type { FrameMeta } from "../types/render-db.js";
+import type { Canvas2DContextLike, ExecuteDrawListOptions } from "./types.js";
+import { packedHeight, packedWidth, rgba } from "./util.js";
+
+const PIXEL_SNAPPED_RAIL_LAYERS = new Set<number>([
+  RENDER_LAYERS["rail-stone-path-lower"],
+  RENDER_LAYERS["rail-stone-path"],
+  RENDER_LAYERS["rail-tie"],
+  RENDER_LAYERS["rail-screw"],
+  RENDER_LAYERS["rail-metal"],
+  RENDER_LAYERS["elevated-rail-stone-path-lower"],
+  RENDER_LAYERS["elevated-rail-stone-path"],
+  RENDER_LAYERS["elevated-rail-tie"],
+  RENDER_LAYERS["elevated-rail-screw"],
+  RENDER_LAYERS["elevated-rail-metal"],
+]);
+
+export function drawRect(
+  ctx: Canvas2DContextLike,
+  cmd: RectCmd,
+  ox: number,
+  oy: number,
+  ppt: number,
+): void {
+  ctx.fillStyle = rgba(cmd.color);
+  ctx.fillRect((cmd.x + ox) * ppt, (cmd.y + oy) * ppt, cmd.w * ppt, cmd.h * ppt);
+}
+
+export function atlasSourceRect(
+  frame: FrameMeta,
+  src: { x: number; y: number; w: number; h: number },
+): { x: number; y: number; w: number; h: number } {
+  const packedW = packedWidth(frame);
+  const packedH = packedHeight(frame);
+  const atlasScaleX = frame.w === 0 ? 0 : packedW / frame.w;
+  const atlasScaleY = frame.h === 0 ? 0 : packedH / frame.h;
+  const relX = src.x - frame.ox;
+  const relY = src.y - frame.oy;
+  return {
+    x: frame.x + relX * atlasScaleX,
+    y: frame.y + relY * atlasScaleY,
+    w: src.w * atlasScaleX,
+    h: src.h * atlasScaleY,
+  };
+}
+
+export function drawSprite(
+  ctx: Canvas2DContextLike,
+  cmd: SpriteCmd,
+  frame: FrameMeta,
+  image: ImageSource,
+  ox: number,
+  oy: number,
+  ppt: number,
+  createCanvas?: ExecuteDrawListOptions["createCanvas"],
+): void {
+  let dx = (cmd.x + ox) * ppt;
+  let dy = (cmd.y + oy) * ppt;
+  let dw = cmd.w * ppt;
+  let dh = cmd.h * ppt;
+
+  // Rail pieces are authored to meet exactly at their untrimmed sprite
+  // boundaries. When a large render is capped, ppt becomes fractional and
+  // independent drawImage calls can round the shared edge in opposite
+  // directions, exposing a one-pixel strip of terrain. Snap both sides from
+  // absolute world coordinates so adjacent pieces share the same pixel edge.
+  if (PIXEL_SNAPPED_RAIL_LAYERS.has(cmd.layer) && (cmd.rotation ?? 0) === 0) {
+    const right = Math.round((cmd.x + cmd.w + ox) * ppt);
+    const bottom = Math.round((cmd.y + cmd.h + oy) * ppt);
+    dx = Math.round(dx);
+    dy = Math.round(dy);
+    dw = right - dx;
+    dh = bottom - dy;
+  }
+
+  const src = cmd.src ?? { x: 0, y: 0, w: frame.sw, h: frame.sh };
+  const scaleX = src.w === 0 ? 0 : dw / src.w;
+  const scaleY = src.h === 0 ? 0 : dh / src.h;
+  const atlasSrc = cmd.src
+    ? atlasSourceRect(frame, src)
+    : {
+        x: frame.x,
+        y: frame.y,
+        w: packedWidth(frame),
+        h: packedHeight(frame),
+      };
+  let trimmedDx = cmd.src ? dx : dx + frame.ox * scaleX;
+  let trimmedDy = cmd.src ? dy : dy + frame.oy * scaleY;
+  let trimmedDw = cmd.src ? dw : frame.w * scaleX;
+  let trimmedDh = cmd.src ? dh : frame.h * scaleY;
+
+  const flipX = cmd.flipX === true;
+  const flipY = cmd.flipY === true;
+  const rotation = cmd.rotation ?? 0;
+
+  // Atlases pack frames with no gutters. Fractional destinations make Canvas2D
+  // sample one texel past the packed rect into a neighboring sprite, which
+  // shows up as a 1px colorful strip (inserter platforms on half-pixel anchors).
+  if (rotation === 0 && !flipX && !flipY) {
+    const right = Math.round(trimmedDx + trimmedDw);
+    const bottom = Math.round(trimmedDy + trimmedDh);
+    trimmedDx = Math.round(trimmedDx);
+    trimmedDy = Math.round(trimmedDy);
+    trimmedDw = right - trimmedDx;
+    trimmedDh = bottom - trimmedDy;
+  }
+
+  const prevAlpha = ctx.globalAlpha;
+  if (cmd.shadow) {
+    ctx.globalAlpha = prevAlpha * 0.5;
+  }
+
+  const hasClip = cmd.clip != null;
+  const tint = cmd.tint;
+
+  const blit = (
+    target: Canvas2DContextLike,
+    destDx: number,
+    destDy: number,
+    destDw: number,
+    destDh: number,
+  ): void => {
+    target.drawImage(
+      image,
+      atlasSrc.x,
+      atlasSrc.y,
+      atlasSrc.w,
+      atlasSrc.h,
+      destDx,
+      destDy,
+      destDw,
+      destDh,
+    );
+  };
+
+  /** Multiply-tint the sprite via an offscreen canvas, then draw the result. */
+  const tintedSource = (): { image: ImageSource; w: number; h: number } | null => {
+    if (!tint || !createCanvas) return null;
+    const tw = Math.max(1, Math.ceil(trimmedDw));
+    const th = Math.max(1, Math.ceil(trimmedDh));
+    const scratch = createCanvas(tw, th);
+    scratch.width = tw;
+    scratch.height = th;
+    const sctx = scratch.getContext("2d");
+    if (!sctx) return null;
+    sctx.imageSmoothingEnabled = false;
+    blit(sctx, 0, 0, tw, th);
+    sctx.globalCompositeOperation = "multiply";
+    sctx.fillStyle = rgba(tint);
+    sctx.fillRect(0, 0, tw, th);
+    sctx.globalCompositeOperation = "destination-in";
+    blit(sctx, 0, 0, tw, th);
+    sctx.globalCompositeOperation = "source-over";
+    return { image: scratch as unknown as ImageSource, w: tw, h: th };
+  };
+
+  const tinted = tintedSource();
+
+  if (hasClip) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(
+      (cmd.clip!.x + ox) * ppt,
+      (cmd.clip!.y + oy) * ppt,
+      cmd.clip!.w * ppt,
+      cmd.clip!.h * ppt,
+    );
+    ctx.clip();
+  }
+
+  if (flipX || flipY || rotation !== 0) {
+    // Rotate/flip around the untrimmed sprite center so shift+rotation stay aligned.
+    const ucx = dx + dw / 2;
+    const ucy = dy + dh / 2;
+    ctx.save();
+    ctx.translate(ucx, ucy);
+    if (rotation !== 0) ctx.rotate((rotation * Math.PI) / 180);
+    ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+    if (tinted) {
+      ctx.drawImage(
+        tinted.image,
+        0,
+        0,
+        tinted.w,
+        tinted.h,
+        trimmedDx - ucx,
+        trimmedDy - ucy,
+        trimmedDw,
+        trimmedDh,
+      );
+    } else {
+      blit(ctx, trimmedDx - ucx, trimmedDy - ucy, trimmedDw, trimmedDh);
+    }
+    ctx.restore();
+  } else if (tinted) {
+    ctx.drawImage(
+      tinted.image,
+      0,
+      0,
+      tinted.w,
+      tinted.h,
+      trimmedDx,
+      trimmedDy,
+      trimmedDw,
+      trimmedDh,
+    );
+  } else {
+    blit(ctx, trimmedDx, trimmedDy, trimmedDw, trimmedDh);
+  }
+
+  // Legacy straight/curved lower rail beds have a sparse alpha-feathered
+  // perimeter. Extend a narrow interior sample beyond each edge so an
+  // adjoining piece can fill the feather's holes. Unlike enlarging the
+  // destination, this leaves every pixel inside the authored sprite unchanged.
+  const seamBleed = cmd.seamBleed;
+  if (seamBleed && !hasClip && !tinted && !flipX && !flipY && rotation === 0) {
+    const bleed = (
+      clipX: number,
+      clipY: number,
+      clipW: number,
+      clipH: number,
+      sx: number,
+      sy: number,
+    ) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(clipX, clipY, clipW, clipH);
+      ctx.clip();
+      blit(ctx, trimmedDx + sx, trimmedDy + sy, trimmedDw, trimmedDh);
+      ctx.restore();
+    };
+    const seamBand = 2;
+    if (seamBleed.top) bleed(dx, dy - seamBand, dw, seamBand, 0, -seamBand);
+    if (seamBleed.right) bleed(dx + dw, dy, seamBand, dh, seamBand, 0);
+    if (seamBleed.bottom) bleed(dx, dy + dh, dw, seamBand, 0, seamBand);
+    if (seamBleed.left) bleed(dx - seamBand, dy, seamBand, dh, -seamBand, 0);
+  }
+
+  if (hasClip) {
+    ctx.restore();
+  }
+
+  if (cmd.shadow) {
+    ctx.globalAlpha = prevAlpha;
+  }
+}
+
+interface PixelBounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+export function shadowSpriteBounds(
+  cmd: SpriteCmd,
+  frame: FrameMeta,
+  ox: number,
+  oy: number,
+  ppt: number,
+  outputWidth: number,
+  outputHeight: number,
+): PixelBounds | null {
+  const dx = (cmd.x + ox) * ppt;
+  const dy = (cmd.y + oy) * ppt;
+  const dw = cmd.w * ppt;
+  const dh = cmd.h * ppt;
+  const scaleX = frame.sw === 0 ? 0 : dw / frame.sw;
+  const scaleY = frame.sh === 0 ? 0 : dh / frame.sh;
+  const left = dx + frame.ox * scaleX;
+  const top = dy + frame.oy * scaleY;
+  const right = left + frame.w * scaleX;
+  const bottom = top + frame.h * scaleY;
+  const centerX = dx + dw / 2;
+  const centerY = dy + dh / 2;
+  const radians = ((cmd.rotation ?? 0) * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const flipX = cmd.flipX === true ? -1 : 1;
+  const flipY = cmd.flipY === true ? -1 : 1;
+
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+  for (const [x, y] of [
+    [left, top],
+    [right, top],
+    [right, bottom],
+    [left, bottom],
+  ] as const) {
+    const localX = (x - centerX) * flipX;
+    const localY = (y - centerY) * flipY;
+    const transformedX = centerX + localX * cos - localY * sin;
+    const transformedY = centerY + localX * sin + localY * cos;
+    minX = Math.min(minX, transformedX);
+    minY = Math.min(minY, transformedY);
+    maxX = Math.max(maxX, transformedX);
+    maxY = Math.max(maxY, transformedY);
+  }
+
+  // Preserve transformed edge pixels at tile boundaries. The gutter is only
+  // used for conservative command-to-tile assignment; the tile canvas itself
+  // provides the exact output clip.
+  minX = Math.floor(minX) - 1;
+  minY = Math.floor(minY) - 1;
+  maxX = Math.ceil(maxX) + 1;
+  maxY = Math.ceil(maxY) + 1;
+
+  if (cmd.clip) {
+    const clipLeft = (cmd.clip.x + ox) * ppt;
+    const clipTop = (cmd.clip.y + oy) * ppt;
+    const clipRight = clipLeft + cmd.clip.w * ppt;
+    const clipBottom = clipTop + cmd.clip.h * ppt;
+    minX = Math.max(minX, clipLeft);
+    minY = Math.max(minY, clipTop);
+    maxX = Math.min(maxX, clipRight);
+    maxY = Math.min(maxY, clipBottom);
+  }
+
+  minX = Math.max(0, minX);
+  minY = Math.max(0, minY);
+  maxX = Math.min(outputWidth, maxX);
+  maxY = Math.min(outputHeight, maxY);
+  return maxX > minX && maxY > minY ? { minX, minY, maxX, maxY } : null;
+}

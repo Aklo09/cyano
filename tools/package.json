@@ -1,0 +1,20 @@
+{
+  "name": "fb-native-development-tools",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.22.1 <25", "npm": ">=12 <13" },
+  "packageManager": "npm@12.2.1",
+  "scripts": {
+    "planner:build": "node build-planner.mjs",
+    "planner:check": "node build-planner.mjs --check",
+    "test": "node --test asset-preparation/blueprint-statistics.test.mjs"
+  },
+  "dependencies": {
+    "@rickyzhangca/fpsr": "0.0.3",
+    "esbuild": "0.28.1",
+    "fflate": "0.8.3",
+    "sharp": "0.35.5",
+    "tsx": "4.23.0"
+  },
+  "overrides": { "fflate": "0.8.3" }
+}
