@@ -63,9 +63,13 @@ Cross-cutting invariants (full contracts in `docs/contracts/`):
   Never normalize whitespace or line endings, and keep unknown blueprint fields and sparse book entry indices.
   Fixtures are marked `-text -diff` in `.gitattributes`. `OriginalSourceTests` checks their hashes.
 - **Single owner.** A kernel flock on `.owner.lock` excludes competing app and CLI sessions. All operations are serialized on the library queue.
-  Preview workers inherit the lease only through a `LibraryOwnershipLoan` on fd 3. Never force-unlock the lease or replace its inode.
-- **Recoverable writes.** Mutations stage hashed intents under `operations/<uuid>/` before publishing. Unpublished staging is preserved, not cleaned up.
-- **Derived cache only.** `cache/` entries are keyed by `LibraryCacheIdentity` and never change source metadata. Cleanup is scoped to known formats.
+  Preview workers get no lease, descriptors or environment: they receive request bytes and only the owner publishes.
+  Never force-unlock the lease or replace its inode.
+- **Recoverable writes.** Mutations stage hashed intents under `operations/<uuid>/` before publishing.
+  Only `staging-cleanup` removes uncommitted staging; refused operations are quarantined, never deleted.
+  Deleted and replaced originals go to the Trash.
+- **Derived cache only.** `cache/` holds previews keyed by `LibraryCacheIdentity` and `source-index.json` (source hash to kind);
+  neither changes source metadata. Cleanup is scoped to known formats.
 - **Independence.** Builds and runtime must not depend on the original web checkout, Node or game files.
   `planner.js` is generated: after changing `tools/planner-entry.ts` or the vendored fpsr, run `just planner-build` and commit the resource and metadata together.
   Record copied or adapted files in `tools/provenance.json`.
