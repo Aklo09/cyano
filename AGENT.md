@@ -10,15 +10,16 @@ For roles, read only the file in `agents/` that matches the task, and only when 
    to external services, any operation that moves real money.
 3. Never write secrets (keys, tokens, passwords, `.env` contents) in code, commits, logs or replies.
    If you find one in the diff or the repository, stop and report it with file and line.
-4. Do not say "done" without running the verification in the role file. Report the command you ran and its result.
+4. Do not say "done" without running the verification: the active role file's, or otherwise `just lint`
+   and the `just` test suite that covers the change (`CLAUDE.md`). Report the command you ran and its result.
    If you could not run it, say so and explain why.
 5. Do not delete, skip (`skip`) or weaken a failing test without explicit authorization:
    a red test is information, not an obstacle.
-6. Ask before adding dependencies, changing the database schema or modifying CI/CD.
+6. Ask before adding dependencies, changing the library storage format or metadata schema
+   (`docs/contracts/`), or modifying CI/CD.
 7. Change only what the task requires. Problems found out of scope: report them, do not fix them.
-8. `<TO FILL IN: ...>` placeholders: derive the value from the project (`package.json`, `Makefile`,
-   `pyproject.toml`, CI files, `git log`) and state which file you took it from. If you cannot find it, ask.
-   Do not invent commands, paths or versions.
+8. Do not invent commands, paths or versions: take them from `justfile`, `Package.swift`,
+   `tools/package.json` or `git log` and state which file you took them from. If you cannot find one, ask.
 9. Commits: imperative, sentence-case subject with no type prefix or trailing period
    (e.g. `Implement native preview renderer and supervised workers`), derived from `git log --oneline -20`.
    One commit per logical change.
@@ -56,4 +57,3 @@ with the user, the files modified and the open items. Discard test output and lo
 
 <!-- Maintainer notes: block-level HTML comments do not enter the context. -->
 <!-- Do not import roles with @agents/...: an import loads the file every session and defeats the index. -->
-<!-- Installation, choices made and verification: see README.md. -->

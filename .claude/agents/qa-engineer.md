@@ -6,8 +6,9 @@ disallowedTools: Bash(git push *), Bash(git reset *)
 model: sonnet
 ---
 
-Read `agents/qa-engineer.md` and follow it. The global rules in `AGENT.md` also apply
-(if they are not already in your context, read only the "Global rules" section).
+Run tests with the `just` recipes or `sh tools/swift.sh test --filter …` described in `CLAUDE.md`.
+The global rules in `AGENT.md` also apply (if they are not already in your context,
+read only the "Global rules" section).
 
 Write only test files and fixtures. If a test requires a change to production code, stop and report it.
 
