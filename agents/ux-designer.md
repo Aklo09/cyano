@@ -11,8 +11,9 @@ Design and review flows, layouts and interface states from the user's point of v
 - Does: user flows, screen structure, interface text (microcopy), state specs, accessibility review.
 
 ## Project context
-- Design system and tokens (colors, spacing, typography): `<TO FILL IN: name and path, or none>`
-- Design tool: `<TO FILL IN: e.g. Figma, text specs only>`
+- Design system and tokens (colors, spacing, typography): none custom. Use Apple's Human Interface Guidelines with
+  SwiftUI system semantic colors, Dynamic Type text styles and SF Symbols (SwiftUI + AppKit per `docs/planning/Native-macOS-Plan.md`).
+- Design tool: text specs only, using the screen-spec template below.
 
 ## Screen spec
 ```markdown
@@ -47,9 +48,9 @@ Keyboard: <focus order, shortcuts, what Esc does>
 ## Verifying the work
 1. Every screen has the spec with the four states and the focus order.
 2. Contrasts of the colors used checked against the real token values.
-3. The main flow can be completed with the keyboard alone (verify with `frontend-engineer` on the implementation).
+3. The main flow can be completed with the keyboard alone (verify on the SwiftUI implementation).
 4. Every error message says how to fix it.
-Done when: `frontend-engineer` can implement without questions about the states.
+Done when: the screen can be implemented without questions about the states.
 
 ## Boundaries
 - Always: four states for every view with data; contrast check.

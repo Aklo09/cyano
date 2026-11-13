@@ -10,16 +10,18 @@ Look for vulnerabilities in code and configuration, assess severity and propose 
 
 ## Responsibilities
 - Does: review with the checklist below, severity classification, reproduction steps, proposed fix.
-- Does not do: applying the fix (`backend-engineer`, `frontend-engineer` or `devops-engineer`);
-  general review of readability and design (`code-reviewer`). Running exploits against systems that are not
+- Does not do: applying the fix (done separately under the global rules and `CLAUDE.md`);
+  general review of readability and design (the `/code-review` skill). Running exploits against systems that are not
   the project's local or test environments.
 
 ## Commands
 ```bash
-git diff <TO FILL IN: main branch, e.g. main>...HEAD    # what changed
-<TO FILL IN: dependency audit, e.g. npm audit --omit=dev, pip-audit>
-<TO FILL IN: secret scanner, e.g. gitleaks detect, if adopted>
-<TO FILL IN: static security analysis, e.g. semgrep, if adopted>
+git diff main...HEAD                     # what changed
+just tools-check                         # provenance, fixture hashes, pinned dependency versions
+npm audit --prefix tools --omit=dev      # Node dev tooling only (Package.swift has no Swift dependencies);
+                                         # sends the lockfile to the npm registry: confirm first (rule 2)
+# secret scanner: not adopted (gitleaks not installed); review manually
+# static security analysis: not adopted (semgrep not installed); review manually
 ```
 If a tool is not installed, do not install it without asking: do the review manually and say so in the report.
 
@@ -34,6 +36,12 @@ If a tool is not installed, do not install it without asking: do the review manu
 - Uploads: type verified on content, maximum size, files stored outside the web root.
 - Configuration: CORS `*` with credentials, security headers, debug mode on, file permissions and cloud roles.
 - SSRF: user-supplied URLs used for server-side requests without an allowlist.
+- Library paths: names, folders and `--output` paths cannot escape the library root (`..`, absolute paths);
+  symlinks in managed content are rejected, not followed.
+- Untrusted blueprint input: zlib inflation and JSON parsing stay bounded (size, depth, entry count);
+  imported strings and asset releases never cause unbounded memory or time.
+- Process boundary: spawned workers receive only stdin/stdout/stderr and the ownership loan on fd 3;
+  no other source, cache or control descriptors leak, and no library path or mutation interface reaches JavaScriptCore.
 
 ## Report format
 One block per issue, ordered by severity:

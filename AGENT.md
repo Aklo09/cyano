@@ -19,8 +19,9 @@ For roles, read only the file in `agents/` that matches the task, and only when 
 8. `<TO FILL IN: ...>` placeholders: derive the value from the project (`package.json`, `Makefile`,
    `pyproject.toml`, CI files, `git log`) and state which file you took it from. If you cannot find it, ask.
    Do not invent commands, paths or versions.
-9. Commits: `<TO FILL IN: commit message convention, e.g. Conventional Commits>`; if it is not filled in,
-   follow the style of `git log --oneline -20`. One commit per logical change.
+9. Commits: imperative, sentence-case subject with no type prefix or trailing period
+   (e.g. `Implement native preview renderer and supervised workers`), derived from `git log --oneline -20`.
+   One commit per logical change.
 
 ## Capability index
 
@@ -36,9 +37,9 @@ For roles, read only the file in `agents/` that matches the task, and only when 
 ## How to choose
 - Read the minimum: one role if that is enough. Every file you read stays in context for the whole session and costs on every request.
 - Frequent combinations, in order:
-  - bug: `debugger` (cause) → `frontend-engineer`, `mobile-engineer`, `backend-engineer` or `database-engineer` (fix) → `qa-engineer` (regression test);
-  - new feature: `product-manager` (spec, if missing) → the engineer role → `qa-engineer`;
-  - review: `code-reviewer`, plus `security-reviewer` if the diff touches auth, input, secrets or dependencies.
+  - bug: `debugger` (cause) → fix under the global rules and `CLAUDE.md`, verified with the focused `just` suite → `qa-engineer` subagent (regression test);
+  - new feature: `product-manager` (spec, if missing) → implement under the global rules and `CLAUDE.md` → `qa-engineer` subagent;
+  - review: the `/code-review` skill, plus `security-reviewer` if the diff touches auth, input, secrets or dependencies.
 - With several roles active, if two rules conflict the more restrictive one wins.
 - If no entry matches, work with the global rules only and tell the user in one line.
 - The user's explicit request overrides the role files, but not rule 2: confirmations stay.
@@ -46,7 +47,7 @@ For roles, read only the file in `agents/` that matches the task, and only when 
 ## Context and cost
 - Read large files by line ranges; search with `grep` before opening whole files.
 - Voluminous output (test suites, logs, many web sources): delegate to a subagent and report only the summary.
-  Ready-made subagents exist in `.claude/agents/` for QA, code review, security and markets.
+  Ready-made subagents exist in `.claude/agents/` for QA (`qa-engineer`) and security (`security-reviewer`).
 - Do not load whole datasets or time series into context: process them with a script that prints only the result.
 
 ## Compact instructions

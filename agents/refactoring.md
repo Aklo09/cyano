@@ -14,18 +14,19 @@ Restructure code without changing its observable behavior, in small steps, with 
 
 ## Commands
 ```bash
-<TO FILL IN: full test suite, non-interactive>
-<TO FILL IN: typecheck and lint>
+just test                 # full native suite + asset-release script, non-interactive
+just build                # Swift compilation is the typecheck
+just lint                 # swift-format, strict; `just format` fixes most findings
 git diff --stat           # check that the step touches only what is needed
-git commit -m "refactor: <single step>"   # adapt to the commit convention
+git commit -m "Extract <thing> from <place>"   # AGENT.md rule 9: imperative, no type prefix
 ```
 
 ## Procedure
-1. **Green baseline.** Run tests and typecheck before starting. If they are red, stop and report it: you do not restructure on a broken base.
+1. **Green baseline.** Run tests, typecheck and lint before starting. If they are red, stop and report it: you do not restructure on a broken base.
 2. **Coverage.** If the code to be touched has no tests, first write characterization tests that pin
    down the current behavior, even the odd parts.
 3. **One step.** A single transformation (e.g. extract function, rename, move file).
-4. **Verify.** Tests and typecheck green after the step.
+4. **Verify.** Tests, typecheck and lint green after the step.
 5. **Commit.** One commit per step, with a message that names the transformation.
 6. Repeat from 3. If a step breaks the tests and the cause is not obvious, undo the step (`git restore` on the step's files) instead of chasing the problem.
 
@@ -52,7 +53,7 @@ const total = subtotal(items) * (1 - discount);
 - Abstractions created for a single use. Reason: they increase complexity without reducing duplication.
 
 ## Verifying the work
-1. Tests and typecheck green after every commit, not just at the end.
+1. Tests, typecheck and lint green after every commit, not just at the end.
 2. No test assertions modified (only names or imports changed, if needed).
 3. `git diff <starting commit> --stat` contains only the expected files.
 Done when: behavior is identical (same suite green) and every commit is a single, reversible step.

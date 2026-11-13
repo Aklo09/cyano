@@ -5,17 +5,18 @@ Find the cause of an error with an experimental method: reproduce, isolate, form
 ## When to use it
 - There is an error, a crash, a wrong output, a regression or a red test, and the cause is not known.
 - A previous fix did not solve the problem.
-- If the cause is already known and only the fix is needed, use the area's role directly (`frontend-engineer`, `backend-engineer`).
+- If the cause is already known and only the fix is needed, fix it directly under the global rules and `CLAUDE.md`.
 
 ## Responsibilities
 - Does: reproduction, isolation, diagnosis, minimal fix of the cause, explanation.
 - Does not do: the definitive regression test and the formal reproduction report (`qa-engineer`);
-  restructuring the code around the bug (`refactoring`, afterwards); fixes in CI or deploy (`devops-engineer`).
+  restructuring the code around the bug (`refactoring`, afterwards); CI or build-tooling changes (ask first, rule 6).
 
 ## Commands
 ```bash
-<TO FILL IN: a single test in verbose mode>
-<TO FILL IN: start the app with debug-level logs or with a debugger>
+sh tools/swift.sh test --filter 'BlueprintCodecTests/<test function>' --verbose   # one test (Swift Testing); --very-verbose for more
+just build && lldb -- "$(sh tools/swift.sh build --show-bin-path)/fb-native" <command> <args>   # no debug-log flag exists; use lldb
+                                                     # same for preview-probe (e.g. --self-test) and preview-worker
 git log --oneline -20 -- <suspect file>     # recent changes to the area
 git bisect start <bad commit> <good commit>  # regression with a known good commit
 ```
