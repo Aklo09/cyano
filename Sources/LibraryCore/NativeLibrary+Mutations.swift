@@ -53,7 +53,7 @@ extension NativeLibrary {
             let oldParent = parts.dropLast().joined(separator: "/")
             try vacant(directory(at: parent), names: [newName], allowing: parent == oldParent ? [oldName] : [])
             // Validate the resulting depth as well as the moved root.
-            let inventory = try LibraryTrees.inventory(directory(at: folder))
+            let inventory = try LibraryTrees.inventory(directory(at: folder), identity: true)
             for path in inventory.directories { _ = try LibraryNames.folderComponents(destination + "/" + path) }
             for file in inventory.files { _ = try MutationPath.parts(destination + "/" + file.path, file: true) }
             try commitTree(kind: "tree-move", source: folder, destination: destination)

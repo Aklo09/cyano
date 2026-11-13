@@ -10,12 +10,15 @@ struct LibraryFileChange: Codable {
 struct LibraryTreeFile: Codable, Equatable {
     let path: String
     let bytes: Int
-    let sha256: String
+    /// Content hash for created and deleted trees; absent for identity-checked moves.
+    let sha256: String?
 }
 
 struct LibraryTreeInventory: Codable, Equatable {
     let directories: [String]
     let files: [LibraryTreeFile]
+    /// Root directory inode for moves: a rename keeps it, and APFS inode numbers survive remounts.
+    let rootInode: UInt64?
 }
 
 struct LibraryTransaction: Codable {
@@ -123,12 +126,21 @@ enum LibraryTrees {
         return (directory, name)
     }
 
-    static func inventory(_ root: LibraryDirectory) throws -> LibraryTreeInventory {
+    /// Content inventory (hashes, bounded by the transaction byte limit) or, for moves, an identity
+    /// inventory (root inode, member paths and sizes) that reads no file content.
+    static func inventory(_ root: LibraryDirectory, identity: Bool = false) throws -> LibraryTreeInventory {
         let snapshot = try stamps(root, depth: LibraryBounds.folderDepth)
         var files: [LibraryTreeFile] = []
         var total = 0
         for member in snapshot where !member.directory {
             _ = try MutationPath.parts(member.path, file: true)
+            guard member.bytes <= BlueprintCodecLimits.standard.sourceBytes else {
+                throw NativeLibraryError.limitExceeded
+            }
+            if identity {
+                files.append(LibraryTreeFile(path: member.path, bytes: member.bytes, sha256: nil))
+                continue
+            }
             let (directory, name) = try descendant(root, member.path)
             let hash = try directory.fingerprint(
                 name, maximum: min(BlueprintCodecLimits.standard.sourceBytes, LibraryBounds.transactionBytes - total))
@@ -138,7 +150,8 @@ enum LibraryTrees {
         for member in snapshot where member.directory { _ = try MutationPath.parts(member.path, file: false) }
         guard try stamps(root, depth: LibraryBounds.folderDepth) == snapshot else { throw NativeLibraryError.integrity }
         return LibraryTreeInventory(
-            directories: snapshot.filter(\.directory).map(\.path).sorted(), files: files.sorted { $0.path < $1.path })
+            directories: snapshot.filter(\.directory).map(\.path).sorted(), files: files.sorted { $0.path < $1.path },
+            rootInode: identity ? UInt64(root.inode) : nil)
     }
 
     static func purge(_ root: LibraryDirectory) throws {
@@ -178,12 +191,13 @@ extension LibraryRecords {
             }
         }
         if let tree = value["tree"] {
-            try fields(tree, required: ["directories", "files"])
+            try fields(tree, required: ["directories", "files"], optional: ["rootInode"])
             guard let files = tree["files"]?.array else { throw NativeLibraryError.recoveryRequired }
             for file in files {
-                try fields(file, required: ["path", "bytes", "sha256"])
+                try fields(file, required: ["path", "bytes"], optional: ["sha256"])
                 guard file["bytes"]?.safeInteger != nil else { throw NativeLibraryError.recoveryRequired }
             }
+            if let inode = tree["rootInode"], inode.safeInteger == nil { throw NativeLibraryError.recoveryRequired }
         }
         guard let record = try? JSONDecoder().decode(LibraryTransaction.self, from: data),
             record.operationId == operationId,
@@ -206,13 +220,19 @@ extension LibraryRecords {
                 Set(tree.directories).count == tree.directories.count,
                 Set(tree.files.map(\.path)).isDisjoint(with: tree.directories)
             else { throw NativeLibraryError.recoveryRequired }
+            // Moves use an identity inventory; intents written before identity moves carry hashes and still replay.
+            let identity = tree.rootInode != nil
+            guard !identity || record.kind == "tree-move" else { throw NativeLibraryError.recoveryRequired }
             var total = 0
             for file in tree.files {
                 _ = try MutationPath.parts(file.path, file: true)
-                guard validHash(file.sha256), file.bytes >= 0, file.bytes <= BlueprintCodecLimits.standard.sourceBytes
+                guard file.bytes >= 0, file.bytes <= BlueprintCodecLimits.standard.sourceBytes,
+                    identity ? file.sha256 == nil : file.sha256.map(validHash) == true
                 else { throw NativeLibraryError.recoveryRequired }
                 total += file.bytes
-                guard total <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
+                guard identity || total <= LibraryBounds.transactionBytes else {
+                    throw NativeLibraryError.limitExceeded
+                }
             }
             for directory in tree.directories { _ = try MutationPath.parts(directory, file: false) }
             if record.kind == "tree-delete" {

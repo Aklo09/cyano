@@ -78,7 +78,7 @@ extension NativeLibrary {
                 try hook?(.treeStaged)
             } else {
                 guard let source else { throw NativeLibraryError.invalidInput }
-                inventory = try LibraryTrees.inventory(directory(at: source))
+                inventory = try LibraryTrees.inventory(directory(at: source), identity: kind == "tree-move")
             }
             let intent = LibraryTransaction(
                 schemaVersion: 2, operationId: id, kind: kind, changes: [], cacheIds: [],
@@ -254,7 +254,7 @@ extension NativeLibrary {
         if let destination = intent.destinationFolder { try probe(destination, tag: "destination") }
         if try stage.info("tree") != nil { found.append(("stage", try stage.child("tree"))) }
         guard found.count == 1, let location = found.first, let expected = intent.tree,
-            try LibraryTrees.inventory(location.1) == expected
+            try LibraryTrees.inventory(location.1, identity: expected.rootInode != nil) == expected
         else { throw NativeLibraryError.integrity }
         return location.0
     }

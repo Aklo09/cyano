@@ -201,7 +201,11 @@ inside the library instead, so an unavailable Trash never blocks recovery.
 `tools/swift.sh test` sets it to `.cache/test-trash`.
 The multi-file operation becomes consistent through roll-forward recovery; it is not one filesystem-atomic rename.
 
-`tree-create`, `tree-move`, and `tree-delete` intents record a complete directory/file inventory with exact file hashes and sizes.
+`tree-create` and `tree-delete` intents record a complete directory/file inventory with exact file hashes and sizes.
+`tree-move` intents record an identity inventory instead: the moved folder's root inode plus every member path and size,
+without reading file content. A rename preserves the inode, and APFS inode numbers survive remounts,
+so replay identifies the moved folder even after a restart; a look-alike folder with the same members is refused.
+Replay still accepts move intents written with content hashes.
 Creation prepares the whole tree under staging before commit.
 Move withdraws the source to `operations/<UUID>/tree`, then publishes it exclusively at its destination.
 Empty-folder deletion withdraws the validated folder to staging before removing the intent and cleaning the withdrawn tree.
@@ -237,7 +241,7 @@ Disk usage counts quarantined operations with `operations`.
 | Format and version 1 intents | 64 KiB each |
 | Version 2 intent | 16 MiB |
 | File changes per version 2 operation | 10,000 |
-| Total staged pre/postimage or tree content | 256 MiB |
+| Total staged pre/postimage or hashed tree content | 256 MiB (folder moves are not content-bounded) |
 | Tree inventory members | 100,000 |
 | Item metadata | 4 MiB |
 | Comment text | 64 KiB UTF-8 |

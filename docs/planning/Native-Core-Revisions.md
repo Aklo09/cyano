@@ -43,7 +43,7 @@ Each revision is one commit that updates its contract, tests, and code together.
 3. Done: D6, durability barriers (release build: small import 39.7 → 24.6 ms; 182-leaf unpack 2.21 → 0.80 s). Interruption tests stay green; import and unpack timings are recorded.
 4. Done: D5, quarantine and staging cleanup. Tests cover a conflicting intent that becomes openable after quarantine with evidence intact, and cleanup that never touches committed intents.
 5. Done: D4, Trash for removed originals. Tests cover delete and replace leaving byte-identical preimages in a Trash-equivalent destination.
-6. D7: identity-based folder moves. Tests cover moving a folder above the former content cap and replaying an interrupted move.
+6. Done: D7, identity-based folder moves. Tests cover moving a folder above the former content cap and replaying an interrupted move.
 7. D1: metadata listing and index. Tests cover stale and missing index entries, corrupted sources reported on open, and listing timings at 1,000 roots.
 8. D8: smaller items.
 

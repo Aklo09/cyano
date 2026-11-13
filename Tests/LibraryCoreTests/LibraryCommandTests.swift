@@ -95,11 +95,42 @@ struct LibraryCommandTests {
         let file = LibraryTreeFile(path: "Original.txt", bytes: 1, sha256: String(repeating: "a", count: 64))
         let intent = LibraryTransaction(
             schemaVersion: 2, operationId: operationId, kind: "tree-delete", changes: [], cacheIds: [],
-            sourceFolder: "Folder", destinationFolder: nil, tree: LibraryTreeInventory(directories: [], files: [file]))
+            sourceFolder: "Folder", destinationFolder: nil,
+            tree: LibraryTreeInventory(directories: [], files: [file], rootInode: nil))
         let bytes = try LibraryRecords.encode(intent, maximum: LibraryBounds.transaction)
         #expect(throws: NativeLibraryError.folderNotEmpty) {
             try LibraryRecords.transaction(bytes, operationId: operationId)
         }
+    }
+
+    @Test("Folder moves record identity without content hashes and refuse a look-alike folder on replay")
+    func identityMoves() throws {
+        let target = try CommandLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        _ = try library.createFolder(name: "Source")
+        _ = try library.importSource(commandBook(), name: "Item", folder: "Source")
+        library.close()
+        let killed = try commandChild(
+            "StorageTestDriver", ["folder-move-crash", target.url.path, "Source", "intentPublished"])
+        #expect(killed.0 == SIGKILL, "\(String(decoding: killed.2, as: UTF8.self))")
+        let operations = target.url.appendingPathComponent("operations")
+        let stage = try #require(
+            FileManager.default.contentsOfDirectory(at: operations, includingPropertiesForKeys: nil).first)
+        let intent = try #require(
+            JSONSerialization.jsonObject(with: Data(contentsOf: stage.appendingPathComponent("intent.json")))
+                as? [String: Any])
+        let tree = try #require(intent["tree"] as? [String: Any])
+        let files = try #require(tree["files"] as? [[String: Any]])
+        #expect(tree["rootInode"] != nil && !files.isEmpty && files.allSatisfy { $0["sha256"] == nil })
+
+        // Swap in a different folder with identical member names and sizes: replay must not adopt it.
+        let source = target.url.appendingPathComponent("library/Source")
+        let lookalike = target.parent.appendingPathComponent("Lookalike")
+        try FileManager.default.copyItem(at: source, to: lookalike)
+        try FileManager.default.removeItem(at: source)
+        try FileManager.default.moveItem(at: lookalike, to: source)
+        #expect(throws: NativeLibraryError.integrity) { try NativeLibrary(at: target.url) }
     }
 
     @Test("Moving and renaming preserve exact originals, identity, comments, and creation dates")
