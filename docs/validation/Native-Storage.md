@@ -90,5 +90,6 @@ This is test wall time, not a single-command latency benchmark.
 The 1,000-root latency and memory targets remain unqualified.
 
 Unpublished staging is preserved; automated cleanup is deferred to maintenance work.
-Replacement, organization mutations, deletion, unpacking, cache maintenance, and statistics integration remain pending.
+Replacement, organization mutations, deletion, unpacking, and cache maintenance were pending at this checkpoint;
+the subsequent [command checkpoint](Native-Library-Commands.md) implements them. Native statistics integration remains pending.
 No native image painting, renderer-worker lifecycle, or macOS UI is qualified here.

@@ -1,7 +1,7 @@
 # Native library storage and ownership
 
 Preserve original strings and comments through interrupted writes without an authoritative database.
-This contract covers the initial native import, comment, export, and recovery implementation.
+This contract covers native source storage, organization, comments, maintenance, and recovery.
 
 ## Library identity and layout
 
@@ -50,7 +50,7 @@ JSON metadata version `1` contains:
 | `createdAt` | Creation timestamp |
 | `updatedAt` | Last metadata-change timestamp |
 | `sourceSha256` | Lowercase SHA-256 of exact TXT bytes |
-| `displayNameOverride` | Optional explicit import name |
+| `displayNameOverride` | Optional explicit import or rename name |
 | `comments` | Array of scoped comments |
 
 Every comment contains exactly `id`, `entryPath`, `text`, and `createdAt`.
@@ -65,9 +65,14 @@ Invalid items appear as listing issues and are excluded from usable results.
 Duplicate item UUIDs are reported; ID-addressed operations require a unique match.
 
 Folder membership comes from real filesystem directories.
-The initial CLI can import into existing folders and lists empty folders.
-Folder creation, rename/move, source replacement, deletion, and book unpacking remain deferred.
-Unpacked-book folder-description sidecars are not implemented yet.
+The CLI creates, moves, renames, and deletes empty folders, and lists empty folders.
+Unpacked books use `.folder.json` records containing exactly `schemaVersion: 1`, `comment`, and `createdAt`.
+Descriptions are plain text, bounded like comments; no folder UUID substitutes for its real path.
+An empty folder with a valid description can be deleted; a folder containing other content cannot.
+
+Item moves preserve metadata bytes. Renames preserve identities and creation dates while changing the name and update date.
+Source replacement preserves the chosen filename/override and promotes comments whose entry paths disappear to the root.
+Item deletion and replacement invalidate the item's derived cache under the same committed intent.
 
 ## Portable names and confined access
 
@@ -124,7 +129,7 @@ Application-managed snapshots, verification, and restoration remain outside v1.
 
 Every operation receives a fresh UUID directory beneath `operations/`.
 Staged source and metadata bytes remain separate from temporary publication copies.
-The current intent schema contains exactly:
+The original intent schema contains exactly:
 
 `schemaVersion`, `operationId`, `kind`, `folder`, `basename`, `itemId`,
 `sourceSha256`, `metadataSha256`, and optional `beforeMetadataSha256`.
@@ -158,6 +163,32 @@ Apple's [fsync reference](https://developer.apple.com/library/archive/documentat
 distinguishes host synchronization from stronger drive-flush requests.
 Process-kill tests do not establish power-loss durability.
 
+## File and tree mutation publication
+
+Organization and replacement use intent version `2`; readers continue to replay version `1` intents.
+The library marker and item metadata remain at version `1`.
+Version `2` requires `schemaVersion`, `operationId`, `kind`, `changes`, and `cacheIds`,
+with optional `sourceFolder`, `destinationFolder`, and `tree` for tree operations.
+Unexpected fields, versions, paths, sizes, and hashes are refused.
+
+`files` intents contain relative paths with optional `before` and `after` SHA-256 hashes.
+Exact preimages and postimages are staged as `before-000000` and `after-000000`, indexed in change order.
+All staged bytes and live preconditions are checked before publishing the intent and on replay.
+Old names are removed before new names publish, supporting case-only renames on insensitive APFS.
+Replacement retains its staged preimage until publication and cache invalidation complete.
+The multi-file operation becomes consistent through roll-forward recovery; it is not one filesystem-atomic rename.
+
+`tree-create`, `tree-move`, and `tree-delete` intents record a complete directory/file inventory with exact file hashes and sizes.
+Creation prepares the whole tree under staging before commit.
+Move withdraws the source to `operations/<UUID>/tree`, then publishes it exclusively at its destination.
+Empty-folder deletion withdraws the validated folder to staging before removing the intent and cleaning the withdrawn tree.
+Exactly one matching tree must exist at the source, stage, or destination on replay.
+Conflicting trees, unsafe members, or unexpected destination bytes preserve the evidence and stop recovery.
+Unpacking publishes all folders, descriptions, and leaf pairs as one prepared tree.
+
+Cache cleanup is a separate repeatable derived-file operation with dry-run default, bounded inventory,
+and stamp revalidation before deletion. It does not purge unpublished operations staging.
+
 ## Recovery and bounded work
 
 Opening an owned library replays committed intents before exposing ordinary operations.
@@ -172,12 +203,17 @@ Do not discard an operations directory to bypass a recovery refusal.
 
 | Work | Initial bound |
 | --- | --- |
-| Format and intent files | 64 KiB each |
+| Format and version 1 intents | 64 KiB each |
+| Version 2 intent | 16 MiB |
+| File changes per version 2 operation | 10,000 |
+| Total staged pre/postimage or tree content | 256 MiB |
+| Tree inventory members | 100,000 |
 | Item metadata | 4 MiB |
 | Comment text | 64 KiB UTF-8 |
 | Comments per item | 10,000, subject to metadata capacity |
 | Operation directories | 128, including unpublished staging |
-| Members per operation directory | 64 |
+| Members per version 1 operation directory | 64 |
+| Members per version 2 file operation directory | 20,064 |
 | Listing entries | 100,000 across the hierarchy |
 | Listing source/metadata bytes | 256 MiB |
 

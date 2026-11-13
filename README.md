@@ -3,9 +3,9 @@
 Keep original blueprint strings, books, planners, and comments in an ordinary local directory.
 This project is an independent native port of the original web application.
 
-**Current status:** milestone 1's foundation, bounded codec, and minimal storage workflow are implemented.
-The CLI supports import/export, comments, ownership inspection, and interrupted-operation recovery.
-Organization mutations, image painting, and the macOS interface remain pending.
+**Current status:** native storage and the library CLI are implemented, including organization, replacement,
+deletion, book unpacking, maintenance, and offline asset verification.
+Image painting, renderer integration, native statistics, and the macOS interface remain pending.
 
 ## Requirements
 
@@ -26,6 +26,7 @@ just build
 just test
 just codec-test
 just storage-test
+just asset-test
 just release
 just planner-test
 ```
@@ -62,6 +63,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 - **Inspect evidence:** [foundation validation](docs/validation/Native-Foundation.md).
 - **Use the codec:** [native interfaces](docs/development/Native-Codec.md) and [validation](docs/validation/Native-Codec.md).
 - **Manage a library:** [CLI guide](docs/development/Native-Library-CLI.md), [storage contract](docs/contracts/Native-Storage.md), and [validation](docs/validation/Native-Storage.md).
+- **Inspect command completion:** [organization and maintenance validation](docs/validation/Native-Library-Commands.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).

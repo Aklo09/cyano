@@ -9,11 +9,15 @@ build:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|PlannerRuntimeTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests'
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
 storage-test:
-    sh tools/swift.sh test --filter NativeLibraryTests
+    sh tools/swift.sh test --filter 'NativeLibraryTests|LibraryCommandTests'
+
+# Verify offline asset inventory, hashes, profiles, and declared frame bounds.
+asset-test:
+    sh tools/swift.sh test --filter AssetReleaseTests
 
 # Run native CLI commands; export stdout contains only source bytes.
 library *args:

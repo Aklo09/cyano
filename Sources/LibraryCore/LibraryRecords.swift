@@ -36,6 +36,13 @@ public struct LibraryListing: Codable, Sendable {
     public var folders: [String] = []
     public var items: [LibraryItem] = []
     public var issues: [LibraryIssue] = []
+    public var folderComments: [String: String] = [:]
+}
+
+struct LibraryFolderMetadata: Codable {
+    let schemaVersion: Int
+    let comment: String
+    let createdAt: String
 }
 
 public enum LibraryOwnershipStatus: String, Codable, Sendable {
@@ -102,7 +109,7 @@ enum LibraryRecords {
         return bytes
     }
 
-    private static func parse(_ data: Data, maximum: Int) throws -> JSONValue {
+    static func parse(_ data: Data, maximum: Int) throws -> JSONValue {
         guard data.count <= maximum else { throw NativeLibraryError.limitExceeded }
         var limits = BlueprintCodecLimits()
         limits.decodedBytes = maximum
@@ -114,7 +121,7 @@ enum LibraryRecords {
         } catch { throw NativeLibraryError.invalidMetadata }
     }
 
-    private static func fields(_ value: JSONValue, required: Set<String>, optional: Set<String> = []) throws {
+    static func fields(_ value: JSONValue, required: Set<String>, optional: Set<String> = []) throws {
         guard case .object(let members) = value else { throw NativeLibraryError.invalidMetadata }
         guard members.allSatisfy({ $0.key.utf8.allSatisfy({ $0 < 128 }) }) else { throw NativeLibraryError.invalidMetadata }
         let keys = Set(members.map(\.key))
@@ -156,6 +163,16 @@ enum LibraryRecords {
                   !comment.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                   comment.text.utf8.count <= LibraryBounds.comment else { throw NativeLibraryError.invalidMetadata }
         }
+        return record
+    }
+
+    static func folderMetadata(_ data: Data) throws -> LibraryFolderMetadata {
+        let value = try parse(data, maximum: LibraryBounds.metadata)
+        try fields(value, required: ["schemaVersion", "comment", "createdAt"])
+        guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
+        guard let record = try? JSONDecoder().decode(LibraryFolderMetadata.self, from: data),
+              !record.comment.isEmpty, record.comment.utf8.count <= LibraryBounds.comment,
+              validDate(record.createdAt) else { throw NativeLibraryError.invalidMetadata }
         return record
     }
 

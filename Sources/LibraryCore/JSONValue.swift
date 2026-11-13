@@ -4,10 +4,10 @@ import Foundation
 public struct JSONNumber: Equatable, Sendable {
     public let literal: String
 
-    init(_ literal: String) { self.literal = literal }
+    package init(_ literal: String) { self.literal = literal }
 
     /// Exact nonnegative integer conversion; never rounds through binary floating point.
-    var safeInteger: Int? {
+    package var safeInteger: Int? {
         let parts = literal.lowercased().split(separator: "e", omittingEmptySubsequences: false)
         let negative = parts[0].first == "-"
         let mantissa = negative ? String(parts[0].dropFirst()) : String(parts[0])
@@ -42,7 +42,7 @@ public struct JSONMember: Equatable, Sendable {
     public let key: String
     public let value: JSONValue
 
-    init(key: String, value: JSONValue) {
+    package init(key: String, value: JSONValue) {
         self.key = key
         self.value = value
     }
@@ -88,7 +88,7 @@ public indirect enum JSONValue: Equatable, Sendable {
         return value
     }
 
-    var safeInteger: Int? {
+    package var safeInteger: Int? {
         guard case .number(let number) = self else { return nil }
         return number.safeInteger
     }
@@ -99,12 +99,12 @@ public indirect enum JSONValue: Equatable, Sendable {
         return value.isFinite
     }
 
-    var isObject: Bool {
+    package var isObject: Bool {
         if case .object = self { return true }
         return false
     }
 
-    func encoded(maximum: Int) throws -> Data {
+    package func encoded(maximum: Int) throws -> Data {
         var data = Data()
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.withoutEscapingSlashes]

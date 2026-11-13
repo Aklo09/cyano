@@ -10,11 +10,14 @@ Based on the [initial assessment](Native-macOS-Assessment.md), with the scope de
 - [x] Relocated native build passes with original checkouts unreadable and networking denied.
 - [x] Bounded native codec, exact-byte root exports, and selected-entry exports preserving unknown content.
 - [x] Native metadata, exclusive ownership, minimal CLI library operations, and process-interruption recovery.
+- [x] Complete library commands: organization, replacement, deletion, unpacking, cache maintenance, usage, and offline asset verification.
 - [ ] Real-image renderer feasibility, process deadlines, and complete milestone 1 acceptance.
 
 See [foundation validation](../validation/Native-Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Native-Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Native-Storage.md) records native ownership and publication evidence.
+The [command validation](../validation/Native-Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
+Native statistics and rendering integration remain pending; milestone 2 is not complete.
 Power-loss durability and the full workload qualification remain separate acceptance work.
 
 ## Summary

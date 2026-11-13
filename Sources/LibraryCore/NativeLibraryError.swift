@@ -3,6 +3,7 @@ import Foundation
 public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConvertible {
     case inUse, closed, unsupportedFilesystem, unsafePath, invalidFormat, unsupportedVersion
     case invalidMetadata, integrity, recoveryRequired, notFound, limitExceeded, invalidInput
+    case nameCollision, folderNotEmpty
     case io(Int32)
 
     public var code: String {
@@ -19,6 +20,8 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
         case .notFound: "ITEM_NOT_FOUND"
         case .limitExceeded: "LIBRARY_LIMIT"
         case .invalidInput: "INVALID_INPUT"
+        case .nameCollision: "NAME_COLLISION"
+        case .folderNotEmpty: "FOLDER_NOT_EMPTY"
         case .io: "FILESYSTEM_ERROR"
         }
     }
@@ -29,7 +32,7 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
         case .integrity, .recoveryRequired: 4
         case .invalidFormat, .unsupportedVersion, .invalidMetadata: 5
         case .io: 6
-        case .unsafePath, .notFound, .limitExceeded, .invalidInput: 7
+        case .unsafePath, .notFound, .limitExceeded, .invalidInput, .nameCollision, .folderNotEmpty: 7
         }
     }
 
@@ -57,6 +60,8 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
         case .notFound: "No unique matching saved item exists."
         case .limitExceeded: "A bounded library scan or metadata limit was exceeded."
         case .invalidInput: "The requested name, comment, or identifier is invalid."
+        case .nameCollision: "The destination already contains a conflicting name."
+        case .folderNotEmpty: "Only an empty folder can be deleted."
         case .io(let number): "A filesystem operation failed (errno \(number))."
         }
     }
@@ -70,4 +75,7 @@ enum LibraryBounds {
     static let directoryEntries = 100_000
     static let operations = 128
     static let folderDepth = 32
+    static let transaction = 16 * 1024 * 1024
+    static let transactionBytes = 256 * 1024 * 1024
+    static let changes = 10_000
 }

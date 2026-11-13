@@ -1,13 +1,13 @@
 import Foundation
 
 /// Checks structural budgets during parsing, before constructing an unbounded object tree.
-struct BoundedJSONParser {
+package struct BoundedJSONParser {
     private let bytes: [UInt8]
     private let limits: BlueprintCodecLimits
     private var cursor = 0
     private var nodes = 0
 
-    init(data: Data, limits: BlueprintCodecLimits) throws {
+    package init(data: Data, limits: BlueprintCodecLimits) throws {
         guard String(data: data, encoding: .utf8) != nil else {
             throw BlueprintCodecError.invalidSource("Decoded JSON is not valid UTF-8.")
         }
@@ -16,7 +16,7 @@ struct BoundedJSONParser {
         if bytes.starts(with: [0xef, 0xbb, 0xbf]) { cursor = 3 }
     }
 
-    mutating func parse() throws -> JSONValue {
+    package mutating func parse() throws -> JSONValue {
         let value = try parseValue(depth: 0)
         skipWhitespace()
         guard cursor == bytes.count else { throw invalidJSON() }

@@ -14,7 +14,7 @@ let package = Package(
     targets: [
         .target(name: "CLibraryPlatform", publicHeadersPath: "include"),
         .target(name: "LibraryCore", dependencies: ["CLibraryPlatform"]),
-        .target(name: "FactorioData"),
+        .target(name: "FactorioData", dependencies: ["LibraryCore"]),
         .target(
             name: "PreviewRenderer",
             resources: [.copy("Resources")],
@@ -29,5 +29,6 @@ let package = Package(
             resources: [.copy("Fixtures")]
         ),
         .testTarget(name: "PreviewRendererTests", dependencies: ["PreviewRenderer"]),
+        .testTarget(name: "FactorioDataTests", dependencies: ["FactorioData", "LibraryCore", "FBNativeCLI"]),
     ]
 )

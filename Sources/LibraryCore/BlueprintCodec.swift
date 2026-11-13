@@ -67,7 +67,10 @@ public struct BlueprintDocument: Sendable {
     /// Root exports return the exact imported bytes. Selected entries are new format-0 strings.
     public func export(at path: [Int] = []) throws -> Data {
         guard !path.isEmpty else { return original.bytes }
-        let selected = try entry(at: path)
+        return try standaloneSource(for: entry(at: path))
+    }
+
+    func standaloneSource(for selected: BlueprintEntry) throws -> Data {
         guard case .object(let members) = selected.value else { throw BlueprintCodecError.invalidEntryPath }
         let standalone = JSONValue.object(members.filter { !$0.key.utf8.elementsEqual("index".utf8) })
         let json = try standalone.encoded(maximum: limits.decodedBytes)

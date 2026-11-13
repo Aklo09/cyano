@@ -5,18 +5,20 @@ import Foundation
 @_spi(Testing) public enum LibraryWritePhase: String, CaseIterable, Sendable {
     case formatPublished, sourceStaged, metadataStaged, intentPublished
     case sourcePublished, metadataPublished, intentRemoved
+    case changesStaged, fileRemoved, filePublished, treeStaged, treeWithdrawn, treePublished, cacheRemoved
 }
 
 /// Owns one local library until close. Every complete operation runs on one serial queue.
 public final class NativeLibrary: @unchecked Sendable {
-    private let queue = DispatchQueue(label: "fb-native.library")
-    private let root: LibraryDirectory
-    private let lease: LibraryLease
-    private let library: LibraryDirectory
-    private let operations: LibraryDirectory
-    private let formatBytes: Data
-    private let hook: ((LibraryWritePhase) throws -> Void)?
-    private var needsRecovery = false
+    let queue = DispatchQueue(label: "fb-native.library")
+    let root: LibraryDirectory
+    let lease: LibraryLease
+    let library: LibraryDirectory
+    let operations: LibraryDirectory
+    let cache: LibraryDirectory
+    let formatBytes: Data
+    let hook: ((LibraryWritePhase) throws -> Void)?
+    var needsRecovery = false
 
     public convenience init(at url: URL) throws {
         try self.init(at: url, initializing: false, hook: nil)
@@ -80,7 +82,7 @@ public final class NativeLibrary: @unchecked Sendable {
             self.root = root; self.lease = lease; self.formatBytes = formatBytes; self.hook = hook
             library = try root.child("library", create: true)
             operations = try root.child("operations", create: true)
-            _ = try root.child("cache", create: true)
+            cache = try root.child("cache", create: true)
             try root.sync()
             try replay()
         } catch {
@@ -172,8 +174,7 @@ public final class NativeLibrary: @unchecked Sendable {
     public func export(id: String, entryPath: [Int] = []) throws -> Data {
         try queue.sync {
             try ready()
-            let found = try find(id: id)
-            let (_, document, _) = try readItem(folder: found.folder, basename: found.basename)
+            let (_, document, _) = try load(id: id)
             return try document.export(at: entryPath)
         }
     }
@@ -183,8 +184,8 @@ public final class NativeLibrary: @unchecked Sendable {
             try ready()
             guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                   text.utf8.count <= LibraryBounds.comment else { throw NativeLibraryError.invalidInput }
-            let found = try find(id: id)
-            let (original, document, metadataBytes) = try readItem(folder: found.folder, basename: found.basename)
+            let (found, document, metadataBytes) = try load(id: id)
+            let original = found.metadata
             _ = try document.entry(at: entryPath)
             guard original.comments.count < LibraryBounds.comments else { throw NativeLibraryError.limitExceeded }
             var metadata = original
@@ -197,19 +198,19 @@ public final class NativeLibrary: @unchecked Sendable {
         }
     }
 
-    private func checkControls() throws {
-        try lease.check(); try library.check(); try operations.check()
+    func checkControls() throws {
+        try lease.check(); try library.check(); try operations.check(); try cache.check()
         guard try root.read(".library-format.json", maximum: LibraryBounds.journal) == formatBytes else {
             throw NativeLibraryError.integrity
         }
     }
 
-    private func ready() throws {
+    func ready() throws {
         try checkControls()
         guard !needsRecovery else { throw NativeLibraryError.recoveryRequired }
     }
 
-    private func directory(at folder: String) throws -> LibraryDirectory {
+    func directory(at folder: String) throws -> LibraryDirectory {
         var result = library
         for part in try LibraryNames.folderComponents(folder) {
             let matches = try result.entries().filter { LibraryNames.key($0) == LibraryNames.key(part) }
@@ -219,7 +220,7 @@ public final class NativeLibrary: @unchecked Sendable {
         return result
     }
 
-    private func readItem(folder: String, basename: String) throws -> (LibraryItemMetadata, BlueprintDocument, Data) {
+    func readItem(folder: String, basename: String) throws -> (LibraryItemMetadata, BlueprintDocument, Data) {
         try LibraryNames.validateBasename(basename)
         let parent = try directory(at: folder)
         let data = try parent.read(basename + ".json", maximum: LibraryBounds.metadata)
@@ -234,12 +235,12 @@ public final class NativeLibrary: @unchecked Sendable {
         return (metadata, document, data)
     }
 
-    private func item(metadata: LibraryItemMetadata, document: BlueprintDocument, folder: String, basename: String) -> LibraryItem {
+    func item(metadata: LibraryItemMetadata, document: BlueprintDocument, folder: String, basename: String) -> LibraryItem {
         LibraryItem(id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
                     kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata)
     }
 
-    private func listing() throws -> LibraryListing {
+    func listing() throws -> LibraryListing {
         var result = LibraryListing()
         var visited = 0
         var scannedBytes = 0
@@ -259,6 +260,12 @@ public final class NativeLibrary: @unchecked Sendable {
                         try LibraryNames.validateBasename(name)
                         result.folders.append(path)
                         try walk(parent.child(name), folder: path, depth: depth + 1)
+                    } else if name == ".folder.json" {
+                        let data = try parent.read(name, maximum: LibraryBounds.metadata)
+                        let record = try LibraryRecords.folderMetadata(data)
+                        scannedBytes += data.count
+                        guard scannedBytes <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
+                        result.folderComments[folder] = record.comment
                     } else if name.hasSuffix(".json") {
                         let basename = String(name.dropLast(5))
                         guard names.contains(where: { $0.utf8.elementsEqual((basename + ".txt").utf8) }) else {
@@ -290,14 +297,46 @@ public final class NativeLibrary: @unchecked Sendable {
         return result
     }
 
-    private func find(id: String) throws -> LibraryItem {
-        guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.invalidInput }
-        let matches = try listing().items.filter { $0.id == id }
-        guard matches.count == 1, let item = matches.first else { throw NativeLibraryError.notFound }
-        return item
+    func find(id: String) throws -> LibraryItem {
+        try load(id: id).0
     }
 
-    private func transact(kind: String, folder: String, basename: String, metadata: LibraryItemMetadata, source: Data?, before: String?) throws {
+    func load(id: String) throws -> (LibraryItem, BlueprintDocument, Data) {
+        guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.invalidInput }
+        var matches: [(String, String)] = []
+        var visited = 0
+        var bytes = 0
+        func visit(_ directory: LibraryDirectory, folder: String, depth: Int) throws {
+            guard depth <= LibraryBounds.folderDepth else { throw NativeLibraryError.limitExceeded }
+            let names = try directory.entries()
+            visited += names.count
+            guard visited <= LibraryBounds.directoryEntries else { throw NativeLibraryError.limitExceeded }
+            for name in names {
+                guard let info = try directory.info(name) else { throw NativeLibraryError.integrity }
+                if info.st_mode & S_IFMT == S_IFDIR {
+                    try LibraryNames.validateBasename(name)
+                    try visit(directory.child(name), folder: MutationPath.join(folder, name), depth: depth + 1)
+                } else if name.hasSuffix(".json"), name != ".folder.json" {
+                    do {
+                        let data = try directory.read(name, maximum: LibraryBounds.metadata)
+                        bytes += data.count
+                        guard bytes <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
+                        let metadata = try LibraryRecords.metadata(data)
+                        if metadata.id == id { matches.append((folder, String(name.dropLast(5)))) }
+                    } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded }
+                    catch { continue }
+                }
+            }
+        }
+        try visit(library, folder: "", depth: 0)
+        guard matches.count == 1, let (folder, basename) = matches.first else { throw NativeLibraryError.notFound }
+        do {
+            let (metadata, document, data) = try readItem(folder: folder, basename: basename)
+            return (item(metadata: metadata, document: document, folder: folder, basename: basename), document, data)
+        } catch { throw NativeLibraryError.notFound }
+    }
+
+    func transact(kind: String, folder: String, basename: String, metadata: LibraryItemMetadata, source: Data?, before: String?) throws {
         guard try operations.entries(maximum: LibraryBounds.operations).count < LibraryBounds.operations else {
             throw NativeLibraryError.limitExceeded
         }
@@ -324,7 +363,7 @@ public final class NativeLibrary: @unchecked Sendable {
         }
     }
 
-    private func validateStage(_ stage: LibraryDirectory) throws -> [String] {
+    func validateStage(_ stage: LibraryDirectory) throws -> [String] {
         let names = try stage.entries(maximum: 64)
         for name in names {
             let standard = ["source.txt", "metadata.json", "intent.pending", "intent.json"].contains(name)
@@ -336,18 +375,24 @@ public final class NativeLibrary: @unchecked Sendable {
         return names
     }
 
-    private func replay() throws {
+    func replay() throws {
         for id in try operations.entries(maximum: LibraryBounds.operations) {
             guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.recoveryRequired }
             let stage = try operations.child(id)
-            let names = try validateStage(stage)
-            guard names.contains("intent.json") else { continue } // Preserve unpublished staging for later maintenance.
-            let intent = try LibraryRecords.intent(stage.read("intent.json", maximum: LibraryBounds.journal), operationId: id)
-            try apply(intent, stage: stage)
+            guard try stage.info("intent.json") != nil else { try validateUnpublishedStage(stage); continue }
+            let bytes = try stage.read("intent.json", maximum: LibraryBounds.transaction)
+            let value = try LibraryRecords.parse(bytes, maximum: LibraryBounds.transaction)
+            if value["schemaVersion"]?.safeInteger == 1 {
+                _ = try validateStage(stage)
+                let intent = try LibraryRecords.intent(bytes, operationId: id)
+                try apply(intent, stage: stage)
+            } else {
+                try applyTransaction(LibraryRecords.transaction(bytes, operationId: id), stage: stage)
+            }
         }
     }
 
-    private func apply(_ intent: LibraryIntent, stage: LibraryDirectory) throws {
+    func apply(_ intent: LibraryIntent, stage: LibraryDirectory) throws {
         let stagedNames = try validateStage(stage)
         guard !stagedNames.contains("intent.pending"),
               stagedNames.contains("source.txt") == (intent.kind == "import") else {
@@ -390,7 +435,7 @@ public final class NativeLibrary: @unchecked Sendable {
         try operations.remove(intent.operationId, directory: true)
     }
 
-    private func install(_ data: Data, target: String, destination: LibraryDirectory, stage: LibraryDirectory, expected: String, before: String?) throws {
+    func install(_ data: Data, target: String, destination: LibraryDirectory, stage: LibraryDirectory, expected: String, before: String?) throws {
         func currentHash() throws -> String? {
             guard try destination.info(target) != nil else { return nil }
             return OriginalSource(bytes: try destination.read(target, maximum: BlueprintCodecLimits.standard.sourceBytes)).sha256

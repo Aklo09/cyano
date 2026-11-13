@@ -39,7 +39,8 @@ just library export "$library" "$item_id"
 ```
 
 Export stdout contains only original bytes, without JSON or an added newline.
-Redirect it to a file when needed.
+Use `--output <new-file.txt>` to create a file exclusively; an existing file is refused.
+Output beneath the active library root is refused, including through directory aliases.
 Build messages and recipe diagnostics stay on stderr.
 
 Book entry comments and standalone exports accept `--entry 5.0`.
@@ -48,8 +49,88 @@ The path must exist in the saved book.
 Omit `--entry` for the root.
 
 Import can select an existing real folder with `--folder "Smelting"`.
-Close all library owners before creating or organizing directories in Finder.
-Folder creation, move/rename, replacement, deletion, and unpacking commands are not available yet.
+Use the commands below to organize directories under ownership.
+Close all library owners before making changes in Finder.
+
+## Organize and replace
+
+The empty string addresses the root folder. Paths are relative to `library/`:
+
+```sh
+just library folder-create "$library" "" Smelting
+just library move "$library" "$item_id" Smelting
+just library rename "$library" "$item_id" "Example renamed"
+just library folder-move "$library" Smelting "" Production
+just library update "$library" "$item_id" Tests/LibraryCoreTests/Fixtures/Blueprints/RS.txt
+```
+
+Moving keeps item identity, metadata bytes, comments, dates, and original TXT bytes.
+Renaming changes the display override, portable filenames, and update date.
+Folder moves also rename when the optional final name is supplied.
+Case-only names are supported; collisions and moving a folder into itself are refused.
+
+Replacement keeps the item UUID, creation time, chosen name, and comment identities.
+Comments on missing book entries become root comments prefixed with `[Former book entry 5.0]` and two newlines.
+Replacement refuses invalid input before changing stored content and invalidates that item's derived cache.
+
+Read a comment's `id` from the item metadata and pass it to `comment-delete`.
+`comment-add` is an alias for `comment`.
+Delete an item and then its empty parent with:
+
+```sh
+just library delete "$library" "$item_id"
+just library folder-delete "$library" Production
+```
+
+Item deletion removes both TXT and JSON plus that item's derived cache.
+Folder deletion accepts only an empty folder, allowing a validated folder-description sidecar and `.DS_Store`.
+It never recursively deletes library items.
+
+## Unpack a book
+
+```sh
+just library import-unpacked "$library" Tests/LibraryCoreTests/Fixtures/Blueprints/v0.59.0.txt
+```
+
+Unpacking creates real folders for books, named TXT/JSON pairs for leaves, and fresh UUIDs for every leaf.
+Stored indices prefix child names, such as `5 - Nested/0 - Leaf`.
+Book descriptions become `.folder.json` comments shown in `list.result.folderComments`.
+Leaf source fields, including unknown wrapper fields, are retained except the enclosing `index`.
+Book container settings such as icons and the active entry are not represented by the resulting folders.
+The complete prepared tree becomes visible after the recovery intent commits; a duplicate root name receives a suffix.
+Use ordinary `import` to preserve a whole book exactly.
+
+## Maintenance
+
+```sh
+just library usage "$library"
+just library cache-cleanup "$library"
+just library cache-cleanup "$library" all --apply
+```
+
+Cache cleanup defaults to the `abandoned` scope and a dry run.
+`--apply` recomputes its selection under ownership; it does not accept a saved deletion plan.
+Scoped cleanup recognizes native cache identity manifests, orphaned item results, and `.tmp-<UUID>` files.
+Unknown or damaged manifest formats remain protected; `all` explicitly selects all safe derived files.
+No cleanup scope deletes operations staging or authoritative library content.
+Unsafe links, shared file inodes, cross-device descendants, and overlapping selected assets cause refusal before deletion.
+
+`obsolete` additionally compares source hash, stored entry path, generator, and selected asset identity.
+It requires `--assets <release-directory>` and optionally accepts `--generator <identity>`.
+The default generator is reserved as `native-preview-v1`; native preview production is still pending.
+The native manifest format is intentionally separate from historical web caches.
+
+`usage` reports originals, metadata, other library members, cache, operations, controls, and optional assets.
+Supply `--assets <release-directory>` to include assets; without it, `complete` is false and an `ASSETS_NOT_SELECTED` issue is explicit.
+Logical bytes count every file path; unique logical and allocated bytes deduplicate device/inode pairs.
+Allocated bytes use `st_blocks × 512`, including directories, and are not an APFS clone-sharing or guaranteed-reclaim estimate.
+Scans stop after 100,000 entries, 64 directory levels, or five seconds; usage reports incomplete categories and issues.
+
+`assets-verify <release-directory>` runs independently of library ownership.
+It requires `release.json`, the full `sprites/` inventory, and `statistics/prototype-map.json`.
+It verifies canonical release identity, hashes, sizes, supported 2.1.23 profiles, schemas, tiers, and declared packed frame bounds.
+It accepts up to 10,000 files and 2 GiB, with bounded JSON reads.
+It does not decode images or validate rendering; a raw sprite directory alone is not an assembled release.
 
 ## Ownership and recovery
 
@@ -69,9 +150,9 @@ See the [storage contract](../contracts/Native-Storage.md) before investigating 
 
 ## Structured results
 
-Successful commands, except help and export, return one JSON object on stdout.
+Successful commands, except help and stdout export, return one JSON object on stdout.
 The envelope fields are `schema: 1`, `ok: true`, `command`, and `result`.
-Lists include `folders`, usable `items`, and `issues` for excluded malformed content.
+Lists include `folders`, `folderComments`, usable `items`, and `issues` for excluded malformed content.
 Inspect issues even when listing succeeds.
 
 Failures emit JSON on stderr and leave stdout empty before output begins.
@@ -102,3 +183,4 @@ just storage-test
 
 The test driver is package test support, with no failure-injection flags in the ordinary CLI.
 See [storage validation](../validation/Native-Storage.md) for completed checks and limitations.
+The [complete-command validation](../validation/Native-Library-Commands.md) covers organization, maintenance, and asset verification.
