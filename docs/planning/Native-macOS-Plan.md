@@ -1,6 +1,6 @@
 # Native macOS port: roadmap and first milestone
 
-Date: 2026-11-13. Status: approved by the owner; milestone 1 is in progress.
+Date: 2026-11-13. Status: approved by the owner; milestone 1 is accepted.
 Based on the [initial assessment](Native-macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
@@ -13,7 +13,7 @@ Based on the [initial assessment](Native-macOS-Assessment.md), with the scope de
 - [x] Complete library commands: organization, replacement, deletion, unpacking, cache maintenance, usage, and offline asset verification.
 - [x] Standalone real-image renderer feasibility, bounded native workers, process deadlines, and independent PNG decoding.
 - [x] Library-bound helper lease retention, close/cancellation, and owned derived-cache publication/reuse.
-- [ ] Owner visual approval, remaining qualification, and complete milestone 1 acceptance.
+- [x] Owner visual approval and complete milestone 1 acceptance ([acceptance record](../validation/Native-Milestone-1.md)).
 
 See [foundation validation](../validation/Native-Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Native-Codec.md) records the next completed checkpoint.

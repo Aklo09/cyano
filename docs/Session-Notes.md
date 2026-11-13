@@ -7,7 +7,7 @@ Minimal storage and CLI workflows are implemented, with [process-interruption ev
 The owner then prioritized [complete library commands](validation/Native-Library-Commands.md) before renderer feasibility; those are implemented.
 The standalone [native renderer harness](validation/Native-Renderer.md) now paints real images through a supervised helper.
 The renderer checkpoint is committed as `75aec1c`; [owned library previews and caches](validation/Native-Library-Previews.md) are implemented next.
-The complete milestone remains in progress.
+Milestone 1 is [accepted](validation/Native-Milestone-1.md): all criteria re-verified on `8daa40e` and the representative images approved by the owner.
 
 ## Current state
 
@@ -38,7 +38,7 @@ Application scheduling, the macOS UI, and native statistics remain pending.
 Continue the complete-core milestone with the native construction-statistics port using the retained reference cases.
 Keep application scheduling/progress/retry and UI work separate from the completed library preview command.
 Preserve inherited kernel ownership, sticky cancellation, and owner-only cache publication.
-Owner visual approval, connected-rail/full-corpus review, and workload measurements remain outstanding.
+Connected-rail/full-corpus review (milestone 4) and workload measurements remain outstanding.
 
 Preserve the [native storage contract](contracts/Native-Storage.md) when integrating rendering.
 Helpers must not retain write access after ownership is released.

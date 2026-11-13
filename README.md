@@ -70,6 +70,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
 - **Render previews:** [native harness guide](docs/development/Native-Preview.md) and [renderer validation](docs/validation/Native-Renderer.md).
 - **Cache saved-item previews:** [library preview guide](docs/development/Native-Library-Previews.md), [contract](docs/contracts/Native-Preview-Cache.md), and [validation](docs/validation/Native-Library-Previews.md).
+- **Check milestone 1:** [acceptance record](docs/validation/Native-Milestone-1.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).
 

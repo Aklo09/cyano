@@ -20,6 +20,7 @@ Use the approved plan for scope and validation records for completed work.
 | Render and reuse saved-item previews | [Library previews](development/Native-Library-Previews.md) |
 | Understand helper leases and cache publication | [Preview cache contract](contracts/Native-Preview-Cache.md) |
 | Inspect owned-render/cache validation | [Library preview validation](validation/Native-Library-Previews.md) |
+| Inspect milestone 1 acceptance | [Milestone 1 acceptance](validation/Native-Milestone-1.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.
