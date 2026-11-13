@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
 
-/// Unmodified imported bytes. Format validation belongs to the forthcoming codec.
+/// Unmodified source bytes. Use BlueprintCodec when format validation is required.
 public struct OriginalSource: Sendable {
     public let bytes: Data
     public let sha256: String

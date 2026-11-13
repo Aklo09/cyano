@@ -7,9 +7,13 @@ default:
 build:
     sh tools/swift.sh build
 
-# Test fixture preservation and real JavaScriptCore planner execution.
+# Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|PlannerRuntimeTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|PlannerRuntimeTests'
+
+# Run focused codec admission, preservation, and selected-entry export checks.
+codec-test:
+    sh tools/swift.sh test --filter BlueprintCodecTests
 
 # Print the currently available CLI capabilities.
 release:

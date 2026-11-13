@@ -3,7 +3,7 @@
 Keep original blueprint strings, books, planners, and comments in an ordinary local directory.
 This project is an independent native port of the original web application.
 
-**Current status:** milestone 1's independent foundation is implemented.
+**Current status:** milestone 1's independent foundation and bounded native codec are implemented.
 The CLI exposes build information; the preview probe exercises JavaScriptCore.
 Library operations, image painting, and the macOS interface are still pending.
 
@@ -24,6 +24,7 @@ Run from the repository root:
 ```sh
 just build
 just test
+just codec-test
 just release
 just planner-test
 ```
@@ -58,6 +59,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 
 - **Read the roadmap:** [approved native plan](docs/planning/Native-macOS-Plan.md).
 - **Inspect evidence:** [foundation validation](docs/validation/Native-Foundation.md).
+- **Use the codec:** [native interfaces](docs/development/Native-Codec.md) and [validation](docs/validation/Native-Codec.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).

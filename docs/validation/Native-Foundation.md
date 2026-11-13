@@ -2,6 +2,7 @@
 
 The native scaffold builds without access to the original web project.
 This evidence covers the first foundation checkpoint, not complete milestone 1 acceptance.
+The subsequent [codec checkpoint](Native-Codec.md) adds native admission and selected-entry export.
 
 Recorded: 2026-11-13.
 
@@ -23,7 +24,7 @@ Recorded: 2026-11-13.
 | Check | Result |
 | --- | --- |
 | `just build` | Native libraries and both executables compile |
-| `just test` | Five Swift tests pass across two suites |
+| `just test` at the foundation checkpoint | Five Swift tests pass across two suites |
 | `just release` | CLI reports only the implemented release-information capability |
 | `just planner-test` | Pinned planner executes through system JavaScriptCore |
 | `just tools-install` | Locked development dependencies install with lifecycle scripts disabled |
@@ -60,14 +61,16 @@ From the project root, run:
 python3 tools/check-independence.py --deny-path ../fb
 ```
 
-The relocated build passes all five tests and runs both native executables.
+At this checkpoint, the relocated build passed all five tests and ran both native executables.
+The [codec checkpoint](Native-Codec.md) extends this isolation check to all 21 native tests.
 The script removes only its own temporary checkout afterward.
 This check uses macOS `sandbox-exec` as a development qualification tool.
 It does not define the finished application's sandbox or distribution design.
 
 ## Remaining qualification
 
-Native codec admission, storage ownership, durable publication, and recovery remain unimplemented.
+Native codec admission was subsequently implemented and validated separately.
+Storage ownership, durable publication, and recovery remain unimplemented.
 So do worker deadlines, image composition, caching, and UI workflows.
 Asset regeneration and game-reference generation have not been rerun.
 No image approval, performance qualification, or power-loss durability claim is made.
