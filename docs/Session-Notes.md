@@ -3,7 +3,7 @@
 The owner approved the [native plan](planning/macOS-Plan.md) on 2026-11-13.
 Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative
 images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
-Milestone 2 ([subtasks](planning/Milestone-2.md)) has its statistics work done (S1–S8); acceptance (S9) is next.
+Milestone 2 is [accepted](validation/Milestone-2.md), including native construction statistics approved by the owner.
 
 ## Current state
 
@@ -33,8 +33,9 @@ Application scheduling and the macOS UI remain pending.
 
 ## Next implementation
 
-Complete milestone 2 acceptance (S9): check the exit condition per operation, collect the statistics evidence,
-run the full checks and the independence check, and ask the owner to sign off on statistics for representative fixtures.
+Milestone 3 is next: the native macOS application (library selection, browsing, nested books, import/export,
+comments, organization, and image viewport), working offline and without renderer assets.
+Plan it as milestone 2 was planned: actionable subtasks with owner decisions recorded first.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

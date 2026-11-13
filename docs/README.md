@@ -26,6 +26,7 @@ Use the approved plan for scope and validation records for completed work.
 | Inspect statistics tests and reference parity | [Statistics validation](validation/Statistics.md) |
 | Inspect owned-render/cache validation | [Library preview validation](validation/Library-Previews.md) |
 | Inspect milestone 1 acceptance | [Milestone 1 acceptance](validation/Milestone-1.md) |
+| Inspect milestone 2 acceptance | [Milestone 2 acceptance](validation/Milestone-2.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.

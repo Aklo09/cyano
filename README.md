@@ -72,7 +72,7 @@ These retained JavaScript cases, with `just statistics-golden`, provide the refe
 - **Render previews:** [native harness guide](docs/development/Preview.md) and [renderer validation](docs/validation/Renderer.md).
 - **Cache saved-item previews:** [library preview guide](docs/development/Library-Previews.md), [contract](docs/contracts/Preview-Cache.md), and [validation](docs/validation/Library-Previews.md).
 - **Calculate statistics:** [statistics guide](docs/development/Statistics.md), [contract](docs/contracts/Statistics.md), and [validation](docs/validation/Statistics.md).
-- **Check milestone 1:** [acceptance record](docs/validation/Milestone-1.md).
+- **Check milestones:** [milestone 1](docs/validation/Milestone-1.md) and [milestone 2](docs/validation/Milestone-2.md) acceptance records.
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).
 

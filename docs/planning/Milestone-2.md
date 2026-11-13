@@ -1,6 +1,6 @@
 # Milestone 2: complete library core
 
-Date: 2026-11-13. Status: approved by the owner; in progress.
+Date: 2026-11-13. Status: accepted ([acceptance record](../validation/Milestone-2.md)).
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 2.
 
 ## Scope
@@ -43,7 +43,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 | S6 | Done: library and CLI integration | Library API taking item, entry path, and assets; `fb-native statistics <library> <item-id> [--entry <stored.indices>] --assets <release>`; books and planners report "not applicable"; missing assets give a clear error; versioned JSON results | CLI tests cover a blueprint, a book leaf, a planner, missing assets, and an unknown entity; source operations still need no assets | S4 |
 | S7 | Done: performance check | Release-build timings for the 6,814-entity leaf and all 149 blueprint leaves of the large book | Recorded; caching decided only if measurements require it | S6 |
 | S8 | Done: documentation | CLI guide, development guide, plan progress, session notes | Links checked | S6 |
-| S9 | Milestone 2 acceptance | `docs/validation/Milestone-2.md`: exit condition per operation, statistics evidence, full checks, independence check | All checks pass; owner signs off on statistics for representative fixtures | S1–S8 |
+| S9 | Done: milestone 2 acceptance | `docs/validation/Milestone-2.md`: exit condition per operation, statistics evidence, full checks, independence check | All checks pass; owner signs off on statistics for representative fixtures | S1–S8 |
 
 ## Reference behaviors the port must reproduce
 

@@ -1,6 +1,6 @@
 # Native macOS port: roadmap and first milestone
 
-Date: 2026-11-13. Status: approved by the owner; milestone 1 is accepted.
+Date: 2026-11-13. Status: approved by the owner; milestones 1 and 2 are accepted.
 Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
@@ -16,13 +16,13 @@ Based on the [initial assessment](macOS-Assessment.md), with the scope decisions
 - [x] Owner visual approval and complete milestone 1 acceptance ([acceptance record](../validation/Milestone-1.md)).
 - [x] Core revisions after milestone 1 review ([decisions](Core-Revisions.md)).
 - [x] Native construction statistics: contract, strict prototype map, calculator, reference parity, library/CLI integration, and measurements ([validation](../validation/Statistics.md)).
-- [ ] Milestone 2 acceptance ([subtask S9](Milestone-2.md)).
+- [x] Milestone 2 acceptance ([acceptance record](../validation/Milestone-2.md)).
 
 See [foundation validation](../validation/Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Native statistics are implemented; milestone 2 acceptance is pending ([subtasks](Milestone-2.md)). Application rendering scheduling remains milestone 4 work.
+Milestone 2 is [accepted](../validation/Milestone-2.md). Application rendering scheduling remains milestone 4 work.
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
 The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
