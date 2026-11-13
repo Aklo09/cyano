@@ -1,61 +1,55 @@
 # Resume native implementation
 
 The owner approved the [native plan](planning/macOS-Plan.md) on 2026-11-13.
-Milestone 1's independent foundation is implemented and validated.
-The bounded native codec is implemented, with [focused validation](validation/Codec.md).
-Minimal storage and CLI workflows are implemented, with [process-interruption evidence](validation/Storage.md).
-The owner then prioritized [complete library commands](validation/Library-Commands.md) before renderer feasibility; those are implemented.
-The standalone [native renderer harness](validation/Renderer.md) now paints real images through a supervised helper.
-The renderer checkpoint is committed as `75aec1c`; [owned library previews and caches](validation/Library-Previews.md) are implemented next.
-Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative images approved by the owner.
+Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative
+images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
+Milestone 2 ([subtasks](planning/Milestone-2.md)) has its statistics work done (S1–S8); acceptance (S9) is next.
 
 ## Current state
 
-- **Build native targets:** three shared libraries, CLI, and planner probe compile.
+- **Build native targets:** shared libraries, the CLI, the preview worker, and the planner probe compile.
 - **Preserve supplied fixtures:** all nine TXT inputs retain their original hashes.
 - **Decode native strings:** bounded parsing preserves unknown fields and exact original exports.
 - **Own native libraries:** permanent kernel leases exclude competing app/CLI sessions.
-- **Publish recoverably:** version 1 import/comment intents and version 2 file/tree mutations retain hashed staged evidence.
-- **Organize sources:** folder/item moves and renames, empty-folder and item deletion, replacement, unpacking, and comment deletion are available.
+- **Publish recoverably:** intents commit behind a drive barrier; replay rolls forward; refused operations can be
+  quarantined; uncommitted staging can be cleaned up.
+- **Organize sources:** folder/item moves and renames, empty-folder and item deletion, replacement, unpacking, and
+  comment deletion are available. Deleted and replaced originals go to the Trash.
+- **List quickly:** listing reads metadata and source hashes with a derived kind index; ID lookups use an
+  in-session index. 888 roots list in 0.24 s in a release build.
 - **Maintain offline:** bounded usage, scoped cache cleanup, and independent asset-release verification are available.
-- **Reuse planner source:** system JavaScriptCore executes the locally bundled fpsr planner.
-- **Paint previews:** Core Graphics handles ordered sprites, shadows, wires, icons, and planner labels; Image I/O decodes atlases and encodes PNGs.
-- **Supervise helpers:** deadlines, cancellation, sampled memory limits, and parent-death lifelines are tested.
-- **Retain ownership:** POSIX launch explicitly hands the shared kernel lease to bound workers; close cancels/drains jobs.
-- **Reuse derived previews:** complete cache metadata binds identities, PNG bytes, and stored reports without changing source metadata.
+- **Paint previews:** JavaScriptCore runs the bundled fpsr planner; Core Graphics paints and Image I/O encodes PNGs.
+- **Supervise helpers:** workers get only stdin/stdout/stderr and an empty environment, never the lease; deadlines,
+  cancellation, memory limits, and parent-death lifelines are tested. Rendering runs off the library queue.
+- **Reuse derived previews:** cache metadata binds identities, PNG bytes, and reports without changing source metadata.
+- **Calculate statistics:** construction requirements and game-tile footprints for one blueprint entry, from a
+  strictly loaded prototype map bound to a verified release; 0 differences from the reference on 348 cases.
 - **Keep tooling local:** preparation sources, dependency locks, and notices live here.
-- **Keep artwork private:** copied sprites and prototype data remain ignored.
-- **Read the evidence:** [foundation validation](validation/Foundation.md) records checks and limitations.
+- **Keep artwork private:** copied sprites, prototype data, and outputs derived from them stay in ignored directories.
 
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
 Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
-The preview probe renders standalone source files and selected book leaves with verified private assets.
-Saved-item preview and cache integration are available through `fb-native preview`.
-Application scheduling, the macOS UI, and native statistics remain pending.
+Application scheduling and the macOS UI remain pending.
 
 ## Next implementation
 
-The approved [core revisions](planning/Core-Revisions.md) after milestone 1 are implemented.
-Then continue the complete-core milestone with the native construction-statistics port, following the [milestone 2 subtasks](planning/Milestone-2.md).
-Keep application scheduling/progress/retry and UI work separate from the completed library preview command.
-Preserve inherited kernel ownership, sticky cancellation, and owner-only cache publication.
-Connected-rail/full-corpus review (milestone 4) and workload measurements remain outstanding.
+Complete milestone 2 acceptance (S9): check the exit condition per operation, collect the statistics evidence,
+run the full checks and the independence check, and ask the owner to sign off on statistics for representative fixtures.
 
-Preserve the [native storage contract](contracts/Storage.md) when integrating rendering.
-Helpers must not retain write access after ownership is released.
-Unpublished staging remains preserved; automatic cleanup is deferred.
-Listings currently validate full sources; large-library performance is not qualified.
+Keep application scheduling/progress/retry and UI work separate from the completed library commands.
+Preserve sticky cancellation, worker isolation, and owner-only cache publication.
+Connected-rail/full-corpus review (milestone 4), the 1,000-root workload targets, and power-loss qualification
+remain outstanding.
 
+Preserve the [storage contract](contracts/Storage.md) and [statistics contract](contracts/Statistics.md).
 Retain original bytes, sparse entry indices, and unknown blueprint fields.
 Application-managed backup and restore remain outside v1.
 Neither builds nor runtime should depend on the original web checkout.
+Strict conformance with the original web application is not required: prefer better native behavior and record the
+difference in the relevant contract.
 
 Run `just --list` for available commands.
-Use `just build`, `just test`, and `just planner-test` for native checks.
-Use `just codec-test` for focused codec admission and export checks.
-Use `just storage-test` for metadata, exclusion, CLI, and crash-recovery checks.
-Use `just asset-test` for inventory/profile/hash and packed-frame admission checks.
-Use `just renderer-test` for composition, complete jobs, and helper lifecycle checks.
-Use `just preview --help` and the [preview guide](development/Preview.md) for rendering commands.
-Use the [library preview guide](development/Library-Previews.md) for saved-item reuse and refresh.
-Use `just library --help` for available native commands.
+Use `just build`, `just lint`, and `just test` for native checks.
+Use `just codec-test`, `just storage-test`, `just asset-test`, and `just renderer-test` for focused suites.
+Use the [preview guide](development/Preview.md) and [library preview guide](development/Library-Previews.md) for rendering,
+and the [statistics guide](development/Statistics.md) for statistics and their reference tooling.

@@ -6,8 +6,9 @@ This project is an independent native port of the original web application.
 **Current status:** native storage and the library CLI are implemented, including organization, replacement,
 deletion, book unpacking, maintenance, and offline asset verification.
 The standalone renderer paints real previews through supervised native workers.
-Saved-item previews retain library ownership and reuse validated derived caches.
-Native statistics, application scheduling, and the macOS interface remain pending.
+Saved-item previews reuse validated derived caches.
+Construction statistics report a blueprint's building requirements and footprint from a verified asset release.
+Application scheduling and the macOS interface remain pending.
 
 ## Requirements
 
@@ -58,7 +59,7 @@ Run `just planner-build` after intentionally changing the planner source or adap
 Commit the regenerated resource and metadata with the source change.
 
 Run `just statistics-test` when the private prototype map is available.
-These retained JavaScript cases provide reference behavior for the future Swift statistics port.
+These retained JavaScript cases, with `just statistics-golden`, provide the reference the native statistics are checked against.
 
 ## Documentation
 
@@ -70,6 +71,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
 - **Render previews:** [native harness guide](docs/development/Preview.md) and [renderer validation](docs/validation/Renderer.md).
 - **Cache saved-item previews:** [library preview guide](docs/development/Library-Previews.md), [contract](docs/contracts/Preview-Cache.md), and [validation](docs/validation/Library-Previews.md).
+- **Calculate statistics:** [statistics guide](docs/development/Statistics.md), [contract](docs/contracts/Statistics.md), and [validation](docs/validation/Statistics.md).
 - **Check milestone 1:** [acceptance record](docs/validation/Milestone-1.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).

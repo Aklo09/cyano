@@ -42,7 +42,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 | S5 | Done: parity with the JS reference | Swift test comparing S4 with S2 case by case: items, warnings, completeness, footprint within 1e-9 | Every case matches; any intended difference is listed in the contract | S2, S4 |
 | S6 | Done: library and CLI integration | Library API taking item, entry path, and assets; `fb-native statistics <library> <item-id> [--entry <stored.indices>] --assets <release>`; books and planners report "not applicable"; missing assets give a clear error; versioned JSON results | CLI tests cover a blueprint, a book leaf, a planner, missing assets, and an unknown entity; source operations still need no assets | S4 |
 | S7 | Done: performance check | Release-build timings for the 6,814-entity leaf and all 149 blueprint leaves of the large book | Recorded; caching decided only if measurements require it | S6 |
-| S8 | Documentation | CLI guide, development guide, plan progress, session notes | Links checked | S6 |
+| S8 | Done: documentation | CLI guide, development guide, plan progress, session notes | Links checked | S6 |
 | S9 | Milestone 2 acceptance | `docs/validation/Milestone-2.md`: exit condition per operation, statistics evidence, full checks, independence check | All checks pass; owner signs off on statistics for representative fixtures | S1–S8 |
 
 ## Reference behaviors the port must reproduce

@@ -39,7 +39,9 @@ sh tools/swift.sh test --filter 'BlueprintCodecTests/<test function name>'
 
 Node tooling (`tools/`, Node 24.22.1 per `.nvmrc`) is for development only, never for native builds:
 `just tools-install` (npm ci, lifecycle scripts disabled), `just tools-check`, `just planner-check`, `just assets-check`.
-`just statistics-test` needs the private prototype map.
+`just statistics-test` and `just statistics-golden` need the private prototype map; the statistics parity test in
+`just test` runs only when the map and `.cache/statistics-golden.json` exist. `just statistics-benchmark` times an
+optimized build with the private release.
 
 Independence check (builds a relocated copy in a sandbox, with the original web checkout denied):
 `python3 tools/check-independence.py --deny-path ../fb`.
