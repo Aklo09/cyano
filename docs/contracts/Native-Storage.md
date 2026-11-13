@@ -224,6 +224,9 @@ Empty-folder deletion withdraws the validated folder to staging before removing 
 Exactly one matching tree must exist at the source, stage, or destination on replay.
 Conflicting trees, unsafe members, or unexpected destination bytes preserve the evidence and stop recovery.
 Unpacking publishes all folders, descriptions, and leaf pairs as one prepared tree.
+By design, each leaf TXT is a newly encoded standalone string that preserves the leaf's JSON, unknown fields included;
+the original book string is not retained, so the book cannot be reassembled byte-for-byte from unpacked items.
+Importing the book with `import` keeps its exact bytes.
 
 Cache cleanup is a separate repeatable derived-file operation with dry-run default, bounded inventory,
 and stamp revalidation before deletion. It does not purge operations staging; `staging-cleanup` does.

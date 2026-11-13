@@ -3,8 +3,10 @@ import Foundation
 import PreviewRenderer
 import PreviewTestPlatform
 
-// Tests choose behavior by basename through a disposable symlink to this executable.
+// Tests choose behavior by basename through a disposable symlink to this executable. Workers start with an
+// empty environment, so per-test files live beside that symlink.
 let mode = URL(fileURLWithPath: CommandLine.arguments[0]).lastPathComponent
+let testDirectory = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
 let args = Array(CommandLine.arguments.dropFirst())
 if args == ["descendant-holder"] {
     Thread.sleep(forTimeInterval: 120)
@@ -36,20 +38,19 @@ if args.count == 1, args[0] == "lifeline" {
 }
 switch mode {
 case "preview-test-descendant":
-    guard let path = ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_READY"] else { exit(2) }
     var child: Int32 = 0
     guard CommandLine.arguments[0].withCString({ fb_test_spawn_descendant($0, &child) }) == 0 else { exit(1) }
-    try JSONSerialization.data(withJSONObject: ["pid": child]).write(to: URL(fileURLWithPath: path), options: .atomic)
+    try JSONSerialization.data(withJSONObject: ["pid": child]).write(
+        to: testDirectory.appendingPathComponent("descendant.json"), options: .atomic)
     try FileHandle.standardOutput.write(contentsOf: Data("{}".utf8))
 case "preview-test-orphan":
-    guard let path = ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_READY"] else { exit(2) }
     var info = stat()
-    var other = stat()
-    let unrelated = Int32(ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_PRIVATE_FD"] ?? "-1") ?? -1
+    // Any open descriptor above stderr is a leak: the lease, a library file, or the driver's unrelated one.
+    let leaked = (3..<1024).filter { fstat(Int32($0), &info) == 0 }
     let bytes = try JSONSerialization.data(withJSONObject: [
-        "pid": getpid(), "descriptor3": fstat(3, &info) == 0, "unrelated": fstat(unrelated, &other) == 0,
+        "pid": getpid(), "leaked": leaked, "environment": Array(ProcessInfo.processInfo.environment.keys),
     ])
-    try bytes.write(to: URL(fileURLWithPath: path), options: .atomic)
+    try bytes.write(to: testDirectory.appendingPathComponent("ready.json"), options: .atomic)
     // Deliberately ignore the lifeline: an orphaned helper must not keep the library owned.
     Thread.sleep(forTimeInterval: 120)
 case "preview-test-gated":

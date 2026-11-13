@@ -1,7 +1,6 @@
 #include "CLibraryPlatform.h"
 #include <sys/file.h>
 #include <libproc.h>
-#include <crt_externs.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <spawn.h>
@@ -19,7 +18,7 @@ unsigned long long fb_process_resident_bytes(int pid) {
     return count == sizeof(info) ? info.pti_resident_size : 0;
 }
 
-/* Explicit descriptor allowlist: the worker receives stdin, stdout, and stderr only. */
+/* Explicit allowlists: the worker receives stdin, stdout, and stderr only, and an empty environment. */
 int fb_spawn_preview(const char *path, int input, int output, int errors, int *pid) {
     int originals[3] = {input, output, errors};
     int copies[3] = {-1, -1, -1};
@@ -41,8 +40,9 @@ int fb_spawn_preview(const char *path, int input, int output, int errors, int *p
     if (!result) result = posix_spawnattr_setpgroup(&attributes, 0);
     if (!result) {
         char *arguments[] = {(char *)path, NULL};
+        char *environment[] = {NULL};
         pid_t child;
-        result = posix_spawn(&child, path, &actions, &attributes, arguments, *_NSGetEnviron());
+        result = posix_spawn(&child, path, &actions, &attributes, arguments, environment);
         if (!result) *pid = child;
     }
     posix_spawnattr_destroy(&attributes);

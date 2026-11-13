@@ -19,11 +19,11 @@ do {
     let worker: URL
     if args[0] == "hold", args.count == 5 {
         worker = URL(fileURLWithPath: args[4])
-        // Verify the spawn allowlist also closes unrelated descriptors lacking FD_CLOEXEC.
+        // Verify the spawn allowlists also drop an unrelated descriptor lacking FD_CLOEXEC and the environment.
         let descriptor = open("/dev/null", O_RDONLY)
-        let unrelated = fcntl(descriptor, F_DUPFD, 200)
+        _ = fcntl(descriptor, F_DUPFD, 200)
         close(descriptor)
-        setenv("FB_PREVIEW_TEST_PRIVATE_FD", String(unrelated), 1)
+        setenv("FB_PREVIEW_TEST_PRIVATE", "1", 1)
     } else {
         worker = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent().appendingPathComponent(
             "preview-worker")

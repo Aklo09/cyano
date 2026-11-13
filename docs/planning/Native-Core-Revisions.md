@@ -1,6 +1,6 @@
 # Core revisions after milestone 1
 
-Date: 2026-11-13. Status: approved by the owner; implementation in progress.
+Date: 2026-11-13. Status: approved by the owner; implemented.
 These decisions come from the review of the accepted milestone 1 work ([acceptance record](../validation/Native-Milestone-1.md)).
 They change the [storage](../contracts/Native-Storage.md) and [preview cache](../contracts/Native-Preview-Cache.md) contracts
 and precede milestone 2, because milestones 3–5 build on the affected interfaces.
@@ -45,6 +45,6 @@ Each revision is one commit that updates its contract, tests, and code together.
 5. Done: D4, Trash for removed originals. Tests cover delete and replace leaving byte-identical preimages in a Trash-equivalent destination.
 6. Done: D7, identity-based folder moves. Tests cover moving a folder above the former content cap and replaying an interrupted move.
 7. Done: D1, metadata listing and index (release build, 888 roots: list 11.9 → 0.24 s; CLI comment 0.67 → 0.06 s). The ID index lives in the open session rather than on disk, so duplicate detection keeps its guarantee; `AMBIGUOUS_ID` from D8 landed here. Tests cover stale and missing index entries, corrupted sources reported on open, and listing timings at 1,000 roots.
-8. D8: smaller items.
+8. Done: D8, smaller items: `AMBIGUOUS_ID` (landed with D1), an empty worker environment, and the unpacking decision recorded in the storage contract.
 
 Every step runs `just lint` and `just test`; D1, D2, and D6 also record release-build timings.

@@ -97,6 +97,8 @@ just library import-unpacked "$library" Tests/LibraryCoreTests/Fixtures/Blueprin
 ```
 
 Unpacking creates real folders for books, named TXT/JSON pairs for leaves, and fresh UUIDs for every leaf.
+Each leaf is saved as a newly encoded standalone string; the original book string is not kept.
+To keep the book's exact bytes as well, also import it with `import`.
 Stored indices prefix child names, such as `5 - Nested/0 - Leaf`.
 Book descriptions become `.folder.json` comments shown in `list.result.folderComments`.
 Leaf source fields, including unknown wrapper fields, are retained except the enclosing `index`.

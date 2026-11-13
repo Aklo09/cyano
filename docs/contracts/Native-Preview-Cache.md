@@ -18,8 +18,9 @@ Concurrent renders of different items may run; each service still runs one worke
 
 The worker never reads or writes library files: it receives request bytes on stdin and returns a report and PNG on stdout.
 It therefore holds no ownership lease; only the owner validates and publishes derived files.
-The launcher uses `posix_spawn` with `POSIX_SPAWN_CLOEXEC_DEFAULT`, explicitly passing only stdin/stdout/stderr.
-The lock, source, cache, control-directory, and unrelated descriptors are excluded.
+The launcher uses `posix_spawn` with `POSIX_SPAWN_CLOEXEC_DEFAULT`, explicitly passing only stdin/stdout/stderr,
+and an empty environment.
+The lock, source, cache, control-directory, and unrelated descriptors, and the parent's environment variables, are excluded.
 No source/cache mutation interface or library path is sent to JavaScriptCore or the worker request.
 The descriptor allowlist is not an OS sandbox boundary.
 

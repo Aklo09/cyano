@@ -362,7 +362,7 @@ struct LibraryPreviewTests {
         }
     }
 
-    @Test("An orphaned noncooperating helper holds no lease or unrelated descriptor and does not keep ownership")
+    @Test("An orphaned helper holds no lease, descriptor, or inherited environment and does not keep ownership")
     func orphanedHelper() throws {
         let target = try PreviewLibrary()
         defer { target.cleanup() }
@@ -378,9 +378,7 @@ struct LibraryPreviewTests {
         let errorPipe = Pipe()
         parent.executableURL = ownedBinary("LibraryPreviewTestDriver")
         parent.arguments = ["hold", target.root.path, item.id, assets.root.path, fake.path]
-        parent.environment = ProcessInfo.processInfo.environment.merging(["FB_PREVIEW_TEST_READY": ready.path]) {
-            _, new in new
-        }
+        // The helper writes ready.json beside its symlink in target.parent.
         parent.standardError = errorPipe
         try parent.run()
         var child: Int32?
@@ -397,8 +395,9 @@ struct LibraryPreviewTests {
         }
         let record = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: ready)) as? [String: Any])
         child = try #require((record["pid"] as? NSNumber)?.int32Value)
-        #expect(record["descriptor3"] as? Bool == false)
-        #expect(record["unrelated"] as? Bool == false)
+        #expect((record["leaked"] as? [Int])?.isEmpty == true)
+        let environment = try #require(record["environment"] as? [String])
+        #expect(!environment.contains("FB_PREVIEW_TEST_PRIVATE") && !environment.contains("HOME"))
         kill(parent.processIdentifier, SIGKILL)
         parent.waitUntilExit()
         // The helper outlives its parent, yet the library is immediately available to a new owner.
@@ -422,8 +421,7 @@ struct LibraryPreviewTests {
         try FileManager.default.createSymbolicLink(at: fake, withDestinationURL: ownedBinary("PreviewTestWorker"))
         let ready = target.parent.appendingPathComponent("descendant.json")
         let response = try ownedChild(
-            "LibraryPreviewTestDriver", ["hold", target.root.path, item.id, assets.root.path, fake.path],
-            environment: ["FB_PREVIEW_TEST_READY": ready.path])
+            "LibraryPreviewTestDriver", ["hold", target.root.path, item.id, assets.root.path, fake.path])
         #expect(response.0 != 0)
         let value = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: ready)) as? [String: Any])
         let pid = try #require((value["pid"] as? NSNumber)?.int32Value)
