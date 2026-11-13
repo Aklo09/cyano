@@ -9,7 +9,8 @@ build:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests'
+    python3 tools/test-asset-release.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
 storage-test:
@@ -34,6 +35,15 @@ release:
 # Run the planner loading/empty-diagram probe. Does not paint images.
 planner-test:
     sh tools/swift.sh run preview-probe --self-test
+
+# Exercise native composition and supervised worker success/failure paths without private assets.
+renderer-test:
+    sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests'
+    python3 tools/test-asset-release.py
+
+# Render a standalone source or selected book leaf using a verified private asset release.
+preview *args:
+    sh tools/swift.sh run preview-probe "$@"
 
 # Install locked development dependencies without package lifecycle scripts.
 tools-install:

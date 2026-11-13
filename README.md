@@ -5,7 +5,8 @@ This project is an independent native port of the original web application.
 
 **Current status:** native storage and the library CLI are implemented, including organization, replacement,
 deletion, book unpacking, maintenance, and offline asset verification.
-Image painting, renderer integration, native statistics, and the macOS interface remain pending.
+The standalone renderer paints real previews through supervised native workers.
+Library/cache rendering integration, native statistics, and the macOS interface remain pending.
 
 ## Requirements
 
@@ -29,11 +30,12 @@ just storage-test
 just asset-test
 just release
 just planner-test
+just renderer-test
 ```
 
 Native builds need no Node installation, game process, or private assets.
 The committed planner resource runs through Apple's system JavaScriptCore framework.
-The probe currently plans empty upgrade and deconstruction diagrams, without painting images.
+The probe supports its original planner self-test and real image rendering with a verified private asset release.
 
 The Swift wrapper keeps compiler and package caches inside this repository.
 It disables SwiftPM's subprocess sandbox for these development commands.
@@ -65,6 +67,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 - **Manage a library:** [CLI guide](docs/development/Native-Library-CLI.md), [storage contract](docs/contracts/Native-Storage.md), and [validation](docs/validation/Native-Storage.md).
 - **Inspect command completion:** [organization and maintenance validation](docs/validation/Native-Library-Commands.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
+- **Render previews:** [native harness guide](docs/development/Native-Preview.md) and [renderer validation](docs/validation/Native-Renderer.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).
 

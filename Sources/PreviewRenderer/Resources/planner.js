@@ -21,6 +21,7 @@ var FBPlanner = (() => {
   // tools/planner-entry.ts
   var planner_entry_exports = {};
   __export(planner_entry_exports, {
+    nativePlan: () => nativePlan,
     planDeconstructionPlannerDrawList: () => planDeconstructionPlannerDrawList,
     planDrawList: () => planDrawList,
     planDrawListWithOptions: () => planDrawListWithOptions,
@@ -125,6 +126,94 @@ var FBPlanner = (() => {
   };
   function compareDrawCmd(a, b) {
     return a.layer - b.layer || a.sortY - b.sortY || a.sortX - b.sortX || a.entity - b.entity || a.sub - b.sub;
+  }
+
+  // tools/vendor/fpsr/packages/renderer/src/plan-diagnostics.ts
+  var countUnsupported = (values, isSupported) => {
+    const counts = /* @__PURE__ */ new Map();
+    for (const value of values) {
+      if (isSupported(value.name)) continue;
+      const entry = counts.get(value.name) ?? { count: 0, entityNumbers: [] };
+      entry.count += 1;
+      if (value.entity_number != null) entry.entityNumbers.push(value.entity_number);
+      counts.set(value.name, entry);
+    }
+    return [...counts.entries()].map(([name, value]) => ({
+      name,
+      count: value.count,
+      ...value.entityNumbers.length > 0 ? { entityNumbers: value.entityNumbers } : {}
+    })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  };
+  var hasOnlyFiniteNumbers = (value) => {
+    if (typeof value === "number") return Number.isFinite(value);
+    if (Array.isArray(value)) return value.every(hasOnlyFiniteNumbers);
+    if (value && typeof value === "object") {
+      return Object.values(value).every(hasOnlyFiniteNumbers);
+    }
+    return true;
+  };
+  var countValues = (values) => {
+    return values.reduce((sum, value) => sum + value.count, 0);
+  };
+  function analyzePlan(blueprint, drawList, db) {
+    const entities = blueprint.entities ?? [];
+    const tiles = blueprint.tiles ?? [];
+    const unsupportedEntities = countUnsupported(entities, (name) => db.entities[name] != null);
+    const unsupportedTiles = countUnsupported(tiles, (name) => db.tiles[name] != null);
+    const byKind = {};
+    const frames = /* @__PURE__ */ new Set();
+    const layers = /* @__PURE__ */ new Set();
+    const atlases = /* @__PURE__ */ new Set();
+    let validFrameReferences = true;
+    for (const command of drawList.commands) {
+      byKind[command.kind] = (byKind[command.kind] ?? 0) + 1;
+      layers.add(command.layer);
+      if (command.kind !== "sprite" && command.kind !== "icon") continue;
+      const frameIds = [command.frame];
+      if (command.kind === "icon" && command.backingFrame != null) {
+        frameIds.push(command.backingFrame);
+      }
+      for (const frameId of frameIds) {
+        frames.add(frameId);
+        const frame = db.frames[frameId];
+        if (!frame) {
+          validFrameReferences = false;
+          continue;
+        }
+        atlases.add(frame.a);
+      }
+    }
+    const { bounds } = drawList;
+    const finiteBounds = hasOnlyFiniteNumbers(bounds) && bounds.minX <= bounds.maxX && bounds.minY <= bounds.maxY;
+    const sortedCommands = drawList.commands.every((command, index) => {
+      const previous = drawList.commands[index - 1];
+      return !previous || compareDrawCmd(previous, command) <= 0;
+    });
+    return {
+      entities: {
+        total: entities.length,
+        resolved: entities.length - countValues(unsupportedEntities),
+        unsupported: unsupportedEntities
+      },
+      tiles: {
+        total: tiles.length,
+        resolved: tiles.length - countValues(unsupportedTiles),
+        unsupported: unsupportedTiles
+      },
+      drawList: {
+        commandCount: drawList.commands.length,
+        byKind,
+        uniqueFrames: frames.size,
+        uniqueLayers: layers.size,
+        atlasIndices: [...atlases].sort((a, b) => a - b)
+      },
+      checks: {
+        finiteBounds,
+        finiteCommands: drawList.commands.every(hasOnlyFiniteNumbers),
+        sortedCommands,
+        validFrameReferences
+      }
+    };
   }
 
   // tools/vendor/fpsr/packages/renderer/src/alt-mode-signals.ts
@@ -4108,6 +4197,40 @@ var FBPlanner = (() => {
 
   // tools/planner-entry.ts
   var plannerRevision = "2f7dc70f2681de530402556f757006e904e692d5";
+  function nativePlan(entryJSON, dbJSON) {
+    const started = Date.now();
+    const entry = JSON.parse(entryJSON);
+    const db = JSON.parse(dbJSON);
+    const parsed = Date.now();
+    let list;
+    let warnings = [];
+    if (entry.blueprint) {
+      list = planDrawListWithOptions(entry.blueprint, db, { altMode: true }).drawList;
+    } else if (entry.upgrade_planner) {
+      list = planUpgradePlannerDrawList(entry.upgrade_planner, db);
+    } else if (entry.deconstruction_planner) {
+      list = planDeconstructionPlannerDrawList(entry.deconstruction_planner, db);
+    } else {
+      throw new Error("Select a blueprint or planner leaf, not a book container.");
+    }
+    if (list.commands.length > 25e4) throw new Error("Draw command limit exceeded.");
+    const diagnostics = analyzePlan(entry.blueprint ?? {}, list, db);
+    if (!Object.values(diagnostics.checks).every(Boolean)) throw new Error("Invalid planner draw-list integrity.");
+    warnings = [
+      ...diagnostics.entities.unsupported.map((value) => `Unsupported entity: ${value.name} (${value.count})`),
+      ...diagnostics.tiles.unsupported.map((value) => `Unsupported tile: ${value.name} (${value.count})`)
+    ];
+    const result = JSON.stringify({
+      schema: 1,
+      drawList: list,
+      warnings,
+      commandKinds: diagnostics.drawList.byKind,
+      parseMs: parsed - started,
+      planningMs: Date.now() - parsed
+    });
+    if (result.length > 64 * 1024 * 1024) throw new Error("Draw-list transfer limit exceeded.");
+    return result;
+  }
   function selfTest() {
     const db = { frames: [], icons: {} };
     const planner = { settings: {} };

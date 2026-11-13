@@ -1096,5 +1096,21 @@
       "sha256": "3be678fa8d716a80dc3a908986222aca9a82569c90befe38dbd98522ccd8ec81",
       "bytes": 9933
     }
+  ],
+  "nativeAdaptations": [
+    {
+      "path": "Sources/PreviewRenderer/NativePainter.swift",
+      "source": "fpsr/packages/renderer/src/canvas2d/",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "license": "MIT",
+      "note": "Native Core Graphics/Core Text implementation of the ordered drawing contract; bounded transparency groups and native bitmap caches."
+    },
+    {
+      "path": "Sources/PreviewRenderer/IconSilhouette.swift",
+      "source": "fpsr/packages/renderer/src/icon-silhouette.ts",
+      "revision": "2f7dc70f2681de530402556f757006e904e692d5",
+      "license": "MIT",
+      "note": "CPU alpha dilation and box blur port, retaining packed-density sizing."
+    }
   ]
 }

@@ -28,13 +28,14 @@ public struct PlannerSelfTest: Codable, Sendable {
 }
 
 /// Synchronous, thread-confined runtime. Production jobs will run in a helper process.
-/// This foundation exposes only a fixed self-test, without filesystem or network bridges.
+/// No filesystem or network bridges are installed in JavaScriptCore.
 public final class PlannerRuntime {
     private let context: JSContext
 
     public init() throws {
         guard let context = JSContext() else { throw PlannerRuntimeError.contextUnavailable }
-        guard let script = Bundle.module.url(forResource: "planner", withExtension: "js", subdirectory: "Resources") else {
+        guard let script = Bundle.module.url(forResource: "planner", withExtension: "js", subdirectory: "Resources")
+        else {
             throw PlannerRuntimeError.resourceMissing
         }
         self.context = context
@@ -51,10 +52,30 @@ public final class PlannerRuntime {
         }
         let report = try JSONDecoder().decode(PlannerSelfTest.self, from: data)
         guard report.schema == 1, report.finiteBounds,
-              !report.nodeAvailable, !report.networkAPIAvailable else {
+            !report.nodeAvailable, !report.networkAPIAvailable
+        else {
             throw PlannerRuntimeError.invalidResult
         }
         return report
+    }
+
+    func plan(entry: Data, database: Data) throws -> PlannedPreview {
+        guard let entryJSON = String(data: entry, encoding: .utf8),
+            let dbJSON = String(data: database, encoding: .utf8),
+            let function = context.objectForKeyedSubscript("FBPlanner")?.objectForKeyedSubscript("nativePlan")
+        else { throw PlannerRuntimeError.invalidResult }
+        context.exception = nil
+        let value = function.call(withArguments: [entryJSON, dbJSON])
+        try checkException()
+        guard let json = value?.toString(), json.utf8.count <= 64 * 1024 * 1024,
+            let bytes = json.data(using: .utf8)
+        else { throw PlannerRuntimeError.invalidResult }
+        let result = try JSONDecoder().decode(PlannedPreview.self, from: bytes)
+        guard result.schema == 1, result.drawList.schema == 1, result.drawList.commands.count <= 250_000,
+            result.warnings.count <= 100_000
+        else { throw PreviewError.invalidDrawList }
+        try result.drawList.bounds.validate()
+        return result
     }
 
     private func checkException() throws {

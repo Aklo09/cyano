@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='fb-native-independent-') as temporary:
     )
     environment = dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin')
     for command in [
-        ['sh', 'tools/swift.sh', 'test', '--filter', 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests'],
+        ['sh', 'tools/swift.sh', 'test', '--filter', 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests'],
         ['.build/debug/fb-native', 'release'],
         ['.build/debug/preview-probe', '--self-test'],
     ]:

@@ -56,12 +56,13 @@ private struct Failure: Encodable {
 
 private struct ReleaseReport: Encodable {
     let product = "fb-native"
-    let stage = "library-commands"
+    let stage = "renderer-feasibility"
     let nativeFormatVersion = 1
     let profile = FactorioProfile.initial
     let capabilities = commands.sorted()
     let libraryOperationsAvailable = true
-    let previewPaintingAvailable = false
+    let previewPaintingAvailable = true
+    let previewLibraryIntegrationAvailable = false
 }
 
 private struct OwnerReport: Encodable { let state: LibraryOwnershipStatus }

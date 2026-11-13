@@ -15,6 +15,8 @@ Use the approved plan for scope and validation records for completed work.
 | Inspect process-interruption evidence | [Storage validation](validation/Native-Storage.md) |
 | Inspect complete library command coverage | [Command validation](validation/Native-Library-Commands.md) |
 | Work with the asset toolchain | [Asset preparation](development/Asset-Preparation.md) |
+| Render standalone previews | [Native preview harness](development/Native-Preview.md) |
+| Inspect image and worker qualification | [Renderer validation](validation/Native-Renderer.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.

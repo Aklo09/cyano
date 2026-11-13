@@ -15,6 +15,11 @@ public struct AssetReleaseReport: Encodable, Sendable {
     public let totalBytes: Int
     public let tiers: [String]
     public let imageDecodingPerformed = false
+    package let spriteManifestSha256: String
+
+    private enum CodingKeys: String, CodingKey {
+        case id, identity, profile, files, totalBytes, tiers, imageDecodingPerformed
+    }
 }
 
 /// Offline inventory/schema verification; does not invoke Factorio or decode atlas pixels.
@@ -160,6 +165,7 @@ public enum AssetRelease {
         snapshot = [:]; try scan(root, prefix: "", depth: 0)
         try require(snapshot == firstSnapshot, "Assets changed during verification.")
         try root.check()
-        return AssetReleaseReport(id: id, identity: identity, profile: initial, files: files.count, totalBytes: total, tiers: tiers.map(\.key).sorted())
+        return AssetReleaseReport(id: id, identity: identity, profile: initial, files: files.count, totalBytes: total,
+            tiers: tiers.map(\.key).sorted(), spriteManifestSha256: inventory["sprites/manifest.json"]!.sha256)
     }
 }
