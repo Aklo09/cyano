@@ -49,6 +49,22 @@ private func commandChild(_ name: String, _ args: [String]) throws -> (Int32, Da
     return (process.terminationStatus, stdout, stderr)
 }
 
+/// Folders in the test Trash (set by tools/swift.sh) whose metadata preimage belongs to `id`.
+private func trashedCopies(of id: String) throws -> [URL] {
+    let trash = try #require(
+        ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"], "Run tests through tools/swift.sh")
+    let folders =
+        (try? FileManager.default.contentsOfDirectory(
+            at: URL(fileURLWithPath: trash), includingPropertiesForKeys: nil)) ?? []
+    return folders.filter { folder in
+        let files = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
+        return files.contains { file in
+            file.pathExtension == "json"
+                && ((try? Data(contentsOf: file)).map { String(decoding: $0, as: UTF8.self).contains(id) } ?? false)
+        }
+    }
+}
+
 @Suite("Complete native library commands", .serialized)
 struct LibraryCommandTests {
     @Test("Folder organization, case-only names, collisions, cycles, and empty-only deletion")
@@ -199,6 +215,7 @@ struct LibraryCommandTests {
                 phases.append("cacheRemoved")
             }
             if operation == "update" { phases.append("cacheRemoved") }
+            if ["update", "delete"].contains(operation) { phases.append("removedRetained") }
             for phase in phases {
                 let target = try CommandLibrary()
                 defer { target.cleanup() }
@@ -222,6 +239,14 @@ struct LibraryCommandTests {
                 try reopened.recover()
                 let listing = try reopened.list()
                 #expect(listing.issues.isEmpty)
+                if ["update", "delete"].contains(operation) {
+                    // Exactly one preserved copy once committed, never a duplicate after replay.
+                    let copies = try trashedCopies(of: item.id)
+                    #expect(copies.count == (phase == "changesStaged" ? 0 : 1), "\(operation) \(phase)")
+                    if let copy = copies.first {
+                        #expect(try Data(contentsOf: copy.appendingPathComponent("Original.txt")) == original)
+                    }
+                }
                 if operation == "delete" && phase != "changesStaged" {
                     #expect(listing.items.isEmpty)
                 } else {
@@ -240,6 +265,50 @@ struct LibraryCommandTests {
                 reopened.close()
             }
         }
+    }
+
+    @Test("Deleted and replaced originals move to the Trash byte-identical, with a library fallback")
+    func removedOriginals() throws {
+        let target = try CommandLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        let original = try commandBook()
+        let replacement = try commandSource()
+        let replaced = try library.importSource(original, name: "Replaced")
+        let deleted = try library.importSource(original, name: "Deleted")
+        let metadata = try Data(contentsOf: target.url.appendingPathComponent("library/Deleted.json"))
+        _ = try library.updateSource(id: replaced.id, bytes: replacement)
+        try library.deleteItem(id: deleted.id)
+        let replacedCopy = try #require(try trashedCopies(of: replaced.id).first)
+        #expect(replacedCopy.lastPathComponent.hasPrefix("Replaced (replaced "))
+        #expect(try Data(contentsOf: replacedCopy.appendingPathComponent("Replaced.txt")) == original)
+        let deletedCopy = try #require(try trashedCopies(of: deleted.id).first)
+        #expect(deletedCopy.lastPathComponent.hasPrefix("Deleted (deleted "))
+        #expect(try Data(contentsOf: deletedCopy.appendingPathComponent("Deleted.txt")) == original)
+        #expect(try Data(contentsOf: deletedCopy.appendingPathComponent("Deleted.json")) == metadata)
+        #expect(try library.export(id: replaced.id) == replacement)
+        library.close()
+
+        // When the Trash cannot take the folder, it stays inside the library instead of blocking it.
+        let blocked = target.parent.appendingPathComponent("not-a-directory")
+        try Data().write(to: blocked)
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().appendingPathComponent(".build/debug/fb-native")
+        process.arguments = ["delete", target.url.path, replaced.id]
+        process.environment = ["FB_NATIVE_TRASH_DIRECTORY": blocked.path]
+        try process.run()
+        process.waitUntilExit()
+        #expect(process.terminationStatus == 0)
+        let quarantine = target.url.appendingPathComponent("operations-quarantine")
+        let kept = try #require(FileManager.default.contentsOfDirectory(atPath: quarantine.path).first)
+        #expect(kept.contains("Replaced (deleted "))
+        #expect(
+            try Data(contentsOf: quarantine.appendingPathComponent(kept).appendingPathComponent("Replaced.txt"))
+                == replacement)
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
+        #expect(try reopened.list().items.isEmpty)
     }
 
     @Test("Folder move, empty deletion, and unpack publication recover after process termination")

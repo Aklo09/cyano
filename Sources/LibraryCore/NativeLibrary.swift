@@ -7,7 +7,7 @@ import Foundation
     case sourcePublished, metadataPublished, intentRemoved
     case changesStaged, fileRemoved, filePublished, treeStaged, treeWithdrawn, treePublished, cacheRemoved
     case previewImageStaged, previewManifestStaged, previewImagePublished, previewManifestPublished
-    case previewWorkerStarting
+    case previewWorkerStarting, removedRetained
 }
 
 /// Owns one local library until close. Every complete operation runs on one serial queue.

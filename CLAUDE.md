@@ -27,6 +27,9 @@ just library <args>        # run the fb-native CLI (just library --help)
 just preview <args>        # run preview-probe; real images need verified private assets
 ```
 
+Tests delete items; `tools/swift.sh test` redirects their removed originals to `.cache/test-trash` through
+`FB_NATIVE_TRASH_DIRECTORY`. Running `swift test` directly would send them to the real Trash.
+
 Run a single test (Swift Testing; suites are `struct`s):
 
 ```sh

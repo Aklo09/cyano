@@ -75,6 +75,7 @@ An empty folder with a valid description can be deleted; a folder containing oth
 Item moves preserve metadata bytes. Renames preserve identities and creation dates while changing the name and update date.
 Source replacement preserves the chosen filename/override and promotes comments whose entry paths disappear to the root.
 Item deletion and replacement invalidate the item's derived cache under the same committed intent.
+They also retain the removed originals, as described under file and tree mutation publication.
 
 ## Portable names and confined access
 
@@ -190,6 +191,14 @@ Exact preimages and postimages are staged as `before-000000` and `after-000000`,
 All staged bytes and live preconditions are checked before publishing the intent and on replay.
 Old names are removed before new names publish, supporting case-only renames on insensitive APFS.
 Replacement retains its staged preimage until publication and cache invalidation complete.
+
+Item deletion and source replacement also stage copies of the exact preimage TXT and JSON under
+`removed/<name> (deleted|replaced <date> UTC)/` before the intent commits. After publication and the drive barrier,
+and before intent removal, that folder moves to the macOS Trash; replay skips the step once `removed/` is gone,
+so a crash never loses or duplicates it. If the Trash refuses the folder, it moves to `operations-quarantine/`
+inside the library instead, so an unavailable Trash never blocks recovery.
+`FB_NATIVE_TRASH_DIRECTORY`, an absolute path, redirects these folders for tests and development;
+`tools/swift.sh test` sets it to `.cache/test-trash`.
 The multi-file operation becomes consistent through roll-forward recovery; it is not one filesystem-atomic rename.
 
 `tree-create`, `tree-move`, and `tree-delete` intents record a complete directory/file inventory with exact file hashes and sizes.

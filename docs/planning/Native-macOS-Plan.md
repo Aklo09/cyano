@@ -32,7 +32,7 @@ Target this Apple Silicon Mac first. Preserve the useful workflows and data-safe
 
 The first milestone delivers a CLI and preview harness that prove storage, recovery, and renderer feasibility. It does not include the application UI.
 
-**Excluded from v1:** application-managed backup/restore, web-store migration, cloud synchronization, network libraries, mods, Intel qualification, App Store submission, and public distribution packaging. A closed library can be copied with ordinary filesystem tools.
+**Excluded from v1:** application-managed backup/restore (deleted and replaced originals go to the macOS Trash instead), web-store migration, cloud synchronization, network libraries, mods, Intel qualification, App Store submission, and public distribution packaging. A closed library can be copied with ordinary filesystem tools.
 
 ## Architecture and independence
 

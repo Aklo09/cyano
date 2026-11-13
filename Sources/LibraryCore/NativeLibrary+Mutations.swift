@@ -139,11 +139,14 @@ extension NativeLibrary {
             try ready()
             let (found, document, metadata) = try load(id: id)
             let base = MutationPath.join(found.folder, found.basename)
+            let removed = LibraryRemovedItem(
+                folder: Self.removedFolderName(found.basename, action: "deleted"),
+                files: [(found.basename + ".txt", document.original.bytes), (found.basename + ".json", metadata)])
             try commitChanges(
                 [
                     PreparedLibraryChange(path: base + ".txt", before: document.original.bytes, after: nil),
                     PreparedLibraryChange(path: base + ".json", before: metadata, after: nil),
-                ], cacheIds: [id])
+                ], cacheIds: [id], removed: removed)
         }
     }
 
@@ -166,11 +169,16 @@ extension NativeLibrary {
                 displayNameOverride: found.metadata.displayNameOverride, comments: comments)
             let after = try LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata)
             let base = MutationPath.join(found.folder, found.basename)
+            let removed = LibraryRemovedItem(
+                folder: Self.removedFolderName(found.basename, action: "replaced"),
+                files: [
+                    (found.basename + ".txt", oldDocument.original.bytes), (found.basename + ".json", before),
+                ])
             try commitChanges(
                 [
                     PreparedLibraryChange(path: base + ".txt", before: oldDocument.original.bytes, after: bytes),
                     PreparedLibraryChange(path: base + ".json", before: before, after: after),
-                ], cacheIds: [id])
+                ], cacheIds: [id], removed: removed)
             return item(metadata: metadata, document: document, folder: found.folder, basename: found.basename)
         }
     }

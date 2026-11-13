@@ -72,6 +72,7 @@ Case-only names are supported; collisions and moving a folder into itself are re
 Replacement keeps the item UUID, creation time, chosen name, and comment identities.
 Comments on missing book entries become root comments prefixed with `[Former book entry 5.0]` and two newlines.
 Replacement refuses invalid input before changing stored content and invalidates that item's derived cache.
+The replaced TXT and JSON move to the Trash as a folder named `<name> (replaced <date> UTC)`.
 
 Read a comment's `id` from the item metadata and pass it to `comment-delete`.
 `comment-add` is an alias for `comment`.
@@ -83,6 +84,9 @@ just library folder-delete "$library" Production
 ```
 
 Item deletion removes both TXT and JSON plus that item's derived cache.
+The exact TXT and JSON move to the Trash as a folder named `<name> (deleted <date> UTC)`.
+To restore one, close the library and move both files back into a library folder with Finder.
+If the Trash cannot accept the folder, it is kept in `operations-quarantine/` inside the library instead.
 Folder deletion accepts only an empty folder, allowing a validated folder-description sidecar and `.DS_Store`.
 It never recursively deletes library items.
 

@@ -13,7 +13,10 @@ extension NativeLibrary {
         return (id, try operations.child(id, create: true))
     }
 
-    func commitChanges(_ prepared: [PreparedLibraryChange], cacheIds: [String] = []) throws {
+    /// `removed` names a folder of exact preimages that moves to the Trash once the change is published.
+    func commitChanges(
+        _ prepared: [PreparedLibraryChange], cacheIds: [String] = [], removed: LibraryRemovedItem? = nil
+    ) throws {
         guard !prepared.isEmpty, prepared.count <= LibraryBounds.changes else { throw NativeLibraryError.invalidInput }
         var total = 0
         for change in prepared {
@@ -32,6 +35,10 @@ extension NativeLibrary {
             for (index, change) in prepared.enumerated() {
                 if let before = change.before { try stage.writeNew(stageName("before", index), data: before) }
                 if let after = change.after { try stage.writeNew(stageName("after", index), data: after) }
+            }
+            if let removed {
+                let folder = try stage.child("removed", create: true).child(removed.folder, create: true)
+                for (name, data) in removed.files { try folder.writeNew(name, data: data) }
             }
             try hook?(.changesStaged)
             let intent = LibraryTransaction(
@@ -135,6 +142,10 @@ extension NativeLibrary {
                 guard current == change.before || current == change.after else { throw NativeLibraryError.integrity }
             }
             for name in try stage.entries(maximum: LibraryBounds.changes * 2 + 64) {
+                if name == "removed" {
+                    try validateRemoved(stage)
+                    continue
+                }
                 guard allowed.contains(name) || validPublicationTemporary(name) else {
                     throw NativeLibraryError.recoveryRequired
                 }
@@ -209,6 +220,8 @@ extension NativeLibrary {
         }
         // Published changes reach permanent storage before the intent that can replay them disappears.
         try stage.barrier()
+        // Still under the intent: a crash before this completes replays it; replay skips an emptied stage.
+        try retainRemoved(stage, operationId: intent.operationId)
         try stage.remove("intent.json")
         try hook?(.intentRemoved)
         if try stage.info("tree") != nil {
@@ -264,6 +277,10 @@ extension NativeLibrary {
                 _ = try LibraryTrees.stamps(stage.child(name), depth: LibraryBounds.folderDepth)
                 continue
             }
+            if name == "removed" {
+                try validateRemoved(stage)
+                continue
+            }
             let indexed = ["before-", "after-"].contains { prefix in
                 name.hasPrefix(prefix) && name.dropFirst(prefix.count).count == 6
                     && name.dropFirst(prefix.count).utf8.allSatisfy { (48...57).contains($0) }
@@ -275,5 +292,72 @@ extension NativeLibrary {
                 info.st_size <= BlueprintCodecLimits.standard.sourceBytes
             else { throw NativeLibraryError.recoveryRequired }
         }
+    }
+}
+
+/// Exact preimages of a deleted or replaced item, staged as one folder for the Trash.
+struct LibraryRemovedItem {
+    let folder: String
+    let files: [(String, Data)]
+}
+
+extension NativeLibrary {
+    func validateRemoved(_ stage: LibraryDirectory) throws {
+        guard let info = try stage.info("removed"), info.st_mode & S_IFMT == S_IFDIR else {
+            throw NativeLibraryError.unsafePath
+        }
+        let members = try LibraryTrees.stamps(stage.child("removed"), depth: 1)
+        guard members.count <= 64, members.allSatisfy({ $0.bytes <= BlueprintCodecLimits.standard.sourceBytes }) else {
+            throw NativeLibraryError.recoveryRequired
+        }
+    }
+
+    /// Moves staged preimages to the Trash. If the Trash cannot take them, they move to
+    /// `operations-quarantine/` instead, so an unavailable Trash never blocks the library.
+    func retainRemoved(_ stage: LibraryDirectory, operationId: String) throws {
+        guard try stage.info("removed") != nil else { return }
+        try validateRemoved(stage)
+        let removed = try stage.child("removed")
+        for name in try removed.entries() {
+            try LibraryNames.validateBasename(name)
+            let source = removed.url.appendingPathComponent(name)
+            do {
+                try Self.moveToTrash(source, name: name, operationId: operationId)
+            } catch {
+                let quarantine = try root.child(Self.quarantineName, create: true)
+                try removed.move(name, to: quarantine, as: "\(operationId) \(name)")
+            }
+            try hook?(.removedRetained)
+        }
+        try stage.remove("removed", directory: true)
+    }
+
+    /// `FB_NATIVE_TRASH_DIRECTORY` redirects removed items for tests and development; otherwise the macOS Trash.
+    static func moveToTrash(_ source: URL, name: String, operationId: String) throws {
+        if let override = ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"], override.hasPrefix("/") {
+            let directory = URL(fileURLWithPath: override, isDirectory: true)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            var destination = directory.appendingPathComponent(name)
+            if FileManager.default.fileExists(atPath: destination.path) {
+                destination = directory.appendingPathComponent("\(name) \(operationId)")
+            }
+            try FileManager.default.moveItem(at: source, to: destination)
+        } else {
+            try FileManager.default.trashItem(at: source, resultingItemURL: nil)
+        }
+    }
+
+    static func removedFolderName(_ basename: String, action: String) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
+        // Keep the folder name within one filename component (255 bytes) for any valid basename.
+        var name = ""
+        for character in basename {
+            guard name.utf8.count + character.utf8.count <= 180 else { break }
+            name.append(character)
+        }
+        return "\(name) (\(action) \(formatter.string(from: Date())) UTC)"
     }
 }
