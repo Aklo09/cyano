@@ -361,6 +361,60 @@ struct NativeLibraryTests {
         #expect(try library.list().items.count == 1)
     }
 
+    @Test("Listing uses a derived kind index that is rebuilt when missing or damaged and pruned to live sources")
+    func sourceIndex() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        defer { library.close() }
+        let book = try library.importSource(blueprintFixture("bp.txt"))
+        let small = try library.importSource(blueprintFixture())
+        let indexURL = target.url.appendingPathComponent("cache/source-index.json")
+        let first = try library.list()
+        let index = try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL))
+        #expect(
+            index.kinds == [
+                book.metadata.sourceSha256: "blueprint_book", small.metadata.sourceSha256: small.kind,
+            ])
+        for damage in [Data("not json".utf8), nil] {
+            if let damage { try damage.write(to: indexURL) } else { try FileManager.default.removeItem(at: indexURL) }
+            #expect(try library.list().items.map(\.kind) == first.items.map(\.kind))
+            #expect(try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL)) == index)
+        }
+        try library.deleteItem(id: book.id)
+        _ = try library.list()
+        let pruned = try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL))
+        #expect(pruned.kinds.keys.sorted() == [small.metadata.sourceSha256])
+    }
+
+    @Test("Duplicate item IDs are listed and refused as ambiguous; stale session paths fall back to a rescan")
+    func duplicateAndStaleIds() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        let bytes = try blueprintFixture()
+        let item = try library.importSource(bytes, name: "Original")
+        _ = try library.list()
+        // Unsupported external edit while owned: the session index is stale, and a verified rescan recovers.
+        let folder = target.url.appendingPathComponent("library")
+        for ext in ["txt", "json"] {
+            try FileManager.default.moveItem(
+                at: folder.appendingPathComponent("Original.\(ext)"), to: folder.appendingPathComponent("Moved.\(ext)"))
+        }
+        #expect(try library.export(id: item.id) == bytes)
+        library.close()
+        for ext in ["txt", "json"] {
+            try FileManager.default.copyItem(
+                at: folder.appendingPathComponent("Moved.\(ext)"), to: folder.appendingPathComponent("Copy.\(ext)"))
+        }
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
+        #expect(try reopened.list().issues.map(\.code) == [NativeLibraryError.ambiguousId.code])
+        #expect(throws: NativeLibraryError.ambiguousId) { try reopened.export(id: item.id) }
+        let fresh = try NativeLibrary.inspectOwnership(at: target.url)
+        #expect(fresh == .owned)
+    }
+
     @Test("Unknown sidecar fields, corrupt hashes, and oversized source reads remain non-mutating")
     func metadataAndReadLimits() throws {
         let target = try TemporaryLibrary()

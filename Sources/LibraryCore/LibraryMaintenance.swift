@@ -97,10 +97,10 @@ extension NativeLibrary {
                 guard a != c, !a.hasPrefix(c + "/"), !c.hasPrefix(a + "/") else { throw NativeLibraryError.unsafePath }
             }
             let deadline = ContinuousClock.now.advanced(by: .seconds(5))
-            let snapshot = try LibraryTrees.stamps(cache, deadline: deadline)
             var known: [String: LibraryItem] = [:]
             var documents: [String: BlueprintDocument] = [:]
             if scope != .all {
+                // List first: listing may refresh the source index, which must precede the cache snapshot.
                 let catalog = try listing()
                 guard catalog.issues.isEmpty else { throw NativeLibraryError.integrity }
                 for item in catalog.items {
@@ -108,6 +108,7 @@ extension NativeLibrary {
                     known[item.id] = item
                 }
             }
+            let snapshot = try LibraryTrees.stamps(cache, deadline: deadline)
             let files = snapshot.filter { !$0.directory }
             let paths = Set(files.map(\.path))
             var selected: [TreeStamp] = []
@@ -118,6 +119,11 @@ extension NativeLibrary {
                 var reason: String?
                 if scope == .all {
                     reason = "all-derived"
+                } else if parts.count == 1, parts[0].hasPrefix(".tmp-"),
+                    LibraryRecords.validUUID(String(parts[0].dropFirst(5)))
+                {
+                    // An interrupted source-index write.
+                    reason = "abandoned-temporary"
                 } else if parts.count == 2, LibraryRecords.validUUID(parts[0]) {
                     let name = parts[1]
                     if name.hasPrefix(".tmp-"), LibraryRecords.validUUID(String(name.dropFirst(5))) {

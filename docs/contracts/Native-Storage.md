@@ -64,7 +64,19 @@ Comment insertion preserves the item UUID, creation time, source hash, and TXT b
 Metadata uses strict field, type, UUID, timestamp, and source-hash validation.
 Unknown fields and versions are never silently accepted or rewritten.
 Invalid items appear as listing issues and are excluded from usable results.
-Duplicate item UUIDs are reported; ID-addressed operations require a unique match.
+Duplicate item UUIDs are reported as `AMBIGUOUS_ID` listing issues; ID-addressed operations require a unique match
+and refuse duplicates with `AMBIGUOUS_ID`.
+
+Listing validates each item's metadata and the SHA-256 of its exact TXT bytes, but does not decode the blueprint.
+The entry kind comes from `cache/source-index.json`, a derived map from source hash to kind.
+Being keyed by content, an entry cannot become stale; a missing source is decoded once and added,
+an unreadable index is rebuilt, and entries for sources no longer in the library are pruned.
+Comment entry paths are validated when an item is opened, and when a source is first indexed.
+
+ID-addressed operations use an index of item paths held by the open library. The first lookup or listing
+builds it with a full scan; the session's own mutations keep it current, and every hit is re-read and verified.
+A stale or missing entry triggers one rescan. Because external edits are unsupported while a library is owned,
+the scan at the start of each session preserves duplicate detection.
 
 Folder membership comes from real filesystem directories.
 The CLI creates, moves, renames, and deletes empty folders, and lists empty folders.
@@ -254,5 +266,6 @@ Disk usage counts quarantined operations with `operations`.
 
 The [codec ceilings](../development/Native-Codec.md#input-admission) govern TXT decoding.
 Directory scans and file reads stop at their limits rather than returning silent partial success.
-Listings currently decode and validate saved sources; large-library performance remains unqualified.
+Listings hash saved sources without decoding them. Release-build measurement on local APFS: listing 888 roots
+takes 0.24 s with a warm source index and 0.69 s when rebuilding it; one CLI comment takes 0.06 s.
 Renderer helpers hold no owner lease; preview caches remain disposable and separate from authoritative recovery.

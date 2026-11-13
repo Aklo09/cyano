@@ -128,6 +128,7 @@ extension NativeLibrary {
                 PreparedLibraryChange(path: newBase + ".txt", before: nil, after: document.original.bytes),
                 PreparedLibraryChange(path: newBase + ".json", before: nil, after: updatedMetadata),
             ])
+            itemPaths?[found.id] = [newBase]
         }
         return item(
             metadata: try LibraryRecords.metadata(updatedMetadata), document: document, folder: folder,
@@ -147,6 +148,7 @@ extension NativeLibrary {
                     PreparedLibraryChange(path: base + ".txt", before: document.original.bytes, after: nil),
                     PreparedLibraryChange(path: base + ".json", before: metadata, after: nil),
                 ], cacheIds: [id], removed: removed)
+            itemPaths?[id] = nil
         }
     }
 

@@ -86,19 +86,29 @@ enum LibraryRecords {
         value.utf8.count == 64 && value.utf8.allSatisfy { (48...57).contains($0) || (97...102).contains($0) }
     }
 
-    static func now() -> String { formatter().string(from: Date()) }
+    static func now() -> String { withFormatter { $0.string(from: Date()) } }
 
     static func validDate(_ value: String) -> Bool {
         guard value.utf8.count == 24 else { return false }
-        guard let date = formatter().date(from: value) else { return false }
-        return formatter().string(from: date) == value
+        return withFormatter { formatter in
+            guard let date = formatter.date(from: value) else { return false }
+            return formatter.string(from: date) == value
+        }
     }
 
-    private static func formatter() -> ISO8601DateFormatter {
+    // Creating a formatter dominated metadata validation; share one behind a lock.
+    private static let formatterLock = NSLock()
+    nonisolated(unsafe) private static let formatter: ISO8601DateFormatter = {
         let result = ISO8601DateFormatter()
         result.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         result.timeZone = TimeZone(secondsFromGMT: 0)
         return result
+    }()
+
+    private static func withFormatter<T>(_ body: (ISO8601DateFormatter) -> T) -> T {
+        formatterLock.lock()
+        defer { formatterLock.unlock() }
+        return body(formatter)
     }
 
     static func encode<T: Encodable>(_ value: T, maximum: Int) throws -> Data {

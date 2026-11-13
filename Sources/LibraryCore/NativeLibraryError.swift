@@ -3,7 +3,7 @@ import Foundation
 public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConvertible {
     case inUse, closed, unsupportedFilesystem, unsafePath, invalidFormat, unsupportedVersion
     case invalidMetadata, integrity, recoveryRequired, notFound, limitExceeded, invalidInput
-    case nameCollision, folderNotEmpty, sourceChanged
+    case nameCollision, folderNotEmpty, sourceChanged, ambiguousId
     case io(Int32)
 
     public var code: String {
@@ -23,6 +23,7 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
         case .nameCollision: "NAME_COLLISION"
         case .folderNotEmpty: "FOLDER_NOT_EMPTY"
         case .sourceChanged: "SOURCE_CHANGED"
+        case .ambiguousId: "AMBIGUOUS_ID"
         case .io: "FILESYSTEM_ERROR"
         }
     }
@@ -30,7 +31,7 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
     public var exitCode: Int32 {
         switch self {
         case .inUse, .closed, .unsupportedFilesystem: 3
-        case .integrity, .recoveryRequired: 4
+        case .integrity, .recoveryRequired, .ambiguousId: 4
         case .invalidFormat, .unsupportedVersion, .invalidMetadata: 5
         case .io: 6
         case .unsafePath, .notFound, .limitExceeded, .invalidInput, .nameCollision, .folderNotEmpty, .sourceChanged:
@@ -64,6 +65,7 @@ public enum NativeLibraryError: Error, Equatable, Sendable, CustomStringConverti
         case .invalidInput: "The requested name, comment, or identifier is invalid."
         case .nameCollision: "The destination already contains a conflicting name."
         case .folderNotEmpty: "Only an empty folder can be deleted."
+        case .ambiguousId: "More than one saved item has this ID; resolve the duplicate files before using it."
         case .sourceChanged: "The item changed while its preview was rendering; the result was not saved. Retry."
         case .io(let number): "A filesystem operation failed (errno \(number))."
         }

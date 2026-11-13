@@ -47,6 +47,7 @@ extension NativeLibrary {
             try commitTransaction(intent, stage: stage)
         } catch {
             needsRecovery = true
+            itemPaths = nil
             throw error
         }
     }
@@ -84,8 +85,11 @@ extension NativeLibrary {
                 schemaVersion: 2, operationId: id, kind: kind, changes: [], cacheIds: [],
                 sourceFolder: source, destinationFolder: destination, tree: inventory)
             try commitTransaction(intent, stage: stage)
+            // Tree operations add or move many items at once; rebuild the ID index on next use.
+            itemPaths = nil
         } catch {
             needsRecovery = true
+            itemPaths = nil
             throw error
         }
     }

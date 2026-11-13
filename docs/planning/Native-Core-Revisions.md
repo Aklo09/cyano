@@ -44,7 +44,7 @@ Each revision is one commit that updates its contract, tests, and code together.
 4. Done: D5, quarantine and staging cleanup. Tests cover a conflicting intent that becomes openable after quarantine with evidence intact, and cleanup that never touches committed intents.
 5. Done: D4, Trash for removed originals. Tests cover delete and replace leaving byte-identical preimages in a Trash-equivalent destination.
 6. Done: D7, identity-based folder moves. Tests cover moving a folder above the former content cap and replaying an interrupted move.
-7. D1: metadata listing and index. Tests cover stale and missing index entries, corrupted sources reported on open, and listing timings at 1,000 roots.
+7. Done: D1, metadata listing and index (release build, 888 roots: list 11.9 → 0.24 s; CLI comment 0.67 → 0.06 s). The ID index lives in the open session rather than on disk, so duplicate detection keeps its guarantee; `AMBIGUOUS_ID` from D8 landed here. Tests cover stale and missing index entries, corrupted sources reported on open, and listing timings at 1,000 roots.
 8. D8: smaller items.
 
 Every step runs `just lint` and `just test`; D1, D2, and D6 also record release-build timings.

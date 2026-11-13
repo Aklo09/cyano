@@ -437,9 +437,11 @@ struct LibraryCommandTests {
         #expect(throws: NativeLibraryError.invalidInput) { try library.cleanupCache(scope: .obsolete) }
         let obsolete = try library.cleanupCache(
             scope: .obsolete, apply: true, assetIdentity: String(repeating: "a", count: 64))
-        #expect(obsolete.selection.count == 2 && obsolete.retainedFiles == 1)
+        // Retained: unknown.bin and the derived source index, which scoped cleanup never selects.
+        #expect(obsolete.selection.count == 2 && obsolete.retainedFiles == 2)
         #expect(try library.export(id: item.id) == bytes)
-        #expect(try library.cleanupCache(scope: .all, apply: true).selection.count == 1)
+        let all = try library.cleanupCache(scope: .all, apply: true).selection.map(\.path)
+        #expect(all.count == 2 && all.contains(LibrarySourceIndex.name))
         #expect(
             try FileManager.default.contentsOfDirectory(atPath: target.url.appendingPathComponent("cache").path).isEmpty
         )
@@ -495,7 +497,8 @@ struct LibraryCommandTests {
         try Data("{\"schemaVersion\":99}".utf8).write(to: folder.appendingPathComponent(unknown + ".json"))
         try Data([2]).write(to: folder.appendingPathComponent(unknown + ".png"))
         #expect(try library.cleanupCache().selection.count == 2)
-        #expect(try library.cleanupCache().retainedFiles == 2)
+        // The unknown manifest pair plus the derived source index.
+        #expect(try library.cleanupCache().retainedFiles == 3)
         #expect(throws: NativeLibraryError.unsafePath) {
             try library.cleanupCache(scope: .all, apply: true, protectedAssets: cache)
         }

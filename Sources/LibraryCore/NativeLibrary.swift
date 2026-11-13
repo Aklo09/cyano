@@ -21,6 +21,9 @@ public final class NativeLibrary: @unchecked Sendable {
     let formatBytes: Data
     let hook: ((LibraryWritePhase) throws -> Void)?
     var needsRecovery = false
+    /// Item ID to relative "folder/basename" paths, built by the first full scan and kept current by this
+    /// session's own mutations. External edits are unsupported while owned; every hit is still re-verified.
+    var itemPaths: [String: [String]]?
     let lifecycleLock = NSLock()
     var closing = false
     /// Renders run off the serial queue; close cancels each one and waits for its cleanup.
@@ -176,6 +179,7 @@ public final class NativeLibrary: @unchecked Sendable {
         try queue.sync {
             guard !isClosing else { throw NativeLibraryError.closed }
             try checkControls()
+            itemPaths = nil
             do {
                 try replay()
                 needsRecovery = false
@@ -304,11 +308,43 @@ public final class NativeLibrary: @unchecked Sendable {
             kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata)
     }
 
+    /// Lists an item from its metadata and source hash. Sources decode only when the kind index lacks them.
+    func listedItem(
+        _ parent: LibraryDirectory, folder: String, basename: String, index: inout LibrarySourceIndex
+    ) throws -> (LibraryItem, metadataBytes: Int) {
+        try LibraryNames.validateBasename(basename)
+        let data = try parent.read(basename + ".json", maximum: LibraryBounds.metadata)
+        let metadata = try LibraryRecords.metadata(data)
+        let source = try parent.fingerprint(basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
+        guard source.sha256 == metadata.sourceSha256 else { throw NativeLibraryError.integrity }
+        let kind: String
+        if let indexed = index.kinds[source.sha256] {
+            kind = indexed
+        } else {
+            let bytes = try parent.read(basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
+            guard OriginalSource(bytes: bytes).sha256 == metadata.sourceSha256 else {
+                throw NativeLibraryError.integrity
+            }
+            let document = try BlueprintCodec.decode(bytes)
+            for comment in metadata.comments {
+                do { _ = try document.entry(at: comment.entryPath) } catch { throw NativeLibraryError.invalidMetadata }
+            }
+            kind = document.root.kind.rawValue
+            index.kinds[source.sha256] = kind
+        }
+        let listed = LibraryItem(
+            id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
+            kind: kind, sourceBytes: source.bytes, metadata: metadata)
+        return (listed, data.count)
+    }
+
     func listing() throws -> LibraryListing {
         var result = LibraryListing()
         var visited = 0
         var scannedBytes = 0
         var identities = Set<String>()
+        let storedIndex = LibrarySourceIndex.read(cache)
+        var index = storedIndex
         func walk(_ parent: LibraryDirectory, folder: String, depth: Int) throws {
             guard depth <= LibraryBounds.folderDepth else { throw NativeLibraryError.limitExceeded }
             let names = try parent.entries()
@@ -337,14 +373,14 @@ public final class NativeLibrary: @unchecked Sendable {
                         guard names.contains(where: { $0.utf8.elementsEqual((basename + ".txt").utf8) }) else {
                             throw NativeLibraryError.integrity
                         }
-                        let (metadata, document, data) = try readItem(folder: folder, basename: basename)
-                        scannedBytes += data.count + document.original.bytes.count
+                        let (listed, metadataBytes) = try listedItem(
+                            parent, folder: folder, basename: basename, index: &index)
+                        scannedBytes += metadataBytes + listed.sourceBytes
                         guard scannedBytes <= 256 * 1024 * 1024 else { throw NativeLibraryError.limitExceeded }
-                        if !identities.insert(metadata.id).inserted {
-                            result.issues.append(LibraryIssue(path: path, code: NativeLibraryError.integrity.code))
+                        if !identities.insert(listed.id).inserted {
+                            result.issues.append(LibraryIssue(path: path, code: NativeLibraryError.ambiguousId.code))
                         }
-                        result.items.append(
-                            item(metadata: metadata, document: document, folder: folder, basename: basename))
+                        result.items.append(listed)
                     } else if name.hasSuffix(".txt") {
                         let metadataName = String(name.dropLast(4)) + ".json"
                         guard names.contains(where: { $0.utf8.elementsEqual(metadataName.utf8) }) else {
@@ -363,6 +399,13 @@ public final class NativeLibrary: @unchecked Sendable {
             }
         }
         try walk(library, folder: "", depth: 0)
+        // Keep only kinds this library still uses; a failed index write merely costs decodes next time.
+        let used = Set(result.items.map(\.metadata.sourceSha256))
+        index.kinds = index.kinds.filter { used.contains($0.key) }
+        if index != storedIndex { try? index.write(cache) }
+        itemPaths = Dictionary(grouping: result.items, by: \.id).mapValues {
+            $0.map { MutationPath.join($0.folder, $0.basename) }
+        }
         return result
     }
 
@@ -372,7 +415,37 @@ public final class NativeLibrary: @unchecked Sendable {
 
     func load(id: String) throws -> (LibraryItem, BlueprintDocument, Data) {
         guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.invalidInput }
-        var matches: [(String, String)] = []
+        var rescanned = false
+        while true {
+            if itemPaths == nil {
+                itemPaths = try scanItemPaths()
+                rescanned = true
+            }
+            let paths = itemPaths?[id] ?? []
+            guard paths.count <= 1 else { throw NativeLibraryError.ambiguousId }
+            if let path = paths.first {
+                let parts = path.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+                let folder = parts.dropLast().joined(separator: "/")
+                let basename = parts.last ?? ""
+                if let (metadata, document, data) = try? readItem(folder: folder, basename: basename),
+                    metadata.id == id
+                {
+                    return (
+                        item(metadata: metadata, document: document, folder: folder, basename: basename), document, data
+                    )
+                }
+                if rescanned { throw NativeLibraryError.notFound }
+            } else if rescanned {
+                throw NativeLibraryError.notFound
+            }
+            // A stale or missing entry: rebuild once from the filesystem.
+            itemPaths = nil
+        }
+    }
+
+    /// Full scan for item IDs. Reads each metadata file's ID without full validation; the match is validated.
+    func scanItemPaths() throws -> [String: [String]] {
+        var matches: [String: [String]] = [:]
         var visited = 0
         var bytes = 0
         func visit(_ directory: LibraryDirectory, folder: String, depth: Int) throws {
@@ -390,8 +463,10 @@ public final class NativeLibrary: @unchecked Sendable {
                         let data = try directory.read(name, maximum: LibraryBounds.metadata)
                         bytes += data.count
                         guard bytes <= LibraryBounds.transactionBytes else { throw NativeLibraryError.limitExceeded }
-                        let metadata = try LibraryRecords.metadata(data)
-                        if metadata.id == id { matches.append((folder, String(name.dropLast(5)))) }
+                        let value = try LibraryRecords.parse(data, maximum: LibraryBounds.metadata)
+                        if let found = value["id"]?.string, LibraryRecords.validUUID(found) {
+                            matches[found, default: []].append(MutationPath.join(folder, String(name.dropLast(5))))
+                        }
                     } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded } catch {
                         continue
                     }
@@ -399,11 +474,7 @@ public final class NativeLibrary: @unchecked Sendable {
             }
         }
         try visit(library, folder: "", depth: 0)
-        guard matches.count == 1, let (folder, basename) = matches.first else { throw NativeLibraryError.notFound }
-        do {
-            let (metadata, document, data) = try readItem(folder: folder, basename: basename)
-            return (item(metadata: metadata, document: document, folder: folder, basename: basename), document, data)
-        } catch { throw NativeLibraryError.notFound }
+        return matches
     }
 
     func transact(
@@ -435,8 +506,10 @@ public final class NativeLibrary: @unchecked Sendable {
             try hook?(.intentPublished)
             try apply(intent, stage: stage)
             needsRecovery = false
+            if kind == "import" { itemPaths?[metadata.id, default: []].append(MutationPath.join(folder, basename)) }
         } catch {
             needsRecovery = true
+            itemPaths = nil
             throw error
         }
     }

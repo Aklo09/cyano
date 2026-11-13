@@ -250,7 +250,9 @@ struct LibraryPreviewTests {
         }
         #expect(try Data(contentsOf: metadata) == future)
         #expect(try library.cleanupCache().selection.isEmpty)
-        #expect(try library.cleanupCache(scope: .all, apply: true).selection.count == 2)
+        // The image, its manifest, and the derived source index.
+        let all = try library.cleanupCache(scope: .all, apply: true).selection.map(\.path)
+        #expect(all.count == 3 && all.contains(LibrarySourceIndex.name))
     }
 
     @Test("Library close cancels, kills, and reaps a blocked renderer before releasing ownership")
