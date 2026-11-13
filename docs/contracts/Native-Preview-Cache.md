@@ -1,6 +1,6 @@
 # Owned preview lifetime and derived cache
 
-Library previews extend the existing storage queue and kernel lease without introducing an authoritative database.
+Library previews extend the existing storage queue without introducing an authoritative database.
 The native library marker and item metadata remain version 1; import/mutation intents retain their existing versions.
 
 ## Ownership and process boundary
@@ -10,13 +10,12 @@ The context validates the selected item and actual stored entry indices and reta
 Selection, cache lookup, worker execution, validation, and publication run as one serialized library operation.
 Source mutations and cache maintenance cannot interleave with that operation through the owner API.
 
-A `LibraryOwnershipLoan` duplicates the existing lock descriptor using `F_DUPFD_CLOEXEC`.
-It shares the same flock open-file description; neither parent nor helper explicitly unlocks it.
-The launcher uses `posix_spawn` with `POSIX_SPAWN_CLOEXEC_DEFAULT`, explicitly passing only stdin/stdout/stderr
-and the optional loan on descriptor 3. Other source, cache, control-directory, and unrelated descriptors are excluded.
-The real worker marks descriptor 3 close-on-exec after startup.
+The worker never reads or writes library files: it receives request bytes on stdin and returns a report and PNG on stdout.
+It therefore holds no ownership lease; only the owner validates and publishes derived files.
+The launcher uses `posix_spawn` with `POSIX_SPAWN_CLOEXEC_DEFAULT`, explicitly passing only stdin/stdout/stderr.
+The lock, source, cache, control-directory, and unrelated descriptors are excluded.
 No source/cache mutation interface or library path is sent to JavaScriptCore or the worker request.
-Descriptor 3 is a raw lock-lifetime handle, not an OS sandbox boundary.
+The descriptor allowlist is not an OS sandbox boundary.
 
 The worker starts in a dedicated process group. The supervisor observes its exit using `waitid(...WNOWAIT)`
 so the leader PID/PGID cannot be reused before group shutdown.
@@ -25,9 +24,8 @@ The original worker deadline, cancellation, resident-memory checks, and parent-d
 
 `NativeLibrary.close()` sets a closing flag before draining the queue and signals the active bound preview's sticky cancellation token.
 The token covers startup, worker execution, validation, and publication.
-The queue-scoped loan closes only after the worker call has completed cleanup.
-Opening another owner is still refused while an inherited loan survives parent death.
-The lease inode is never replaced or force-unlocked to bypass a surviving helper.
+If the owner process dies, its lease is released at once; an orphaned helper cannot keep the library owned
+and cannot publish, because publication belongs to the owner.
 
 ## Identity
 

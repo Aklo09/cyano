@@ -92,7 +92,7 @@ public final class LibraryPreviewService: @unchecked Sendable {
             }
             try context.willStartWorker()
             try token.check()
-            let result = try process.render(request, deadline: 60, cancellation: token, ownership: context.ownership)
+            let result = try process.render(request, deadline: 60, cancellation: token)
             guard result.report.assetIdentity == verified.identity else { throw PreviewError.assetDecode }
             try token.check()
             try context.publish(identity, image: result.png, report: JSONEncoder().encode(result.report))

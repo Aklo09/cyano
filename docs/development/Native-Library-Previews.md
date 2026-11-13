@@ -1,7 +1,7 @@
 # Cached library previews
 
 Render a saved item while its native library remains exclusively owned, then reuse a validated derived image.
-The caller publishes the cache after the worker exits; the worker receives source bytes and a shared kernel lease.
+The caller publishes the cache after the worker exits; the worker receives source bytes only.
 
 ## Generate and reuse a preview
 
@@ -65,8 +65,8 @@ cancels its bound preview, drains the job, and closes the owner lease after work
 Cancellation remains effective before worker launch. Pure asset preflight may finish reading before observing cancellation;
 it cannot launch a worker against a closed library.
 
-Kernel ownership is inherited by the worker on a dedicated descriptor, so abrupt parent death does not release
-the library while that helper remains alive. The existing pipe lifeline normally ends the orphaned helper promptly.
+The worker never receives the ownership lease, so abrupt parent death releases the library immediately,
+even if an orphaned helper is still running. The existing pipe lifeline normally ends that helper promptly.
 The supervisor stops the worker's process group before reaping its leader.
 
 Source replacement and item deletion invalidate all of that item's cached variants.

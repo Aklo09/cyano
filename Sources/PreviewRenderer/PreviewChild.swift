@@ -8,12 +8,10 @@ final class PreviewChild {
     private var exitCode: Int32?
     private var reaped = false
 
-    init(url: URL, input: Int32, output: Int32, errors: Int32, ownership: LibraryOwnershipLoan?) throws {
+    init(url: URL, input: Int32, output: Int32, errors: Int32) throws {
         try LibraryDirectory.validateURL(url)
         var child: Int32 = 0
-        let error = url.path.withCString {
-            fb_spawn_preview($0, input, output, errors, ownership?.descriptor ?? -1, &child)
-        }
+        let error = url.path.withCString { fb_spawn_preview($0, input, output, errors, &child) }
         guard error == 0 else { throw NativeLibraryError.io(error) }
         pid = child
     }

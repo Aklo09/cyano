@@ -41,19 +41,16 @@ case "preview-test-descendant":
     guard CommandLine.arguments[0].withCString({ fb_test_spawn_descendant($0, &child) }) == 0 else { exit(1) }
     try JSONSerialization.data(withJSONObject: ["pid": child]).write(to: URL(fileURLWithPath: path), options: .atomic)
     try FileHandle.standardOutput.write(contentsOf: Data("{}".utf8))
-case "preview-test-lease":
+case "preview-test-orphan":
     guard let path = ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_READY"] else { exit(2) }
     var info = stat()
     var other = stat()
-    let hasLease = fstat(3, &info) == 0 && info.st_mode & S_IFMT == S_IFREG && info.st_size == 0
     let unrelated = Int32(ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_PRIVATE_FD"] ?? "-1") ?? -1
-    let inheritedOther = fstat(unrelated, &other) == 0
     let bytes = try JSONSerialization.data(withJSONObject: [
-        "pid": getpid(), "lease": hasLease, "unrelated": inheritedOther,
-        "inode": UInt64(info.st_ino),
+        "pid": getpid(), "descriptor3": fstat(3, &info) == 0, "unrelated": fstat(unrelated, &other) == 0,
     ])
     try bytes.write(to: URL(fileURLWithPath: path), options: .atomic)
-    // Deliberately ignore the lifeline to prove the inherited kernel lease itself survives parent death.
+    // Deliberately ignore the lifeline: an orphaned helper must not keep the library owned.
     Thread.sleep(forTimeInterval: 120)
 case "preview-test-crash": kill(getpid(), SIGKILL)
 case "preview-test-malformed":

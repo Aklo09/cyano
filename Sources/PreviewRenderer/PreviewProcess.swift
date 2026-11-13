@@ -33,7 +33,7 @@ private final class PreviewPipeBuffer: @unchecked Sendable {
     }
 }
 
-/// One active, supervised, read-only helper per owner. No library mutation interface is sent.
+/// One active, supervised helper per owner. It receives request bytes only: no library path, lease, or write interface.
 public final class PreviewProcess: @unchecked Sendable {
     private let lock = NSLock()
     private var active = false, cancellation = false
@@ -61,13 +61,6 @@ public final class PreviewProcess: @unchecked Sendable {
 
     public func render(
         _ request: PreviewRequest, deadline: TimeInterval = 60, cancellation token: PreviewCancellation? = nil
-    ) throws -> PreviewResult {
-        try render(request, deadline: deadline, cancellation: token, ownership: nil)
-    }
-
-    package func render(
-        _ request: PreviewRequest, deadline: TimeInterval, cancellation token: PreviewCancellation?,
-        ownership: LibraryOwnershipLoan?
     ) throws -> PreviewResult {
         try request.validate()
         try token?.check()
@@ -105,8 +98,7 @@ public final class PreviewProcess: @unchecked Sendable {
         let launchStarted = previewMilliseconds()
         let process = try PreviewChild(
             url: workerURL, input: input.fileHandleForReading.fileDescriptor,
-            output: output.fileHandleForWriting.fileDescriptor, errors: errors.fileHandleForWriting.fileDescriptor,
-            ownership: ownership)
+            output: output.fileHandleForWriting.fileDescriptor, errors: errors.fileHandleForWriting.fileDescriptor)
         defer { process.cleanup() }
         try input.fileHandleForReading.close()
         try output.fileHandleForWriting.close()

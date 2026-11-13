@@ -293,9 +293,8 @@ struct LibraryPreviewTests {
                 .isEmpty)
     }
 
-    @Test(
-        "A noncooperating helper retains the same kernel lease after parent death and inherits no unrelated descriptor")
-    func inheritedOwnership() throws {
+    @Test("An orphaned noncooperating helper holds no lease or unrelated descriptor and does not keep ownership")
+    func orphanedHelper() throws {
         let target = try PreviewLibrary()
         defer { target.cleanup() }
         let assets = try SyntheticPreviewAssets()
@@ -303,7 +302,7 @@ struct LibraryPreviewTests {
         let library = try NativeLibrary.initialize(at: target.root)
         let item = try library.importSource(renderSource())
         library.close()
-        let fake = target.parent.appendingPathComponent("preview-test-lease")
+        let fake = target.parent.appendingPathComponent("preview-test-orphan")
         try FileManager.default.createSymbolicLink(at: fake, withDestinationURL: ownedBinary("PreviewTestWorker"))
         let ready = target.parent.appendingPathComponent("ready.json")
         let parent = Process()
@@ -329,22 +328,19 @@ struct LibraryPreviewTests {
         }
         let record = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: ready)) as? [String: Any])
         child = try #require((record["pid"] as? NSNumber)?.int32Value)
-        #expect(record["lease"] as? Bool == true)
+        #expect(record["descriptor3"] as? Bool == false)
         #expect(record["unrelated"] as? Bool == false)
         kill(parent.processIdentifier, SIGKILL)
         parent.waitUntilExit()
+        // The helper outlives its parent, yet the library is immediately available to a new owner.
         #expect(kill(child!, 0) == 0)
-        #expect(try NativeLibrary.inspectOwnership(at: target.root) == .owned)
-        #expect(throws: NativeLibraryError.inUse) { try NativeLibrary(at: target.root) }
-        kill(child!, SIGKILL)
-        let until = Date().addingTimeInterval(3)
-        while try NativeLibrary.inspectOwnership(at: target.root) == .owned && Date() < until {
-            Thread.sleep(forTimeInterval: 0.01)
-        }
         #expect(try NativeLibrary.inspectOwnership(at: target.root) == .idle)
+        let reopened = try NativeLibrary(at: target.root)
+        #expect(try reopened.export(id: item.id) == renderSource())
+        reopened.close()
     }
 
-    @Test("A worker's descendants cannot keep the inherited lease or pipes alive after the leader exits")
+    @Test("A worker's descendants cannot keep its pipes or the library owned after the leader exits")
     func descendants() throws {
         let target = try PreviewLibrary()
         defer { target.cleanup() }

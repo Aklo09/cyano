@@ -322,24 +322,4 @@ final class LibraryLease {
             fd = -1
         }
     }
-
-    func loan() throws -> LibraryOwnershipLoan {
-        try check()
-        let duplicate = fcntl(fd, F_DUPFD_CLOEXEC, 4)
-        guard duplicate >= 0 else { throw NativeLibraryError.io(errno) }
-        return LibraryOwnershipLoan(descriptor: duplicate)
-    }
-}
-
-/// Shares the same flock open-file description; closing never explicitly unlocks it.
-package final class LibraryOwnershipLoan {
-    package private(set) var descriptor: Int32
-    init(descriptor: Int32) { self.descriptor = descriptor }
-    deinit { close() }
-    func close() {
-        if descriptor >= 0 {
-            Darwin.close(descriptor)
-            descriptor = -1
-        }
-    }
 }

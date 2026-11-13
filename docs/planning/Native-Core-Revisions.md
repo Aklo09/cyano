@@ -38,7 +38,7 @@ and ID-addressed operations read every item metadata file. Both grow with the nu
 
 Each revision is one commit that updates its contract, tests, and code together.
 
-1. D3: remove the worker lease. Lifecycle tests drop lease-inheritance assertions and keep reaping, cancellation, and close behavior.
+1. Done: D3, remove the worker lease. Lifecycle tests drop lease-inheritance assertions and keep reaping, cancellation, and close behavior.
 2. D2: three-phase rendering. New tests show library operations completing while a render is in flight, and a source change during rendering preventing publication.
 3. D6: durability barriers. Interruption tests stay green; import and unpack timings are recorded.
 4. D5: quarantine and staging cleanup. Tests cover a conflicting intent that becomes openable after quarantine with evidence intact, and cleanup that never touches committed intents.

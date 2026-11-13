@@ -12,7 +12,6 @@ int fb_test_spawn_descendant(const char *executable, int *pid) {
     result = posix_spawnattr_init(&attributes);
     if (result) { posix_spawn_file_actions_destroy(&actions); return result; }
     if (!result) result = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_CLOEXEC_DEFAULT);
-    if (!result) result = posix_spawn_file_actions_adddup2(&actions, 3, 3);
     if (!result) result = posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0600);
     if (!result) result = posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0600);
     if (!result) {

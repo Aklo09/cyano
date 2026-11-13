@@ -47,22 +47,17 @@ package final class LibraryPreviewContext {
     package let source: Data
     package let entryPath: [Int]
     package let sourceSha256: String
-    package let ownership: LibraryOwnershipLoan
     private var active = true
 
-    init(owner: NativeLibrary, item: LibraryItem, source: Data, entryPath: [Int], ownership: LibraryOwnershipLoan) {
+    init(owner: NativeLibrary, item: LibraryItem, source: Data, entryPath: [Int]) {
         self.owner = owner
         itemId = item.id
         self.source = source
         self.entryPath = entryPath
         sourceSha256 = item.metadata.sourceSha256
-        self.ownership = ownership
     }
 
-    func finish() {
-        active = false
-        ownership.close()
-    }
+    func finish() { active = false }
 
     private func check(_ identity: LibraryCacheIdentity) throws {
         dispatchPrecondition(condition: .onQueue(owner.queue))
@@ -199,9 +194,8 @@ extension NativeLibrary {
             }
             let (item, document, _) = try load(id: id)
             _ = try document.entry(at: entryPath)
-            let context = try LibraryPreviewContext(
-                owner: self, item: item, source: document.original.bytes,
-                entryPath: entryPath, ownership: lease.loan())
+            let context = LibraryPreviewContext(
+                owner: self, item: item, source: document.original.bytes, entryPath: entryPath)
             defer { context.finish() }
             return try body(context)
         }

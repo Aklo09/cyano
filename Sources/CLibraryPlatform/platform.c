@@ -19,13 +19,12 @@ unsigned long long fb_process_resident_bytes(int pid) {
     return count == sizeof(info) ? info.pti_resident_size : 0;
 }
 
-/* Explicit descriptor allowlist: stdio and optional shared flock open-file description on fd 3. */
-int fb_spawn_preview(const char *path, int input, int output, int errors, int lease, int *pid) {
-    int originals[4] = {input, output, errors, lease};
-    int copies[4] = {-1, -1, -1, -1};
+/* Explicit descriptor allowlist: the worker receives stdin, stdout, and stderr only. */
+int fb_spawn_preview(const char *path, int input, int output, int errors, int *pid) {
+    int originals[3] = {input, output, errors};
+    int copies[3] = {-1, -1, -1};
     int result = 0;
-    for (int i = 0; i < 4; i++) {
-        if (i == 3 && originals[i] < 0) continue;
+    for (int i = 0; i < 3; i++) {
         copies[i] = fcntl(originals[i], F_DUPFD_CLOEXEC, 10);
         if (copies[i] < 0) { result = errno; goto close_copies; }
     }
@@ -35,8 +34,8 @@ int fb_spawn_preview(const char *path, int input, int output, int errors, int le
     if (result) goto close_copies;
     result = posix_spawnattr_init(&attributes);
     if (result) { posix_spawn_file_actions_destroy(&actions); goto close_copies; }
-    for (int i = 0; i < 4 && !result; i++) {
-        if (copies[i] >= 0) result = posix_spawn_file_actions_adddup2(&actions, copies[i], i);
+    for (int i = 0; i < 3 && !result; i++) {
+        result = posix_spawn_file_actions_adddup2(&actions, copies[i], i);
     }
     if (!result) result = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_CLOEXEC_DEFAULT | POSIX_SPAWN_SETPGROUP);
     if (!result) result = posix_spawnattr_setpgroup(&attributes, 0);
@@ -49,7 +48,7 @@ int fb_spawn_preview(const char *path, int input, int output, int errors, int le
     posix_spawnattr_destroy(&attributes);
     posix_spawn_file_actions_destroy(&actions);
 close_copies:
-    for (int i = 0; i < 4; i++) if (copies[i] >= 0) close(copies[i]);
+    for (int i = 0; i < 3; i++) if (copies[i] >= 0) close(copies[i]);
     return result;
 }
 
