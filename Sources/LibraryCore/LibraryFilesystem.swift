@@ -229,9 +229,8 @@ package final class LibraryDirectory {
                 offset += written
             }
         }
-        guard fsync(descriptor) == 0, fcntl(descriptor, F_FULLFSYNC) == 0 else {
-            throw NativeLibraryError.io(errno)
-        }
+        // Host-level flush only; authoritative operations add drive barriers at their commit points.
+        guard fsync(descriptor) == 0 else { throw NativeLibraryError.io(errno) }
         try sync()
     }
 
@@ -257,6 +256,12 @@ package final class LibraryDirectory {
 
     package func sync() throws {
         guard fsync(fd) == 0 else { throw NativeLibraryError.io(errno) }
+    }
+
+    /// Drive barrier: flushes this directory and asks the drive to persist all buffered writes for the volume.
+    package func barrier() throws {
+        try check()
+        guard fcntl(fd, F_FULLFSYNC) == 0 else { throw NativeLibraryError.io(errno) }
     }
 
     private func component(_ name: String) throws {
@@ -294,9 +299,8 @@ final class LibraryLease {
         do {
             try check()
             if create {
-                guard fsync(descriptor) == 0, fcntl(descriptor, F_FULLFSYNC) == 0 else {
-                    throw NativeLibraryError.io(errno)
-                }
+                // The format publication that follows initialization issues the drive barrier.
+                guard fsync(descriptor) == 0 else { throw NativeLibraryError.io(errno) }
                 try directory.sync()
             }
         } catch {

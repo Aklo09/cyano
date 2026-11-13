@@ -92,6 +92,7 @@ public final class NativeLibrary: @unchecked Sendable {
                 }
                 _ = try LibraryRecords.format(root.read(".format.pending", maximum: LibraryBounds.journal))
                 try root.move(".format.pending", to: root, as: ".library-format.json")
+                try root.barrier()
                 try hook?(.formatPublished)
             }
             let formatBytes = try root.read(".library-format.json", maximum: LibraryBounds.journal)
@@ -429,6 +430,8 @@ public final class NativeLibrary: @unchecked Sendable {
                 metadataSha256: OriginalSource(bytes: metadataBytes).sha256, beforeMetadataSha256: before)
             try stage.writeNew("intent.pending", data: LibraryRecords.encode(intent, maximum: LibraryBounds.journal))
             try stage.move("intent.pending", to: stage, as: "intent.json")
+            // Commit point: staged bytes and the intent reach permanent storage before live files change.
+            try stage.barrier()
             needsRecovery = true
             try hook?(.intentPublished)
             try apply(intent, stage: stage)
@@ -528,6 +531,8 @@ public final class NativeLibrary: @unchecked Sendable {
             data, target: intent.basename + ".json", destination: destination, stage: stage,
             expected: intent.metadataSha256, before: intent.beforeMetadataSha256)
         try hook?(.metadataPublished)
+        // Published files reach permanent storage before the intent that can replay them disappears.
+        try stage.barrier()
         try stage.remove("intent.json")
         try hook?(.intentRemoved)
         for name in try validateStage(stage) { try stage.remove(name) }

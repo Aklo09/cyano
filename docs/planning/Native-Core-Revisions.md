@@ -40,7 +40,7 @@ Each revision is one commit that updates its contract, tests, and code together.
 
 1. Done: D3, remove the worker lease. Lifecycle tests drop lease-inheritance assertions and keep reaping, cancellation, and close behavior.
 2. Done: D2, three-phase rendering. New tests show library operations completing while a render is in flight, and a source change during rendering preventing publication.
-3. D6: durability barriers. Interruption tests stay green; import and unpack timings are recorded.
+3. Done: D6, durability barriers (release build: small import 39.7 → 24.6 ms; 182-leaf unpack 2.21 → 0.80 s). Interruption tests stay green; import and unpack timings are recorded.
 4. D5: quarantine and staging cleanup. Tests cover a conflicting intent that becomes openable after quarantine with evidence intact, and cleanup that never touches committed intents.
 5. D4: Trash for removed originals. Tests cover delete and replace leaving byte-identical preimages in a Trash-equivalent destination.
 6. D7: identity-based folder moves. Tests cover moving a folder above the former content cap and replaying an interrupted move.

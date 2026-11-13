@@ -143,10 +143,10 @@ Hashes describe exact stored bytes, without relying on JSON canonicalization.
 1. Validate source, names, metadata, and the destination.
 2. Write staged files exclusively and synchronize them.
 3. Write and synchronize `intent.pending`.
-4. Rename it to `intent.json` and synchronize its directory.
+4. Rename it to `intent.json`, synchronize its directory, and issue a drive barrier.
 5. Validate staged hashes and destination preconditions again.
 6. Publish the source and metadata through synchronized atomic renames.
-7. Remove the intent after successful publication, then remove owned staging files.
+7. Issue a drive barrier, remove the intent, then remove owned staging files.
 
 The published, synchronized intent commits the operation to roll forward.
 Imports publish the TXT before JSON; the pair itself is not atomic.
@@ -158,9 +158,18 @@ Existing destinations must match the intended after-hash or the recorded before-
 An already matching after-hash makes replay idempotent.
 Unexpected bytes stop replay and preserve both live files and staged evidence.
 
-Files use checked `fsync` and `F_FULLFSYNC` calls before publication.
-Affected directories are synchronized after creation, rename, and cleanup.
-Synchronization errors prevent success reporting.
+Durability policy:
+
+- Staged, published, and cache files use checked `fsync`; affected directories are synchronized after creation, rename, and cleanup.
+- A drive barrier (`F_FULLFSYNC`) follows each intent commit rename, so staged bytes and the intent reach
+  permanent storage before any live file changes. A second barrier precedes intent removal, so published
+  changes are permanent before the record that can replay them disappears. Library initialization issues
+  one barrier after publishing the format marker.
+- Disposable cache publication issues no drive barrier.
+- Synchronization errors prevent success reporting.
+
+Measured with a release build on local APFS, this policy reduced a small import from 39.7 ms to 24.6 ms
+and unpacking a 182-leaf book from 2.21 s to 0.80 s, compared with a drive flush per staged file.
 Apple's [fsync reference](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fsync.2.html)
 distinguishes host synchronization from stronger drive-flush requests.
 Process-kill tests do not establish power-loss durability.
@@ -168,6 +177,7 @@ Process-kill tests do not establish power-loss durability.
 ## File and tree mutation publication
 
 Organization and replacement use intent version `2`; readers continue to replay version `1` intents.
+Version `2` operations follow the same durability policy: a drive barrier after the intent commit rename and before intent removal.
 The library marker and item metadata remain at version `1`.
 Version `2` requires `schemaVersion`, `operationId`, `kind`, `changes`, and `cacheIds`,
 with optional `sourceFolder`, `destinationFolder`, and `tree` for tree operations.

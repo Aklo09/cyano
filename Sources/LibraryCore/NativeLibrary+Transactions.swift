@@ -89,6 +89,8 @@ extension NativeLibrary {
         try preflightTransaction(intent, stage: stage)
         try stage.writeNew("intent.pending", data: bytes)
         try stage.move("intent.pending", to: stage, as: "intent.json")
+        // Commit point: staged bytes and the intent reach permanent storage before live files change.
+        try stage.barrier()
         needsRecovery = true
         try hook?(.intentPublished)
         try applyTransaction(intent, stage: stage)
@@ -205,6 +207,8 @@ extension NativeLibrary {
             }
             _ = try treeLocation(intent, stage: stage)
         }
+        // Published changes reach permanent storage before the intent that can replay them disappears.
+        try stage.barrier()
         try stage.remove("intent.json")
         try hook?(.intentRemoved)
         if try stage.info("tree") != nil {
