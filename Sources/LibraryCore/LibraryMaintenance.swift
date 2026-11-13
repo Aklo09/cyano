@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 
-/// Reserved native preview identity. Unknown manifest versions are protected by scoped cleanup.
+/// Native preview identity. Unknown manifest versions are protected by scoped cleanup.
 public struct LibraryCacheIdentity: Codable, Sendable {
     public let schemaVersion: Int
     public let itemId: String
@@ -116,7 +116,7 @@ extension NativeLibrary {
                             else {
                                 let (parent, name) = try LibraryTrees.descendant(cache, manifestPath)
                                 // Unknown, damaged, or foreign manifests stay protected in scoped cleanup.
-                                if let identity = try? LibraryCacheIdentity.read(parent.read(name, maximum: LibraryBounds.journal)),
+                                if let identity = try? LibraryCacheRecords.identity(parent.read(name, maximum: LibraryBounds.metadata)),
                                    identity.itemId == parts[0], (try? identity.key()) == key {
                                     if let item = known[identity.itemId] {
                                         if scope == .obsolete {

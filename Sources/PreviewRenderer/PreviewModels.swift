@@ -3,6 +3,21 @@ import Foundation
 public enum PreviewError: Error, CustomStringConvertible {
     case invalidInput, invalidDrawList, assetDecode, imageAllocation, imageEncoding
     case timedOut, cancelled, workerFailed, workerProtocol, workerBusy, memoryLimit
+    public var code: String {
+        switch self {
+        case .invalidInput: "PREVIEW_INVALID_INPUT"
+        case .invalidDrawList: "PREVIEW_INVALID_DRAW_LIST"
+        case .assetDecode: "PREVIEW_ASSET_DECODE"
+        case .imageAllocation: "PREVIEW_IMAGE_ALLOCATION"
+        case .imageEncoding: "PREVIEW_IMAGE_ENCODING"
+        case .timedOut: "PREVIEW_TIMEOUT"
+        case .cancelled: "PREVIEW_CANCELLED"
+        case .workerFailed: "PREVIEW_WORKER_FAILED"
+        case .workerProtocol: "PREVIEW_WORKER_PROTOCOL"
+        case .workerBusy: "PREVIEW_BUSY"
+        case .memoryLimit: "PREVIEW_MEMORY_LIMIT"
+        }
+    }
     public var description: String {
         switch self {
         case .invalidInput: "Invalid preview input, selection, tier, or output limits."

@@ -22,7 +22,7 @@ let package = Package(
             resources: [.copy("Resources")],
             linkerSettings: [.linkedFramework("JavaScriptCore")]
         ),
-        .executableTarget(name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData"]),
+        .executableTarget(name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData", "PreviewRenderer", "PreviewWorker"]),
         .executableTarget(name: "PreviewWorker", dependencies: ["PreviewRenderer"]),
         .executableTarget(name: "PreviewProbe", dependencies: ["PreviewRenderer", "PreviewWorker", "LibraryCore"]),
         .executableTarget(name: "StorageTestDriver", dependencies: ["LibraryCore"], path: "Tests/Support/StorageTestDriver"),
@@ -31,8 +31,10 @@ let package = Package(
             dependencies: ["LibraryCore", "StorageTestDriver", "FBNativeCLI"],
             resources: [.copy("Fixtures")]
         ),
-        .executableTarget(name: "PreviewTestWorker", dependencies: ["PreviewRenderer"], path: "Tests/Support/PreviewTestWorker"),
-        .testTarget(name: "PreviewRendererTests", dependencies: ["PreviewRenderer", "PreviewWorker", "PreviewTestWorker", "PreviewProbe", "LibraryCore"]),
+        .target(name: "PreviewTestPlatform", path: "Tests/Support/PreviewTestPlatform", publicHeadersPath: "include"),
+        .executableTarget(name: "PreviewTestWorker", dependencies: ["PreviewRenderer", "PreviewTestPlatform"], path: "Tests/Support/PreviewTestWorker"),
+        .executableTarget(name: "LibraryPreviewTestDriver", dependencies: ["LibraryCore", "PreviewRenderer"], path: "Tests/Support/LibraryPreviewTestDriver"),
+        .testTarget(name: "PreviewRendererTests", dependencies: ["PreviewRenderer", "PreviewWorker", "PreviewTestWorker", "PreviewProbe", "LibraryCore", "LibraryPreviewTestDriver", "FBNativeCLI"]),
         .testTarget(name: "FactorioDataTests", dependencies: ["FactorioData", "LibraryCore", "FBNativeCLI"]),
     ]
 )

@@ -113,6 +113,8 @@ There are no suspension points inside read-modify-write operations.
 Concurrent comments therefore append without losing another accepted comment.
 Closing drains earlier queued work, rejects later operations, and releases the lease.
 Closing again is harmless.
+Closing also signals a bound preview's cancellation token and drains worker cleanup before the owner lease closes.
+See the [preview lifetime/cache contract](Native-Preview-Cache.md) for inherited kernel ownership and derived publication.
 
 Separate app/CLI instances cannot open the same live library, including through aliases.
 Ordinary reads and exports require ownership too.
@@ -220,4 +222,4 @@ Do not discard an operations directory to bypass a recovery refusal.
 The [codec ceilings](../development/Native-Codec.md#input-admission) govern TXT decoding.
 Directory scans and file reads stop at their limits rather than returning silent partial success.
 Listings currently decode and validate saved sources; large-library performance remains unqualified.
-Renderer helpers and their lease lifetime will be integrated in the renderer checkpoint.
+Bound renderer helpers now share the owner lease; preview caches remain disposable and separate from authoritative recovery.

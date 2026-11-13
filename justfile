@@ -9,7 +9,7 @@ build:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
     python3 tools/test-asset-release.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
@@ -38,7 +38,7 @@ planner-test:
 
 # Exercise native composition and supervised worker success/failure paths without private assets.
 renderer-test:
-    sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests'
+    sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
     python3 tools/test-asset-release.py
 
 # Render a standalone source or selected book leaf using a verified private asset release.

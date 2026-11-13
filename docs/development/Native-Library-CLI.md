@@ -100,6 +100,13 @@ Book container settings such as icons and the active entry are not represented b
 The complete prepared tree becomes visible after the recovery intent commits; a duplicate root name receives a suffix.
 Use ordinary `import` to preserve a whole book exactly.
 
+## Saved-item previews
+
+`preview <library> <item-id> --assets <release>` renders under ownership and reuses validated images.
+Use `--entry` for selected book leaves and `--refresh` for explicit regeneration.
+Results include a library-relative cache path rather than raw image bytes.
+See the [library preview guide](Native-Library-Previews.md) for the complete workflow and lifetime rules.
+
 ## Maintenance
 
 ```sh
@@ -117,7 +124,8 @@ Unsafe links, shared file inodes, cross-device descendants, and overlapping sele
 
 `obsolete` additionally compares source hash, stored entry path, generator, and selected asset identity.
 It requires `--assets <release-directory>` and optionally accepts `--generator <identity>`.
-The default generator is reserved as `native-preview-v1`; native preview production is still pending.
+The default generator is `native-preview-v1`, selecting 2x/2048/transparent previews.
+Use the preview result's `generator` with `--generator` when comparing a different rendering variant.
 The native manifest format is intentionally separate from historical web caches.
 
 `usage` reports originals, metadata, other library members, cache, operations, controls, and optional assets.
@@ -169,6 +177,7 @@ The error includes `category`, `code`, `message`, and `exitCode`.
 | 5 | Unsupported or malformed native format/metadata |
 | 6 | Filesystem or output failure |
 | 7 | Invalid content, names, paths, identifiers, or resource limits |
+| 8 | Preview execution, cancellation, timeout, or worker-result failure |
 
 `release` reports the available capabilities and native format version without opening a library.
 Raw exports preserve their separate byte-oriented protocol.

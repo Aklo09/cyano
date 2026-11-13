@@ -1,10 +1,15 @@
 import Darwin
 import Foundation
 import PreviewRenderer
+import PreviewTestPlatform
 
 // Tests choose behavior by basename through a disposable symlink to this executable.
 let mode = URL(fileURLWithPath: CommandLine.arguments[0]).lastPathComponent
 let args = Array(CommandLine.arguments.dropFirst())
+if args == ["descendant-holder"] {
+    Thread.sleep(forTimeInterval: 120)
+    exit(0)
+}
 if args.count == 1, args[0] == "parent" {
     let input = Pipe()
     let child = Process()
@@ -30,6 +35,26 @@ if args.count == 1, args[0] == "lifeline" {
     exit(0)
 }
 switch mode {
+case "preview-test-descendant":
+    guard let path = ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_READY"] else { exit(2) }
+    var child: Int32 = 0
+    guard CommandLine.arguments[0].withCString({ fb_test_spawn_descendant($0, &child) }) == 0 else { exit(1) }
+    try JSONSerialization.data(withJSONObject: ["pid": child]).write(to: URL(fileURLWithPath: path), options: .atomic)
+    try FileHandle.standardOutput.write(contentsOf: Data("{}".utf8))
+case "preview-test-lease":
+    guard let path = ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_READY"] else { exit(2) }
+    var info = stat()
+    var other = stat()
+    let hasLease = fstat(3, &info) == 0 && info.st_mode & S_IFMT == S_IFREG && info.st_size == 0
+    let unrelated = Int32(ProcessInfo.processInfo.environment["FB_PREVIEW_TEST_PRIVATE_FD"] ?? "-1") ?? -1
+    let inheritedOther = fstat(unrelated, &other) == 0
+    let bytes = try JSONSerialization.data(withJSONObject: [
+        "pid": getpid(), "lease": hasLease, "unrelated": inheritedOther,
+        "inode": UInt64(info.st_ino),
+    ])
+    try bytes.write(to: URL(fileURLWithPath: path), options: .atomic)
+    // Deliberately ignore the lifeline to prove the inherited kernel lease itself survives parent death.
+    Thread.sleep(forTimeInterval: 120)
 case "preview-test-crash": kill(getpid(), SIGKILL)
 case "preview-test-malformed":
     try FileHandle.standardOutput.write(contentsOf: Data("{}".utf8))

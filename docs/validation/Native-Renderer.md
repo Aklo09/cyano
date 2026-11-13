@@ -105,6 +105,7 @@ The test now observes the PID immediately after process launch and retains the s
 
 This is a standalone-source harness. Library-bound helper lease retention, owner-controlled cache publication,
 render scheduling, retry/progress UI, and integration with library close are still pending.
+The subsequent [library preview checkpoint](Native-Library-Previews.md) implements the helper lease, cache, and close integration.
 No helper receives a library path/lease or authoritative write interface in this checkpoint.
 Terrain/space backgrounds and coordinate overlays remain outside the native painter's current options.
 Source operations continue to work without assets.

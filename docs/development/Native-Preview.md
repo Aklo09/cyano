@@ -98,6 +98,7 @@ They exercise successful subprocess rendering, pixel composition, bounds, crash/
 timeout, memory-limit enforcement, cancellation, parent death, and exclusive publication.
 See [validation and image coverage](../validation/Native-Renderer.md) for measurements and remaining work.
 
-The harness operates on standalone source files. Library-bound helper leases, owned cache publication,
-visible-item scheduling, the macOS UI, and full-corpus visual approval remain pending.
+This harness operates on standalone source files. The separate [library preview command](Native-Library-Previews.md)
+implements saved-item ownership and derived caching.
+Visible-item scheduling, the macOS UI, and full-corpus visual approval remain pending.
 Terrain/space backgrounds and coordinate overlays are not part of this painter checkpoint.

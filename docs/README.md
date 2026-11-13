@@ -17,6 +17,9 @@ Use the approved plan for scope and validation records for completed work.
 | Work with the asset toolchain | [Asset preparation](development/Asset-Preparation.md) |
 | Render standalone previews | [Native preview harness](development/Native-Preview.md) |
 | Inspect image and worker qualification | [Renderer validation](validation/Native-Renderer.md) |
+| Render and reuse saved-item previews | [Library previews](development/Native-Library-Previews.md) |
+| Understand helper leases and cache publication | [Preview cache contract](contracts/Native-Preview-Cache.md) |
+| Inspect owned-render/cache validation | [Library preview validation](validation/Native-Library-Previews.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.

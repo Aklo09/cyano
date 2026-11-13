@@ -12,14 +12,16 @@ Based on the [initial assessment](Native-macOS-Assessment.md), with the scope de
 - [x] Native metadata, exclusive ownership, minimal CLI library operations, and process-interruption recovery.
 - [x] Complete library commands: organization, replacement, deletion, unpacking, cache maintenance, usage, and offline asset verification.
 - [x] Standalone real-image renderer feasibility, bounded native workers, process deadlines, and independent PNG decoding.
-- [ ] Library-bound helper lease/cache integration, owner visual approval, and complete milestone 1 acceptance.
+- [x] Library-bound helper lease retention, close/cancellation, and owned derived-cache publication/reuse.
+- [ ] Owner visual approval, remaining qualification, and complete milestone 1 acceptance.
 
 See [foundation validation](../validation/Native-Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Native-Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Native-Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Native-Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Native statistics and rendering integration remain pending; milestone 2 is not complete.
+Native statistics and application rendering scheduling remain pending; milestone 2 is not complete.
 The [renderer validation](../validation/Native-Renderer.md) records the standalone painter/worker checkpoint.
+The [library preview validation](../validation/Native-Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
 
 ## Summary

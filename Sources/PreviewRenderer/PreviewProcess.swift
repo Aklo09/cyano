@@ -59,8 +59,18 @@ public final class PreviewProcess: @unchecked Sendable {
         lock.unlock()
     }
 
-    public func render(_ request: PreviewRequest, deadline: TimeInterval = 60) throws -> PreviewResult {
+    public func render(
+        _ request: PreviewRequest, deadline: TimeInterval = 60, cancellation token: PreviewCancellation? = nil
+    ) throws -> PreviewResult {
+        try render(request, deadline: deadline, cancellation: token, ownership: nil)
+    }
+
+    package func render(
+        _ request: PreviewRequest, deadline: TimeInterval, cancellation token: PreviewCancellation?,
+        ownership: LibraryOwnershipLoan?
+    ) throws -> PreviewResult {
         try request.validate()
+        try token?.check()
         guard deadline.isFinite, deadline > 0, deadline <= 60 else { throw PreviewError.invalidInput }
         lock.lock()
         guard !active else {
@@ -79,23 +89,30 @@ public final class PreviewProcess: @unchecked Sendable {
         let started = previewMilliseconds()
         let bytes = try JSONEncoder().encode(request)
         guard bytes.count <= 24 * 1024 * 1024 else { throw PreviewError.invalidInput }
-        let process = Process()
         let input = Pipe()
         let output = Pipe()
         let errors = Pipe()
-        process.executableURL = workerURL
-        process.arguments = []
-        process.standardInput = input
-        process.standardOutput = output
-        process.standardError = errors
+        defer {
+            for handle in [
+                input.fileHandleForReading, input.fileHandleForWriting, output.fileHandleForReading,
+                output.fileHandleForWriting, errors.fileHandleForReading, errors.fileHandleForWriting,
+            ] { try? handle.close() }
+        }
         // Avoid a process-wide SIGPIPE change when a crashed worker closes stdin early.
         _ = fcntl(input.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
         let resultBuffer = PreviewPipeBuffer()
         let errorBuffer = PreviewPipeBuffer()
         let launchStarted = previewMilliseconds()
-        try process.run()
+        let process = try PreviewChild(
+            url: workerURL, input: input.fileHandleForReading.fileDescriptor,
+            output: output.fileHandleForWriting.fileDescriptor, errors: errors.fileHandleForWriting.fileDescriptor,
+            ownership: ownership)
+        defer { process.cleanup() }
+        try input.fileHandleForReading.close()
+        try output.fileHandleForWriting.close()
+        try errors.fileHandleForWriting.close()
         lock.lock()
-        lastPID = process.processIdentifier
+        lastPID = process.pid
         lock.unlock()
         let launchMs = previewMilliseconds() - launchStarted
         let group = DispatchGroup()
@@ -119,32 +136,35 @@ public final class PreviewProcess: @unchecked Sendable {
             } catch { /* Exit/status and framed-result validation handle a closed worker pipe. */  }
         }
         var failure: PreviewError?
-        while process.isRunning {
+        while try process.running() {
             lock.lock()
             let cancelled = cancellation
             lock.unlock()
-            if cancelled {
+            if cancelled || token?.isCancelled == true {
                 failure = .cancelled
             } else if previewMilliseconds() - started >= deadline * 1000 {
                 failure = .timedOut
-            } else if fb_process_resident_bytes(process.processIdentifier) > residentLimit {
+            } else if fb_process_resident_bytes(process.pid) > residentLimit {
                 failure = .memoryLimit
             } else if resultBuffer.snapshot().1 || errorBuffer.snapshot().1 {
                 failure = .workerProtocol
             }
             if failure != nil {
-                kill(process.processIdentifier, SIGKILL)
+                process.killGroup()
                 break
             }
             Thread.sleep(forTimeInterval: 0.01)
         }
-        process.waitUntilExit()
+        try process.wait()
         try? input.fileHandleForWriting.close()
-        guard group.wait(timeout: .now() + 2) == .success else { throw PreviewError.workerProtocol }
+        guard group.wait(timeout: .now() + 2) == .success else {
+            _ = group.wait(timeout: .now() + 2)
+            throw PreviewError.workerProtocol
+        }
         if let failure { throw failure }
         let (data, invalid, finished) = resultBuffer.snapshot()
         guard !invalid, finished, !errorBuffer.snapshot().1 else { throw PreviewError.workerProtocol }
-        guard process.terminationReason == .exit, process.terminationStatus == 0 else {
+        guard process.succeeded else {
             throw PreviewError.workerFailed
         }
         guard var result = try? JSONDecoder().decode(PreviewResult.self, from: data) else {
@@ -155,7 +175,7 @@ public final class PreviewProcess: @unchecked Sendable {
         lock.lock()
         let wasCancelled = cancellation
         lock.unlock()
-        if wasCancelled { throw PreviewError.cancelled }
+        if wasCancelled || token?.isCancelled == true { throw PreviewError.cancelled }
         guard previewMilliseconds() - started < deadline * 1000 else { throw PreviewError.timedOut }
         result.report.timingsMs["parentValidation"] = previewMilliseconds() - validationStarted
         result.report.timingsMs["processLaunch"] = launchMs

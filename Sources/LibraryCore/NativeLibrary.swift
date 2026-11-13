@@ -6,6 +6,8 @@ import Foundation
     case formatPublished, sourceStaged, metadataStaged, intentPublished
     case sourcePublished, metadataPublished, intentRemoved
     case changesStaged, fileRemoved, filePublished, treeStaged, treeWithdrawn, treePublished, cacheRemoved
+    case previewImageStaged, previewManifestStaged, previewImagePublished, previewManifestPublished
+    case previewWorkerStarting
 }
 
 /// Owns one local library until close. Every complete operation runs on one serial queue.
@@ -19,6 +21,10 @@ public final class NativeLibrary: @unchecked Sendable {
     let formatBytes: Data
     let hook: ((LibraryWritePhase) throws -> Void)?
     var needsRecovery = false
+    let lifecycleLock = NSLock()
+    var closing = false
+    var previewCancellation: (@Sendable () -> Void)?
+    package var isClosing: Bool { lifecycleLock.lock(); defer { lifecycleLock.unlock() }; return closing }
 
     public convenience init(at url: URL) throws {
         try self.init(at: url, initializing: false, hook: nil)
@@ -93,7 +99,14 @@ public final class NativeLibrary: @unchecked Sendable {
 
     deinit { lease.close() }
 
-    public func close() { queue.sync { lease.close() } }
+    public func close() {
+        lifecycleLock.lock()
+        closing = true
+        let cancel = previewCancellation
+        lifecycleLock.unlock()
+        cancel?()
+        queue.sync { lease.close() }
+    }
 
     public static func inspectOwnership(at url: URL) throws -> LibraryOwnershipStatus {
         try LibraryDirectory.validateURL(url)
@@ -135,6 +148,7 @@ public final class NativeLibrary: @unchecked Sendable {
 
     public func recover() throws {
         try queue.sync {
+            guard !isClosing else { throw NativeLibraryError.closed }
             try checkControls()
             do { try replay(); needsRecovery = false }
             catch { needsRecovery = true; throw error }
@@ -206,6 +220,10 @@ public final class NativeLibrary: @unchecked Sendable {
     }
 
     func ready() throws {
+        lifecycleLock.lock()
+        let isClosing = closing
+        lifecycleLock.unlock()
+        guard !isClosing else { throw NativeLibraryError.closed }
         try checkControls()
         guard !needsRecovery else { throw NativeLibraryError.recoveryRequired }
     }

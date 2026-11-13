@@ -2,6 +2,7 @@ import Darwin
 import FactorioData
 import Foundation
 import LibraryCore
+import PreviewRenderer
 
 private let usage = """
 Usage: fb-native <command> [arguments]
@@ -27,10 +28,13 @@ Usage: fb-native <command> [arguments]
   cache-cleanup <library> [abandoned|obsolete|all] [--apply] [--assets <release>] [--generator <identity>]
   usage <library> [--assets <release>]
   assets-verify <release-directory>
+  preview <library> <item-id> --assets <release> [--entry <stored.indices>]
+    [--tier 1x|2x] [--max-dimension 64...4096] [--checkerboard] [--refresh]
 
 Export writes source bytes to stdout or exclusively creates --output. Other results use versioned JSON.
 Use an empty string for the root folder. Folder deletion requires an empty folder.
 Cache cleanup defaults to a dry run. Obsolete cleanup requires --assets.
+Preview reuses validated derived images; --refresh regenerates a known cache entry.
 Close the library in the application before using store commands or Finder edits.
 """
 
@@ -56,13 +60,13 @@ private struct Failure: Encodable {
 
 private struct ReleaseReport: Encodable {
     let product = "fb-native"
-    let stage = "renderer-feasibility"
+    let stage = "owned-library-previews"
     let nativeFormatVersion = 1
     let profile = FactorioProfile.initial
     let capabilities = commands.sorted()
     let libraryOperationsAvailable = true
     let previewPaintingAvailable = true
-    let previewLibraryIntegrationAvailable = false
+    let previewLibraryIntegrationAvailable = true
 }
 
 private struct OwnerReport: Encodable { let state: LibraryOwnershipStatus }
@@ -70,6 +74,14 @@ private struct RecoveryReport: Encodable { let recovered = true }
 private struct FolderReport: Encodable { let folder: String }
 private struct DeletedReport: Encodable { let deleted = true }
 private struct ExportReport: Encodable { let path: String; let bytes: Int }
+private struct PreviewCommandReport: Encodable {
+    let key: String
+    let generator: String
+    let cacheHit: Bool
+    let cachePath: String
+    let durationMs: Double
+    let report: PreviewReport
+}
 private enum ArgumentsError: Error { case invalid }
 
 private func emit<T: Encodable>(_ value: T, to output: FileHandle = .standardOutput) throws {
@@ -187,6 +199,25 @@ private func run(_ args: [String]) throws {
         let opts = try options(args.dropFirst(2), allowed: ["--assets"])
         let library = try NativeLibrary(at: url); defer { library.close() }
         try emit(Success(command: command, result: library.diskUsage(assets: opts["--assets"].map { URL(fileURLWithPath: $0) })))
+    case "preview":
+        guard args.count >= 3 else { throw ArgumentsError.invalid }
+        let rest = Array(args.dropFirst(3))
+        for flag in ["--refresh", "--checkerboard"] {
+            guard rest.filter({ $0 == flag }).count <= 1 else { throw ArgumentsError.invalid }
+        }
+        let opts = try options(rest.filter { !["--refresh", "--checkerboard"].contains($0) }[...],
+            allowed: ["--assets", "--entry", "--tier", "--max-dimension"])
+        guard let assets = opts["--assets"], let maximum = Int(opts["--max-dimension"] ?? "2048") else { throw ArgumentsError.invalid }
+        let path = try entryPath(opts["--entry"])
+        let library = try NativeLibrary(at: url); defer { library.close() }
+        let executable = URL(fileURLWithPath: CommandLine.arguments[0]).standardizedFileURL.resolvingSymlinksInPath()
+        let service = LibraryPreviewService(workerURL: executable.deletingLastPathComponent().appendingPathComponent("preview-worker"))
+        let rendering = LibraryPreviewOptions(tier: opts["--tier"] ?? "2x", maximumDimension: maximum, checkerboard: rest.contains("--checkerboard"))
+        let result = try service.render(library: library, id: args[2], entryPath: path, assetsURL: URL(fileURLWithPath: assets),
+            options: rendering,
+            refresh: rest.contains("--refresh"))
+        try emit(Success(command: command, result: PreviewCommandReport(key: result.key, generator: rendering.generator, cacheHit: result.cacheHit,
+            cachePath: result.cachePath, durationMs: result.durationMs, report: result.preview.report)))
     case "cache-cleanup":
         var rest = Array(args.dropFirst(2))
         var scope = CacheCleanupScope.abandoned
@@ -211,13 +242,15 @@ private func run(_ args: [String]) throws {
 
 private let args = Array(CommandLine.arguments.dropFirst())
 private let commands = Set(["release", "init", "owner", "list", "recover", "import", "import-unpacked", "export", "comment", "comment-add",
-    "comment-delete", "update", "rename", "move", "delete", "folder-create", "folder-move", "folder-delete", "cache-cleanup", "usage", "assets-verify"])
+    "comment-delete", "update", "rename", "move", "delete", "folder-create", "folder-move", "folder-delete", "cache-cleanup", "usage", "assets-verify", "preview"])
 do {
     try run(args)
 } catch {
     let detail: Failure.Detail
     if let error = error as? NativeLibraryError {
         detail = .init(category: error.category, code: error.code, message: error.description, exitCode: error.exitCode)
+    } else if let error = error as? PreviewError {
+        detail = .init(category: "rendering", code: error.code, message: error.description, exitCode: error == .invalidInput ? 7 : 8)
     } else if let error = error as? AssetReleaseError {
         detail = .init(category: "validation", code: "INVALID_ASSET_RELEASE", message: error.description, exitCode: 7)
     } else if let error = error as? BlueprintCodecError {

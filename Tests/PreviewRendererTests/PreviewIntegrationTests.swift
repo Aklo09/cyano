@@ -12,7 +12,7 @@ private func previewJSON(_ value: Any) throws -> Data {
     bytes.append(10)
     return bytes
 }
-private struct SyntheticPreviewAssets {
+struct SyntheticPreviewAssets {
     let root: URL
     init() throws {
         root = FileManager.default.temporaryDirectory.appendingPathComponent(
@@ -81,7 +81,7 @@ private struct SyntheticPreviewAssets {
     }
     func cleanup() { try? FileManager.default.removeItem(at: root) }
 }
-private func renderSource(name: String = "wooden-chest") throws -> Data {
+func renderSource(name: String = "wooden-chest") throws -> Data {
     let json = Data(
         "{\"blueprint\":{\"version\":562954249895936,\"entities\":[{\"entity_number\":1,\"name\":\"\(name)\",\"position\":{\"x\":0,\"y\":0}}]}}"
             .utf8)

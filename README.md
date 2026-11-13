@@ -6,7 +6,8 @@ This project is an independent native port of the original web application.
 **Current status:** native storage and the library CLI are implemented, including organization, replacement,
 deletion, book unpacking, maintenance, and offline asset verification.
 The standalone renderer paints real previews through supervised native workers.
-Library/cache rendering integration, native statistics, and the macOS interface remain pending.
+Saved-item previews retain library ownership and reuse validated derived caches.
+Native statistics, application scheduling, and the macOS interface remain pending.
 
 ## Requirements
 
@@ -68,6 +69,7 @@ These retained JavaScript cases provide reference behavior for the future Swift 
 - **Inspect command completion:** [organization and maintenance validation](docs/validation/Native-Library-Commands.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
 - **Render previews:** [native harness guide](docs/development/Native-Preview.md) and [renderer validation](docs/validation/Native-Renderer.md).
+- **Cache saved-item previews:** [library preview guide](docs/development/Native-Library-Previews.md), [contract](docs/contracts/Native-Preview-Cache.md), and [validation](docs/validation/Native-Library-Previews.md).
 - **Resume development:** [session notes](docs/Session-Notes.md).
 - **Find documents:** [documentation map](docs/README.md).
 

@@ -6,6 +6,7 @@ The bounded native codec is implemented, with [focused validation](validation/Na
 Minimal storage and CLI workflows are implemented, with [process-interruption evidence](validation/Native-Storage.md).
 The owner then prioritized [complete library commands](validation/Native-Library-Commands.md) before renderer feasibility; those are implemented.
 The standalone [native renderer harness](validation/Native-Renderer.md) now paints real images through a supervised helper.
+The renderer checkpoint is committed as `75aec1c`; [owned library previews and caches](validation/Native-Library-Previews.md) are implemented next.
 The complete milestone remains in progress.
 
 ## Current state
@@ -20,6 +21,8 @@ The complete milestone remains in progress.
 - **Reuse planner source:** system JavaScriptCore executes the locally bundled fpsr planner.
 - **Paint previews:** Core Graphics handles ordered sprites, shadows, wires, icons, and planner labels; Image I/O decodes atlases and encodes PNGs.
 - **Supervise helpers:** deadlines, cancellation, sampled memory limits, and parent-death lifelines are tested.
+- **Retain ownership:** POSIX launch explicitly hands the shared kernel lease to bound workers; close cancels/drains jobs.
+- **Reuse derived previews:** complete cache metadata binds identities, PNG bytes, and stored reports without changing source metadata.
 - **Keep tooling local:** preparation sources, dependency locks, and notices live here.
 - **Keep artwork private:** copied sprites and prototype data remain ignored.
 - **Read the evidence:** [foundation validation](validation/Native-Foundation.md) records checks and limitations.
@@ -27,14 +30,15 @@ The complete milestone remains in progress.
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
 Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
 The preview probe renders standalone source files and selected book leaves with verified private assets.
-Library-bound rendering/cache integration, the macOS UI, and native statistics remain pending.
+Saved-item preview and cache integration are available through `fb-native preview`.
+Application scheduling, the macOS UI, and native statistics remain pending.
 
 ## Next implementation
 
-Review the generated representative images with the owner, then integrate rendering with owned libraries and derived caches.
-Library-bound workers must retain the planned ownership guarantees; the current harness passes source bytes without opening a library.
-Preserve the standalone worker's no-mutation interface and the validated publication boundary.
-Expand connected-rail/full-corpus visual qualification and cancellation/workload measurements before full UI work.
+Continue the complete-core milestone with the native construction-statistics port using the retained reference cases.
+Keep application scheduling/progress/retry and UI work separate from the completed library preview command.
+Preserve inherited kernel ownership, sticky cancellation, and owner-only cache publication.
+Owner visual approval, connected-rail/full-corpus review, and workload measurements remain outstanding.
 
 Preserve the [native storage contract](contracts/Native-Storage.md) when integrating rendering.
 Helpers must not retain write access after ownership is released.
@@ -52,4 +56,5 @@ Use `just storage-test` for metadata, exclusion, CLI, and crash-recovery checks.
 Use `just asset-test` for inventory/profile/hash and packed-frame admission checks.
 Use `just renderer-test` for composition, complete jobs, and helper lifecycle checks.
 Use `just preview --help` and the [preview guide](development/Native-Preview.md) for rendering commands.
+Use the [library preview guide](development/Native-Library-Previews.md) for saved-item reuse and refresh.
 Use `just library --help` for available native commands.

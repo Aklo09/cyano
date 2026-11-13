@@ -60,6 +60,8 @@ public enum PreviewWorker {
 
     package static func serve(renderJob: (PreviewRequest) throws -> PreviewResult) throws {
         signal(SIGPIPE, SIG_IGN)
+        let leaseFlags = fcntl(3, F_GETFD)
+        if leaseFlags >= 0 { _ = fcntl(3, F_SETFD, leaseFlags | FD_CLOEXEC) }
         let input = FileHandle.standardInput
         func read(_ count: Int) throws -> Data {
             var result = Data()
