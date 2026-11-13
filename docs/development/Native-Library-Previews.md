@@ -58,10 +58,12 @@ Without that override, obsolete cleanup compares against the default rendering c
 Keep `preview-worker` adjacent to `fb-native` when installing binaries; repository builds produce both.
 The command holds ownership through selection, rendering, independent PNG validation, and publication.
 Another application or CLI process cannot open the same library during that work.
+Within the owning process, rendering runs off the library queue, so listing, comments, and other operations proceed.
+If the item's source changes before publication, the render fails with `SOURCE_CHANGED` and saves nothing.
 
 The shared `LibraryPreviewService` API runs synchronously; an application should call it from background work.
 `cancel()` cancels its current request. `NativeLibrary.close()` marks the library as closing,
-cancels its bound preview, drains the job, and closes the owner lease after worker cleanup.
+cancels every in-flight preview, waits for worker cleanup, and then closes the owner lease.
 Cancellation remains effective before worker launch. Pure asset preflight may finish reading before observing cancellation;
 it cannot launch a worker against a closed library.
 

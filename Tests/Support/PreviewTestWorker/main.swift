@@ -52,6 +52,12 @@ case "preview-test-orphan":
     try bytes.write(to: URL(fileURLWithPath: path), options: .atomic)
     // Deliberately ignore the lifeline: an orphaned helper must not keep the library owned.
     Thread.sleep(forTimeInterval: 120)
+case "preview-test-gated":
+    // Render for real only after the test creates a "gate" file beside this symlink.
+    let gate = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent().appendingPathComponent("gate")
+    let until = Date().addingTimeInterval(30)
+    while !FileManager.default.fileExists(atPath: gate.path) && Date() < until { Thread.sleep(forTimeInterval: 0.01) }
+    try PreviewWorker.serve()
 case "preview-test-crash": kill(getpid(), SIGKILL)
 case "preview-test-malformed":
     try FileHandle.standardOutput.write(contentsOf: Data("{}".utf8))

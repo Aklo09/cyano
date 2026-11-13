@@ -113,7 +113,7 @@ There are no suspension points inside read-modify-write operations.
 Concurrent comments therefore append without losing another accepted comment.
 Closing drains earlier queued work, rejects later operations, and releases the lease.
 Closing again is harmless.
-Closing also signals a bound preview's cancellation token and drains worker cleanup before the owner lease closes.
+Closing also cancels every in-flight preview and waits for its worker cleanup before the owner lease closes.
 See the [preview lifetime/cache contract](Native-Preview-Cache.md) for the worker process boundary and derived publication.
 
 Separate app/CLI instances cannot open the same live library, including through aliases.

@@ -293,6 +293,73 @@ struct LibraryPreviewTests {
                 .isEmpty)
     }
 
+    @Test("Library reads and mutations complete while a render is in flight")
+    func operationsDuringRender() async throws {
+        let target = try PreviewLibrary()
+        defer { target.cleanup() }
+        let assets = try SyntheticPreviewAssets()
+        defer { assets.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.root)
+        let item = try library.importSource(renderSource())
+        let other = try library.importSource(Data(" ".utf8) + (try renderSource()), name: "Other")
+        let fake = target.parent.appendingPathComponent("preview-test-wait")
+        try FileManager.default.createSymbolicLink(at: fake, withDestinationURL: ownedBinary("PreviewTestWorker"))
+        let service = LibraryPreviewService(workerURL: fake)
+        let settings = options
+        let task = Task.detached { () -> PreviewError? in
+            do {
+                _ = try service.render(library: library, id: item.id, assetsURL: assets.root, options: settings)
+                return nil
+            } catch { return error as? PreviewError }
+        }
+        let deadline = Date().addingTimeInterval(3)
+        while service.lastWorkerPID == nil && Date() < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        _ = try #require(service.lastWorkerPID)
+        let start = Date()
+        #expect(try library.list().items.count == 2)
+        _ = try library.addComment(id: other.id, text: "Written during a render")
+        _ = try library.renameItem(id: item.id, name: "Renamed during a render")
+        #expect(Date().timeIntervalSince(start) < 2)
+        library.close()
+        #expect(await task.value == .cancelled)
+    }
+
+    @Test("A source replaced or deleted during rendering is never published")
+    func sourceChangedDuringRender() async throws {
+        for deleting in [false, true] {
+            let target = try PreviewLibrary()
+            defer { target.cleanup() }
+            let assets = try SyntheticPreviewAssets()
+            defer { assets.cleanup() }
+            let library = try NativeLibrary.initialize(at: target.root)
+            defer { library.close() }
+            let item = try library.importSource(renderSource())
+            let fake = target.parent.appendingPathComponent("preview-test-gated")
+            try FileManager.default.createSymbolicLink(at: fake, withDestinationURL: ownedBinary("PreviewTestWorker"))
+            let service = LibraryPreviewService(workerURL: fake)
+            let settings = options
+            let task = Task.detached { () -> NativeLibraryError? in
+                do {
+                    _ = try service.render(library: library, id: item.id, assetsURL: assets.root, options: settings)
+                    return nil
+                } catch { return error as? NativeLibraryError }
+            }
+            let deadline = Date().addingTimeInterval(3)
+            while service.lastWorkerPID == nil && Date() < deadline { try await Task.sleep(for: .milliseconds(10)) }
+            _ = try #require(service.lastWorkerPID)
+            if deleting {
+                try library.deleteItem(id: item.id)
+            } else {
+                _ = try library.updateSource(id: item.id, bytes: Data(" \n".utf8) + (try renderSource()))
+            }
+            FileManager.default.createFile(atPath: target.parent.appendingPathComponent("gate").path, contents: Data())
+            #expect(await task.value == .sourceChanged, "deleting: \(deleting)")
+            let cache = target.root.appendingPathComponent("cache/\(item.id)")
+            let published = (try? FileManager.default.contentsOfDirectory(atPath: cache.path)) ?? []
+            #expect(published.isEmpty, "deleting: \(deleting)")
+        }
+    }
+
     @Test("An orphaned noncooperating helper holds no lease or unrelated descriptor and does not keep ownership")
     func orphanedHelper() throws {
         let target = try PreviewLibrary()

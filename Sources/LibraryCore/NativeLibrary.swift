@@ -23,7 +23,9 @@ public final class NativeLibrary: @unchecked Sendable {
     var needsRecovery = false
     let lifecycleLock = NSLock()
     var closing = false
-    var previewCancellation: (@Sendable () -> Void)?
+    /// Renders run off the serial queue; close cancels each one and waits for its cleanup.
+    var previewCancellations: [UUID: @Sendable () -> Void] = [:]
+    let previewActivity = DispatchGroup()
     package var isClosing: Bool {
         lifecycleLock.lock()
         defer { lifecycleLock.unlock() }
@@ -118,9 +120,10 @@ public final class NativeLibrary: @unchecked Sendable {
     public func close() {
         lifecycleLock.lock()
         closing = true
-        let cancel = previewCancellation
+        let cancellations = Array(previewCancellations.values)
         lifecycleLock.unlock()
-        cancel?()
+        for cancel in cancellations { cancel() }
+        previewActivity.wait()
         queue.sync { lease.close() }
     }
 

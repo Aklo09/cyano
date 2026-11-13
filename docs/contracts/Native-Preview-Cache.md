@@ -5,10 +5,16 @@ The native library marker and item metadata remain version 1; import/mutation in
 
 ## Ownership and process boundary
 
-`LibraryPreviewService` verifies assets, then enters `NativeLibrary.withPreviewContext` on the library's serial queue.
-The context validates the selected item and actual stored entry indices and retains exact original source bytes.
-Selection, cache lookup, worker execution, validation, and publication run as one serialized library operation.
-Source mutations and cache maintenance cannot interleave with that operation through the owner API.
+`LibraryPreviewService` verifies assets, then calls `NativeLibrary.withPreviewContext`. A render has three phases:
+
+1. **Snapshot, on the library's serial queue:** validate the selected item and actual stored entry indices,
+   and retain its exact original source bytes and source hash.
+2. **Render, off the queue:** cache lookup and publication re-enter the queue as short operations;
+   worker execution and PNG validation do not hold it, so other library operations proceed meanwhile.
+3. **Publish, on the queue:** reload the item and require the snapshot's source hash; a replaced or deleted source
+   fails with `SOURCE_CHANGED` and publishes nothing.
+
+Concurrent renders of different items may run; each service still runs one worker at a time.
 
 The worker never reads or writes library files: it receives request bytes on stdin and returns a report and PNG on stdout.
 It therefore holds no ownership lease; only the owner validates and publishes derived files.
@@ -22,7 +28,8 @@ so the leader PID/PGID cannot be reused before group shutdown.
 It stops the group, reaps the leader, and drains bounded pipes before accepting a result or returning an error.
 The original worker deadline, cancellation, resident-memory checks, and parent-death pipe remain active.
 
-`NativeLibrary.close()` sets a closing flag before draining the queue and signals the active bound preview's sticky cancellation token.
+`NativeLibrary.close()` sets a closing flag, signals every in-flight render's sticky cancellation token,
+waits until each render has returned and its worker is reaped, then drains the queue and releases the lease.
 The token covers startup, worker execution, validation, and publication.
 If the owner process dies, its lease is released at once; an orphaned helper cannot keep the library owned
 and cannot publish, because publication belongs to the owner.

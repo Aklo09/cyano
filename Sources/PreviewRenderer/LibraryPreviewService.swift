@@ -25,7 +25,7 @@ public struct LibraryPreviewResult: Sendable {
     public let preview: PreviewResult
 }
 
-/// Library ownership covers source selection, rendering, validation, and derived publication.
+/// Snapshots the source under ownership, renders off the library queue, then revalidates and publishes.
 public final class LibraryPreviewService: @unchecked Sendable {
     private let process: PreviewProcess
     private let lock = NSLock()
