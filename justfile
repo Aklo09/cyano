@@ -76,3 +76,7 @@ assets-check:
 # Run the retained statistics reference cases against the private prototype map.
 statistics-test:
     npm test --prefix tools
+
+# Write reference statistics for native parity to .cache/statistics-golden.json (needs the private map).
+statistics-golden:
+    node tools/asset-preparation/export-statistics-golden.mjs

@@ -61,6 +61,18 @@ Run the retained statistics cases when the map is present:
 just statistics-test
 ```
 
+Generate the reference outputs for the native statistics parity test (milestone 2, S5):
+
+```sh
+just statistics-golden
+```
+
+It runs the reference calculator over all 348 cases the original evaluation used: 234 blueprint leaves from the
+supplied fixtures and vendored fpsr fixtures, plus 114 synthetic cases. It writes `.cache/statistics-golden.json`,
+which records each case's standalone blueprint string, its expected result, the input hashes, and the hashes of the
+reference calculator and prototype map. Identical inputs produce identical bytes. The file is derived from the
+private map, so it stays in the ignored `.cache/` directory.
+
 ## Regeneration status
 
 The asset builder now uses the vendored pipeline and project-local Node dependencies.
