@@ -30,6 +30,7 @@ private let usage = """
       cache-cleanup <library> [abandoned|obsolete|all] [--apply] [--assets <release>] [--generator <identity>]
       usage <library> [--assets <release>]
       assets-verify <release-directory>
+      statistics <library> <item-id> --assets <release> [--entry <stored.indices>]
       preview <library> <item-id> --assets <release> [--entry <stored.indices>]
         [--tier 1x|2x] [--max-dimension 64...4096] [--checkerboard] [--refresh]
 
@@ -38,6 +39,7 @@ private let usage = """
     Cache and staging cleanup default to a dry run. Obsolete cleanup requires --assets.
     If recovery refuses an operation, list it with operations and move it aside with recover --quarantine.
     Preview reuses validated derived images; --refresh regenerates a known cache entry.
+    Statistics need a verified asset release; books and planners report applicable: false.
     Close the library in the application before using store commands or Finder edits.
     """
 
@@ -88,7 +90,7 @@ private struct PreviewCommandReport: Encodable {
     let durationMs: Double
     let report: PreviewReport
 }
-private enum ArgumentsError: Error { case invalid }
+private enum ArgumentsError: Error { case invalid, assetsRequired }
 
 private func emit<T: Encodable>(_ value: T, to output: FileHandle = .standardOutput) throws {
     let encoder = JSONEncoder()
@@ -274,6 +276,16 @@ private func run(_ args: [String]) throws {
                 result: PreviewCommandReport(
                     key: result.key, generator: rendering.generator, cacheHit: result.cacheHit,
                     cachePath: result.cachePath, durationMs: result.durationMs, report: result.preview.report)))
+    case "statistics":
+        guard args.count >= 3 else { throw ArgumentsError.invalid }
+        let opts = try options(args.dropFirst(3), allowed: ["--assets", "--entry"])
+        guard let assets = opts["--assets"] else { throw ArgumentsError.assetsRequired }
+        let path = try entryPath(opts["--entry"])
+        // Verify the release and load its map before taking ownership, so the library is held only briefly.
+        let map = try PrototypeMap.load(release: URL(fileURLWithPath: assets))
+        let library = try NativeLibrary(at: url)
+        defer { library.close() }
+        try emit(Success(command: command, result: library.statistics(id: args[2], entryPath: path, map: map)))
     case "cache-cleanup":
         var rest = Array(args.dropFirst(2))
         var scope = CacheCleanupScope.abandoned
@@ -307,7 +319,7 @@ private let args = Array(CommandLine.arguments.dropFirst())
 private let commands = Set([
     "release", "init", "owner", "list", "recover", "import", "import-unpacked", "export", "comment", "comment-add",
     "comment-delete", "update", "rename", "move", "delete", "folder-create", "folder-move", "folder-delete",
-    "cache-cleanup", "usage", "assets-verify", "preview", "operations", "staging-cleanup",
+    "cache-cleanup", "usage", "assets-verify", "preview", "operations", "staging-cleanup", "statistics",
 ])
 do {
     try run(args)
@@ -319,6 +331,10 @@ do {
         detail = .init(
             category: "rendering", code: error.code, message: error.description,
             exitCode: error == .invalidInput ? 7 : 8)
+    } else if let error = error as? StatisticsError {
+        detail = .init(category: "validation", code: error.code, message: error.description, exitCode: 7)
+    } else if let error = error as? PrototypeMapError {
+        detail = .init(category: "validation", code: "INVALID_PROTOTYPE_MAP", message: error.description, exitCode: 7)
     } else if let error = error as? AssetReleaseError {
         detail = .init(category: "validation", code: "INVALID_ASSET_RELEASE", message: error.description, exitCode: 7)
     } else if let error = error as? BlueprintCodecError {
@@ -326,6 +342,10 @@ do {
         detail = .init(
             category: internalFailure ? "internal" : "validation", code: "BLUEPRINT_CODEC_ERROR",
             message: error.description, exitCode: internalFailure ? 1 : 7)
+    } else if let error = error as? ArgumentsError, error == .assetsRequired {
+        detail = .init(
+            category: "arguments", code: "ASSETS_REQUIRED",
+            message: "Statistics need a verified asset release: pass --assets <release-directory>.", exitCode: 2)
     } else if error is ArgumentsError {
         detail = .init(
             category: "arguments", code: "INVALID_ARGUMENTS", message: "Invalid arguments. Run fb-native --help.",

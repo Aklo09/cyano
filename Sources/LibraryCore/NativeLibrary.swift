@@ -225,6 +225,16 @@ public final class NativeLibrary: @unchecked Sendable {
         }
     }
 
+    /// A snapshot of one saved entry, addressed by actual stored indices, for derived work such as statistics
+    /// that runs off the library queue. The snapshot is a value: later library changes do not affect it.
+    public func entry(id: String, entryPath: [Int] = []) throws -> BlueprintEntry {
+        try queue.sync {
+            try ready()
+            let (_, document, _) = try load(id: id)
+            return try document.entry(at: entryPath)
+        }
+    }
+
     public func export(id: String, entryPath: [Int] = []) throws -> Data {
         try queue.sync {
             try ready()

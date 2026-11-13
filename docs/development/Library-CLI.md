@@ -146,6 +146,26 @@ It verifies canonical release identity, hashes, sizes, supported 2.1.23 profiles
 It accepts up to 10,000 files and 2 GiB, with bounded JSON reads.
 It does not decode images or validate rendering; a raw sprite directory alone is not an assembled release.
 
+## Construction statistics
+
+Report what a saved blueprint needs to be built and its footprint in game tiles:
+
+```sh
+just library statistics "$library" "$item_id" --assets .cache/renderer-assets
+just library statistics "$library" "$book_id" --entry 1.1 --assets .cache/renderer-assets
+```
+
+`--assets` names a verified asset release; its prototype map supplies placement items and collision geometry,
+and the result records the release identity. Without `--assets` the command fails with `ASSETS_REQUIRED`;
+a release whose map is unsuitable fails with `INVALID_PROTOTYPE_MAP`.
+Select a book leaf by stored indices with `--entry`, as for export and previews. A book itself or an
+upgrade/deconstruction planner returns `applicable: false` instead of statistics.
+
+The result follows the [statistics contract](../contracts/Statistics.md): five requirement groups and their total,
+the footprint, completeness flags, and warnings grouped by code with an occurrence count.
+The command verifies the release before opening the library, then reads the entry and releases ownership.
+Applications should load the map once with `PrototypeMap.load(release:)` and call `NativeLibrary.statistics`.
+
 ## Ownership and recovery
 
 Every ordinary library command owns the store, including listing and export.

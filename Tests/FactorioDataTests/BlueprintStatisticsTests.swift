@@ -6,7 +6,7 @@ import Testing
 
 /// The prototype-map test fixture, extended with every prototype the statistics rules exercise.
 /// Geometry uses binary-exact values so expected footprints are exact.
-private func statisticsMapJSON(dropSecondary: Bool = false) -> [String: Any] {
+func statisticsMapJSON(dropSecondary: Bool = false) -> [String: Any] {
     var map = syntheticPrototypeMap()
     func box(_ halfWidth: Double, _ halfHeight: Double, _ orientation: Double = 0) -> [Any] {
         [[-halfWidth, -halfHeight], [halfWidth, halfHeight], orientation]

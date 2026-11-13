@@ -14,6 +14,18 @@ JavaScript-compatible rounding, and the result JSON shape.
 
 Deliberately removing secondary collision boxes failed the rail test; removing tile snapping failed six tests.
 
+## Library and CLI integration (S6)
+
+`LibraryStatisticsTests` runs the real `fb-native` against a synthetic library and release: a blueprint with
+unknown entities (one grouped warning with count 2, bound to the release identity), a book leaf by stored index,
+the book root and a planner (`applicable: false` with only the four contract fields), an invalid entry,
+a missing `--assets` (`ASSETS_REQUIRED`), and a release map too thin for statistics (`INVALID_PROTOTYPE_MAP`).
+Listing and export still work without assets. The library API test reuses one loaded map and shows that an
+entry snapshot stays usable after its item is deleted.
+
+With the private release, the 6,814-entity `v0.59.0.txt` leaf `1.1` reports its 8 `ee-infinity-loader`
+entities as one `UNKNOWN_ENTITY` warning with count 8, and the book root reports not applicable.
+
 ## Parity with the reference calculator (S5)
 
 `StatisticsParityTests` compares the native calculator with `.cache/statistics-golden.json`
