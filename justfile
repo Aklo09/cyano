@@ -77,6 +77,10 @@ assets-check:
 statistics-test:
     npm test --prefix tools
 
+# Time statistics in an optimized build with the private release (.cache/renderer-assets).
+statistics-benchmark:
+    FB_NATIVE_BENCHMARK=1 sh tools/swift.sh test -c release -Xswiftc -enable-testing --filter StatisticsBenchmarkTests
+
 # Write reference statistics for native parity to .cache/statistics-golden.json (needs the private map).
 statistics-golden:
     node tools/asset-preparation/export-statistics-golden.mjs

@@ -165,6 +165,12 @@ For a book or planner the result is only:
 { "schemaVersion": 1, "applicable": false, "entryPath": [], "entryKind": "blueprint_book" }
 ```
 
+## Performance and caching
+
+Statistics are computed on demand and not cached: in an optimized build the 6,814-entity leaf takes about 5 ms
+and a typical leaf well under 1 ms ([measurements](../validation/Statistics.md#performance-s7)).
+Applications load and verify the prototype map once and reuse it.
+
 ## Source and game imports
 
 Game import can snap positions, drop fields, and remove entities. Statistics describe the saved source and

@@ -50,3 +50,29 @@ difference; removing footprint rounding produced 1,041.
 The parity test runs only where the private map and generated reference outputs exist; elsewhere it is reported
 as disabled. Comparison with the game's own `cost_to_build` was done in the original project and is not repeated
 in milestone 2.
+
+## Performance (S7)
+
+Optimized build on this machine (`just statistics-benchmark`, a release build with testing enabled, median of 5 runs;
+it runs only with `FB_NATIVE_BENCHMARK=1` and the private release present):
+
+| Work | Time |
+| --- | --- |
+| Load the map through full release verification | 304 ms |
+| Parse the 1.4 MB map alone | 20 ms |
+| Decode the 696 KB `v0.59.0.txt` book | 323 ms |
+| Statistics for the 6,814-entity leaf `1.1` | 5.3 ms |
+| Statistics for all 149 blueprint leaves of that book | 50.5 ms (0.34 ms each) |
+
+Release CLI end to end (median of 5 processes):
+
+| Command | Time |
+| --- | --- |
+| `assets-verify` | 284 ms |
+| `statistics` on a small root | 316 ms |
+| `statistics` on the 6,814-entity leaf | 642 ms |
+| `export` of the same leaf, for comparison | 369 ms |
+
+The calculation itself is negligible. A CLI call is dominated by release verification, which applications pay once by
+loading the map with `PrototypeMap.load(release:)` and reusing it, and by source decoding, which every operation on
+that item already pays. Statistics results are therefore not cached.
