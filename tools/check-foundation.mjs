@@ -34,7 +34,7 @@ async function inspect(directory) {
     if (entry.name === 'node_modules' || entry.name === 'vendor') continue;
     const relative = path.join(directory, entry.name);
     if (entry.isDirectory()) await inspect(relative);
-    else if (/\.(swift|mjs|ts|sh)$/.test(entry.name)) {
+    else if (/\.(swift|mjs|ts|sh|c|h)$/.test(entry.name)) {
       const source = await readFile(path.join(root, relative), 'utf8');
       assert.ok(!source.includes('/Users/' + 'aklo/Projects/fb'), `External source path: ${relative}`);
       assert.ok(!source.includes('/private/tmp/' + 'fb-fpsr-evaluation'), `Temporary upstream path: ${relative}`);

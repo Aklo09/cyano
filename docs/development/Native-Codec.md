@@ -19,8 +19,7 @@ An empty entry path identifies the root.
 An internal path such as `[5, 0]` follows stored indices, independently of array positions.
 Invalid paths fail without selecting a different entry.
 
-The CLI still exposes only help and release information.
-Library import/export commands will use these interfaces when storage is implemented.
+The [native CLI](Native-Library-CLI.md) uses these interfaces for imports and exports.
 
 ## Input admission
 

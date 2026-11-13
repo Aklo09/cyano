@@ -9,7 +9,15 @@ build:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|PlannerRuntimeTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|PlannerRuntimeTests'
+
+# Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
+storage-test:
+    sh tools/swift.sh test --filter NativeLibraryTests
+
+# Run native CLI commands; export stdout contains only source bytes.
+library *args:
+    sh tools/swift.sh run fb-native "$@"
 
 # Run focused codec admission, preservation, and selected-entry export checks.
 codec-test:

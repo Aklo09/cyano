@@ -9,11 +9,13 @@ Based on the [initial assessment](Native-macOS-Assessment.md), with the scope de
 - [x] Planner resource executes through system JavaScriptCore without Node or private assets.
 - [x] Relocated native build passes with original checkouts unreadable and networking denied.
 - [x] Bounded native codec, exact-byte root exports, and selected-entry exports preserving unknown content.
-- [ ] Native metadata, ownership, minimal library operations, and durable recovery.
+- [x] Native metadata, exclusive ownership, minimal CLI library operations, and process-interruption recovery.
 - [ ] Real-image renderer feasibility, process deadlines, and complete milestone 1 acceptance.
 
 See [foundation validation](../validation/Native-Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Native-Codec.md) records the next completed checkpoint.
+The [storage validation](../validation/Native-Storage.md) records native ownership and publication evidence.
+Power-loss durability and the full workload qualification remain separate acceptance work.
 
 ## Summary
 

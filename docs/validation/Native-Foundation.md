@@ -3,6 +3,7 @@
 The native scaffold builds without access to the original web project.
 This evidence covers the first foundation checkpoint, not complete milestone 1 acceptance.
 The subsequent [codec checkpoint](Native-Codec.md) adds native admission and selected-entry export.
+The [storage checkpoint](Native-Storage.md) adds persistent libraries, CLI commands, and interrupted-operation recovery.
 
 Recorded: 2026-11-13.
 
@@ -70,7 +71,7 @@ It does not define the finished application's sandbox or distribution design.
 ## Remaining qualification
 
 Native codec admission was subsequently implemented and validated separately.
-Storage ownership, durable publication, and recovery remain unimplemented.
+Storage ownership, journaled publication, and process-interruption recovery were subsequently implemented and validated separately.
 So do worker deadlines, image composition, caching, and UI workflows.
 Asset regeneration and game-reference generation have not been rerun.
 No image approval, performance qualification, or power-loss durability claim is made.

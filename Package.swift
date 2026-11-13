@@ -12,7 +12,8 @@ let package = Package(
         .executable(name: "preview-probe", targets: ["PreviewProbe"]),
     ],
     targets: [
-        .target(name: "LibraryCore"),
+        .target(name: "CLibraryPlatform", publicHeadersPath: "include"),
+        .target(name: "LibraryCore", dependencies: ["CLibraryPlatform"]),
         .target(name: "FactorioData"),
         .target(
             name: "PreviewRenderer",
@@ -21,9 +22,10 @@ let package = Package(
         ),
         .executableTarget(name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData"]),
         .executableTarget(name: "PreviewProbe", dependencies: ["PreviewRenderer"]),
+        .executableTarget(name: "StorageTestDriver", dependencies: ["LibraryCore"], path: "Tests/Support/StorageTestDriver"),
         .testTarget(
             name: "LibraryCoreTests",
-            dependencies: ["LibraryCore"],
+            dependencies: ["LibraryCore", "StorageTestDriver", "FBNativeCLI"],
             resources: [.copy("Fixtures")]
         ),
         .testTarget(name: "PreviewRendererTests", dependencies: ["PreviewRenderer"]),
