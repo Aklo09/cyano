@@ -97,10 +97,9 @@ public final class NativeLibrary: @unchecked Sendable {
             }
             let formatBytes = try root.read(".library-format.json", maximum: LibraryBounds.journal)
             _ = try LibraryRecords.format(formatBytes)
-            let allowed: Set<String> = [
-                ".owner.lock", ".library-format.json", "library", "operations", "cache", ".DS_Store",
-            ]
-            guard Set(try root.entries()).isSubset(of: allowed) else { throw NativeLibraryError.invalidFormat }
+            guard Set(try root.entries()).isSubset(of: Self.allowedRootEntries) else {
+                throw NativeLibraryError.invalidFormat
+            }
             self.root = root
             self.lease = lease
             self.formatBytes = formatBytes

@@ -19,6 +19,8 @@ Chosen Library/
     Empty Folder/
   operations/
     <operation UUID>/
+  operations-quarantine/
+    <operation UUID>/
   cache/
 ```
 
@@ -199,7 +201,7 @@ Conflicting trees, unsafe members, or unexpected destination bytes preserve the 
 Unpacking publishes all folders, descriptions, and leaf pairs as one prepared tree.
 
 Cache cleanup is a separate repeatable derived-file operation with dry-run default, bounded inventory,
-and stamp revalidation before deletion. It does not purge unpublished operations staging.
+and stamp revalidation before deletion. It does not purge operations staging; `staging-cleanup` does.
 
 ## Recovery and bounded work
 
@@ -208,10 +210,18 @@ Explicit `recover` invokes the same replay logic and is safe to repeat.
 Failed mutations block further work in that session until recovery or reopening.
 Unsupported or conflicting intents remain preserved for investigation.
 
-Unpublished staging is retained and ignored by normal replay.
-This also covers interruption after intent removal but before staging cleanup.
-Automatic abandoned-staging maintenance is deferred.
-Do not discard an operations directory to bypass a recovery refusal.
+Unpublished staging is ignored by normal replay. It never changed the library: either its intent never committed,
+or it remains after intent removal but before staging cleanup.
+`staging-cleanup` selects only operation directories without `intent.json`, validates their members,
+and removes them with `--apply`; it is a dry run by default and runs under normal ownership.
+
+A refused operation blocks opening. `operations` lists pending operations under ownership without replaying them.
+`recover --quarantine <operation-id>` moves one operation directory unchanged to `operations-quarantine/`,
+followed by a drive barrier. Replay ignores quarantined operations, so the library opens again.
+A quarantined committed operation may have published part of its change; inconsistencies surface as listing issues,
+and the quarantined intent and staged copies remain for manual inspection.
+Do not delete an operations directory to bypass a recovery refusal; quarantine it instead.
+Disk usage counts quarantined operations with `operations`.
 
 | Work | Initial bound |
 | --- | --- |

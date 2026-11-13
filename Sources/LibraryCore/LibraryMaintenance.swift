@@ -275,10 +275,13 @@ extension NativeLibrary {
                     }
                 }
             }
-            for (directory, prefix, category) in [
-                (library, "library", nil as String?), (cache, "cache", "cache"),
-                (operations, "operations", "operations"),
-            ] {
+            var scanned: [(LibraryDirectory, String, String?)] = [
+                (library, "library", nil), (cache, "cache", "cache"), (operations, "operations", "operations"),
+            ]
+            if try root.info(Self.quarantineName) != nil {
+                scanned.append((try root.child(Self.quarantineName), Self.quarantineName, "operations"))
+            }
+            for (directory, prefix, category) in scanned {
                 if let info = try root.info(prefix) { count(info, category: category ?? "libraryOther") }
                 do { try walk(directory, prefix: prefix, fixed: category, level: 0) } catch {
                     issue(prefix, (error as? NativeLibraryError)?.code ?? "IO_ERROR")

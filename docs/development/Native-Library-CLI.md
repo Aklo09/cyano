@@ -119,7 +119,7 @@ Cache cleanup defaults to the `abandoned` scope and a dry run.
 `--apply` recomputes its selection under ownership; it does not accept a saved deletion plan.
 Scoped cleanup recognizes native cache identity manifests, orphaned item results, and `.tmp-<UUID>` files.
 Unknown or damaged manifest formats remain protected; `all` explicitly selects all safe derived files.
-No cleanup scope deletes operations staging or authoritative library content.
+No cache cleanup scope deletes operations staging or authoritative library content.
 Unsafe links, shared file inodes, cross-device descendants, and overlapping selected assets cause refusal before deletion.
 
 `obsolete` additionally compares source hash, stored entry path, generator, and selected asset identity.
@@ -154,6 +154,27 @@ After all owners close, run `just library recover "$library"` when explicit repl
 Recovery replays committed operations before normal access.
 It preserves conflicting live bytes and staged originals instead of overwriting them.
 The command does not discard evidence or force an unlock.
+
+If recovery refuses an operation, the library cannot open until that operation is moved aside.
+List pending operations without replaying them, then quarantine the refused one by its ID:
+
+```sh
+just library operations "$library"
+just library recover "$library" --quarantine <operation-id>
+```
+
+Quarantine moves the operation directory unchanged to `operations-quarantine/` and the library opens again.
+A quarantined committed operation may have published part of its change; remaining inconsistencies appear as listing issues.
+Inspect the quarantined intent and staged copies before deleting them; the CLI never deletes quarantined evidence.
+
+Interrupted operations that never committed leave staging that replay ignores but that counts toward the 128-operation limit.
+`staging-cleanup` lists them, and `--apply` removes them; committed and quarantined operations are never selected:
+
+```sh
+just library staging-cleanup "$library"
+just library staging-cleanup "$library" --apply
+```
+
 See the [storage contract](../contracts/Native-Storage.md) before investigating interrupted operations.
 
 ## Structured results

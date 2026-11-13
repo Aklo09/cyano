@@ -299,6 +299,68 @@ struct NativeLibraryTests {
         #expect(FileManager.default.fileExists(atPath: stage.appendingPathComponent("intent.json").path))
     }
 
+    @Test("Quarantining a refused operation reopens the library and keeps its evidence byte-identical")
+    func quarantine() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let initialized = try NativeLibrary.initialize(at: target.url)
+        initialized.close()
+        let input = target.parent.appendingPathComponent("input.txt")
+        let bytes = try blueprintFixture()
+        try bytes.write(to: input)
+        _ = try child("StorageTestDriver", ["import-crash", target.url.path, input.path, "sourcePublished"])
+        let live = target.url.appendingPathComponent("library/Interrupted.txt")
+        try Data("Unexpected live bytes".utf8).write(to: live)
+        #expect(throws: NativeLibraryError.integrity) { try NativeLibrary(at: target.url) }
+        let pending = try NativeLibrary.inspectOperations(at: target.url)
+        let operation = try #require(pending.first)
+        #expect(pending.count == 1 && operation.state == "committed" && operation.kind == "import")
+        let listed = try child("fb-native", ["operations", target.url.path])
+        #expect(listed.0 == 0 && String(decoding: listed.1, as: UTF8.self).contains(operation.id))
+        #expect(try child("fb-native", ["recover", target.url.path, "--quarantine", "not-a-uuid"]).0 == 7)
+        let moved = try child("fb-native", ["recover", target.url.path, "--quarantine", operation.id])
+        #expect(moved.0 == 0, "\(String(decoding: moved.2, as: UTF8.self))")
+        let evidence = target.url.appendingPathComponent("operations-quarantine/\(operation.id)")
+        #expect(try Data(contentsOf: evidence.appendingPathComponent("source.txt")) == bytes)
+        #expect(FileManager.default.fileExists(atPath: evidence.appendingPathComponent("intent.json").path))
+        #expect(try NativeLibrary.inspectOperations(at: target.url).isEmpty)
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
+        // The partial publication stays visible as a listing issue rather than being guessed at.
+        #expect(try reopened.list().issues.map(\.path) == ["Interrupted.txt"])
+        #expect(throws: NativeLibraryError.inUse) {
+            try NativeLibrary.quarantineOperation(at: target.url, id: operation.id)
+        }
+        #expect(try reopened.diskUsage().categories["operations"]?.files == 3)
+    }
+
+    @Test("Staging cleanup removes only operations that never committed")
+    func stagingCleanup() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let initialized = try NativeLibrary.initialize(at: target.url)
+        initialized.close()
+        let input = target.parent.appendingPathComponent("input.txt")
+        let bytes = try blueprintFixture()
+        try bytes.write(to: input)
+        for phase in ["sourceStaged", "metadataStaged"] {
+            _ = try child("StorageTestDriver", ["import-crash", target.url.path, input.path, phase])
+        }
+        let library = try NativeLibrary(at: target.url)
+        defer { library.close() }
+        #expect(try library.list().items.isEmpty)
+        let dryRun = try library.cleanupStaging()
+        #expect(!dryRun.apply && dryRun.selection.count == 2)
+        #expect(dryRun.selection.allSatisfy { $0.state == "unpublished" })
+        let operations = target.url.appendingPathComponent("operations")
+        #expect(try FileManager.default.contentsOfDirectory(atPath: operations.path).count == 2)
+        #expect(try library.cleanupStaging(apply: true).selection.count == 2)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: operations.path).isEmpty)
+        #expect(try library.cleanupStaging().selection.isEmpty)
+        _ = try library.importSource(bytes)
+        #expect(try library.list().items.count == 1)
+    }
+
     @Test("Unknown sidecar fields, corrupt hashes, and oversized source reads remain non-mutating")
     func metadataAndReadLimits() throws {
         let target = try TemporaryLibrary()

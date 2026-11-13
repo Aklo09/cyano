@@ -11,7 +11,9 @@ private let usage = """
       init <library>
       owner <library>
       list <library>
-      recover <library>
+      recover <library> [--quarantine <operation-id>]
+      operations <library>
+      staging-cleanup <library> [--apply]
       import <library> <file.txt> [--name <name>] [--folder <relative folder>]
       import-unpacked <library> <file.txt> [--folder <relative folder>]
       export <library> <item-id> [--entry <stored.indices>] [--output <new-file.txt>]
@@ -33,7 +35,8 @@ private let usage = """
 
     Export writes source bytes to stdout or exclusively creates --output. Other results use versioned JSON.
     Use an empty string for the root folder. Folder deletion requires an empty folder.
-    Cache cleanup defaults to a dry run. Obsolete cleanup requires --assets.
+    Cache and staging cleanup default to a dry run. Obsolete cleanup requires --assets.
+    If recovery refuses an operation, list it with operations and move it aside with recover --quarantine.
     Preview reuses validated derived images; --refresh regenerates a known cache entry.
     Close the library in the application before using store commands or Finder edits.
     """
@@ -150,6 +153,17 @@ private func run(_ args: [String]) throws {
     case "owner":
         guard args.count == 2 else { throw ArgumentsError.invalid }
         try emit(Success(command: command, result: OwnerReport(state: NativeLibrary.inspectOwnership(at: url))))
+    case "operations":
+        guard args.count == 2 else { throw ArgumentsError.invalid }
+        try emit(Success(command: command, result: NativeLibrary.inspectOperations(at: url)))
+    case "recover" where args.count == 4:
+        guard args[2] == "--quarantine" else { throw ArgumentsError.invalid }
+        try emit(Success(command: command, result: NativeLibrary.quarantineOperation(at: url, id: args[3])))
+    case "staging-cleanup":
+        guard args.count == 2 || (args.count == 3 && args[2] == "--apply") else { throw ArgumentsError.invalid }
+        let library = try NativeLibrary(at: url)
+        defer { library.close() }
+        try emit(Success(command: command, result: library.cleanupStaging(apply: args.count == 3)))
     case "list", "recover":
         guard args.count == 2 else { throw ArgumentsError.invalid }
         let library = try NativeLibrary(at: url)
@@ -293,7 +307,7 @@ private let args = Array(CommandLine.arguments.dropFirst())
 private let commands = Set([
     "release", "init", "owner", "list", "recover", "import", "import-unpacked", "export", "comment", "comment-add",
     "comment-delete", "update", "rename", "move", "delete", "folder-create", "folder-move", "folder-delete",
-    "cache-cleanup", "usage", "assets-verify", "preview",
+    "cache-cleanup", "usage", "assets-verify", "preview", "operations", "staging-cleanup",
 ])
 do {
     try run(args)
