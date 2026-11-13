@@ -35,7 +35,8 @@ Application scheduling, the macOS UI, and native statistics remain pending.
 
 ## Next implementation
 
-Continue the complete-core milestone with the native construction-statistics port using the retained reference cases.
+First implement the approved [core revisions](planning/Native-Core-Revisions.md) in their recorded order.
+Then continue the complete-core milestone with the native construction-statistics port using the retained reference cases.
 Keep application scheduling/progress/retry and UI work separate from the completed library preview command.
 Preserve inherited kernel ownership, sticky cancellation, and owner-only cache publication.
 Connected-rail/full-corpus review (milestone 4) and workload measurements remain outstanding.

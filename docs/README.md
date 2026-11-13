@@ -7,6 +7,7 @@ Use the approved plan for scope and validation records for completed work.
 | Build the foundation | [Project README](../README.md) |
 | Follow the delivery roadmap | [Native plan](planning/Native-macOS-Plan.md) |
 | Understand the original investigation | [Initial assessment](planning/Native-macOS-Assessment.md) |
+| Follow the post-milestone-1 core revisions | [Core revisions](planning/Native-Core-Revisions.md) |
 | Inspect completed checks | [Foundation validation](validation/Native-Foundation.md) |
 | Decode and export native blueprint strings | [Native codec](development/Native-Codec.md) |
 | Inspect codec admission checks | [Codec validation](validation/Native-Codec.md) |
