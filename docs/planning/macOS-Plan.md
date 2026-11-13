@@ -19,7 +19,7 @@ See [foundation validation](../validation/Foundation.md) for evidence and limita
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Native statistics and application rendering scheduling remain pending; milestone 2 is not complete.
+Native statistics and application rendering scheduling remain pending; milestone 2 is not complete ([subtasks](Milestone-2.md)).
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
 The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
