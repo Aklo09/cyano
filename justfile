@@ -7,6 +7,14 @@ default:
 build:
     sh tools/swift.sh build
 
+# Check Swift formatting against .swift-format; any finding fails.
+lint:
+    swift format lint -r --strict Package.swift Sources Tests
+
+# Rewrite Swift sources in place to the committed .swift-format style.
+format:
+    swift format format -i -r --parallel Package.swift Sources Tests
+
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
     sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
