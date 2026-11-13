@@ -33,9 +33,12 @@ Application scheduling and the macOS UI remain pending.
 
 ## Next implementation
 
-Milestone 3 is next: the native macOS application (library selection, browsing, nested books, import/export,
-comments, organization, and image viewport), working offline and without renderer assets.
-Plan it as milestone 2 was planned: actionable subtasks with owner decisions recorded first.
+Milestone 3, the native macOS application, is being planned. Resume here (stopped 2026-11-13):
+
+1. The [milestone 3 draft](planning/Milestone-3.md) lists 18 subtasks (A1–A18) and seven open decisions,
+   each with a recommendation. The owner asked to clarify the decisions before choosing; start by asking
+   what they want to clarify, then record their choices in the draft and mark it approved.
+2. Then start with A1 (app spec, product-manager role) and A2 (screen specs, ux-designer role).
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
