@@ -184,3 +184,23 @@ minimal release in a temporary folder (`AppTestAssetRelease`), so no private ass
 
 Fixed during the run: a folder without `release.json` first read as a disk error (`ENOENT`); every verification
 failure in Settings now reads as an unusable release, with the code and reason in Details.
+
+## Previews (2026-11-14)
+
+Milestone 3 subtask A12. Tests written with the implementation (not by the `qa-engineer` subagent); app tests use a
+gated fake backend or the app's real lookup without a worker, and the service test renders with synthetic assets, so
+no private assets are needed.
+
+| Check | Result |
+| --- | --- |
+| `PreviewCenterTests` (9 tests) | PRV-5/PRV-7 renders run one at a time in request order and the inspector and a window share one render; PRV-6 a dropped waiter leaves the render alone, a dropped render is cancelled and the next starts; PRV-2/PRV-12 cache hits and empty blueprints start no render; PRV-9 no release shows the no-assets state; PRV-11 missing items and book entries are the deleted state; PRV-10 failures show the reason and Retry renders again; SET-5a/SET-6 clearing the release cancels the render; the real lookup finds empty blueprints and a missing worker asks to reinstall; library calls complete during a render |
+| `PreviewViewportTests` (3 tests) | PRV-8 fit follows resizes until zoom or pan, zoom keeps the point under the pointer, Fit and Actual Size alternate, pan stays over the image |
+| `LibraryPreviewTests` cache-only lookup | `cached` needs no worker or release verification, matches only the given identity and options; a caller's cancellation token cancels its render |
+| Bundle | Debug and Release apps carry `Contents/MacOS/preview-worker`; `codesign --verify --deep --strict` passes; the Release worker's only rpath is `@executable_path/../Frameworks` |
+| Real app, scripted (relocated copy, build `PackageFrameworks` moved aside, private release) | The inspector rendered "4x Rocket Silo Beaconed" uncached and published it to `cache/`; "Empty" showed "This blueprint has no entities or tiles." with no worker; ⌘Y opened the upgrade planner in a window titled "Upgrade" at Fit (296%); View-menu Zoom to Fit, Zoom Out, and ⌘− changed the zoom; after quit, no app or worker process remained and `fb-native owner` reported the library idle |
+| `just lint`, `just test`, `just app-build` (Debug, Release), independence check | Pass |
+
+Not exercised in the real app (scripted input stopped while the owner was using the Mac): Space in the list, windows
+closing with the library, rename or replace with a window open, a release change, and sampling worker processes under
+real renders. During the run a Colors panel opened and the zoom read 332% after one ⌘− keystroke; repeating the same
+steps did not reproduce it, so it is unexplained (possibly outside input).

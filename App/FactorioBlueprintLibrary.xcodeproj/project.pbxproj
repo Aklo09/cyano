@@ -9,7 +9,22 @@
 /* Begin PBXBuildFile section */
 		F0A000000000000000000001 /* FactorioBlueprintLibraryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */; };
 		F0A000000000000000000003 /* LibraryApp in Frameworks */ = {isa = PBXBuildFile; productRef = F0A000000000000000000004 /* LibraryApp */; };
+		F0A000000000000000000014 /* preview-worker in Embed Preview Worker */ = {isa = PBXBuildFile; productRef = F0A000000000000000000015 /* preview-worker */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F0A000000000000000000016 /* Embed Preview Worker */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				F0A000000000000000000014 /* preview-worker in Embed Preview Worker */,
+			);
+			name = "Embed Preview Worker";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorioBlueprintLibraryApp.swift; sourceTree = "<group>"; };
@@ -61,6 +76,7 @@
 			buildPhases = (
 				F0A00000000000000000000C /* Sources */,
 				F0A000000000000000000006 /* Frameworks */,
+				F0A000000000000000000016 /* Embed Preview Worker */,
 			);
 			buildRules = (
 			);
@@ -69,6 +85,7 @@
 			name = FactorioBlueprintLibrary;
 			packageProductDependencies = (
 				F0A000000000000000000004 /* LibraryApp */,
+				F0A000000000000000000015 /* preview-worker */,
 			);
 			productName = FactorioBlueprintLibrary;
 			productReference = F0A000000000000000000005 /* Factorio Blueprint Library.app */;
@@ -238,6 +255,10 @@
 		F0A000000000000000000004 /* LibraryApp */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LibraryApp;
+		};
+		F0A000000000000000000015 /* preview-worker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "preview-worker";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -107,6 +107,7 @@ struct PathBar: View {
 /// The item list and its empty states (BRW-1 to BRW-6, BRW-10).
 struct ItemList: View {
     @Bindable var browser: LibraryBrowserModel
+    @Environment(\.openWindow) private var openWindow
     @State private var sortOrder = [KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard)]
 
     var body: some View {
@@ -196,6 +197,7 @@ struct ItemList: View {
             Task { await browser.copySelectedString() }
             return []
         }
+        .onKeyPress(.space) { openPreviewWindow() }
         .accessibilityLabel("Book entries")
     }
 
@@ -250,6 +252,7 @@ struct ItemList: View {
             Task { await browser.copySelectedString() }
             return []
         }
+        .onKeyPress(.space) { openPreviewWindow() }
         .onChange(of: sortOrder, initial: true) { _, order in
             guard let first = order.first else { return }
             browser.ascending = first.order == .forward
@@ -269,6 +272,13 @@ struct ItemList: View {
         .accessibilityLabel("Items")
     }
 
+    /// Space opens the selected blueprint, planner, or entry in a preview window (screen specs, "Menus").
+    private func openPreviewWindow() -> KeyPress.Result {
+        guard browser.renamingRow == nil, let target = browser.previewTarget else { return .ignored }
+        openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
+        return .handled
+    }
+
     private func accessibilityLabel(_ row: BrowserRow) -> String {
         var parts = [row.name, row.kind.label.lowercased()]
         if let updated = row.updated { parts.append("updated \(updated.formatted(date: .long, time: .omitted))") }
@@ -286,6 +296,8 @@ extension BrowserRow {
 /// "Inspector"); folders and multiple selections show a summary.
 struct ItemInspector: View {
     @Bindable var browser: LibraryBrowserModel
+    let previews: PreviewCenter
+    let assetsRevision: Int
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -299,6 +311,15 @@ struct ItemInspector: View {
                 }
                 .frame(maxHeight: 260)
                 .fixedSize(horizontal: false, vertical: true)
+                if browser.previewTarget != nil {
+                    InspectorPreview(browser: browser, center: previews, assetsRevision: assetsRevision)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
+                } else if let count = bookEntryCount {
+                    BookPreviewNote(browser: browser, entryCount: count)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
+                }
                 Picker("Inspector", selection: $browser.inspectorTab) {
                     ForEach(InspectorTab.allCases, id: \.self) { tab in Text(tab.title).tag(tab) }
                 }
@@ -338,6 +359,35 @@ struct ItemInspector: View {
         .task(id: browser.selectedItem.map { $0.id + $0.metadata.sourceSha256 }) {
             await browser.loadSelectedDetail()
         }
+    }
+
+    /// The entry count when the inspector shows a book, which has no rendered preview (PRV-1).
+    private var bookEntryCount: Int? {
+        if let detail = browser.selectedDetail, detail.kind == .book { return detail.entryCount ?? 0 }
+        if browser.selectedDetail == nil, let item = browser.selectedItem, ItemKind(stored: item.kind) == .book {
+            return 0
+        }
+        return nil
+    }
+}
+
+/// "Books have no preview", with the entry count and Open Book (screen specs, "Inspector").
+private struct BookPreviewNote: View {
+    let browser: LibraryBrowserModel
+    let entryCount: Int
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Text("Books have no preview").font(.headline)
+            if browser.selectedDetail != nil {
+                Text(entryCount == 1 ? "1 entry" : "\(entryCount) entries").foregroundStyle(.secondary)
+            }
+            if browser.canOpenSelection {
+                Button("Open Book") { Task { await browser.openSelection() } }
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 120)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 6))
     }
 }
 

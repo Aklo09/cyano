@@ -15,3 +15,18 @@ extension NSColor {
             : .controlBackgroundColor
     }
 }
+
+extension NSColor {
+    /// The checkerboard preview background's two 8-point tiles (screen specs, `checkerboardTiles`).
+    static let checkerboardTiles = (
+        NSColor(name: "checkerboardLight") { appearance in
+            appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                ? NSColor(srgbRed: 0x44 / 255, green: 0x44 / 255, blue: 0x44 / 255, alpha: 1) : .white
+        },
+        NSColor(name: "checkerboardDark") { appearance in
+            appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                ? NSColor(srgbRed: 0x22 / 255, green: 0x22 / 255, blue: 0x22 / 255, alpha: 1)
+                : NSColor(srgbRed: 0xE5 / 255, green: 0xE5 / 255, blue: 0xE5 / 255, alpha: 1)
+        }
+    )
+}

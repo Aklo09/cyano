@@ -217,6 +217,24 @@ public final class LibrarySession {
         }
     }
 
+    /// Runs a preview call with the open library on `worker` instead of the library worker, so a long render never
+    /// holds up library calls and `close()` can cancel it (renders are cancelled through the library). Returns nil
+    /// when no library is open, or when the library closed or changed before the call finished.
+    func previewCall<Value: Sendable>(
+        on worker: LibraryWorker, _ body: @escaping @Sendable (NativeLibrary) throws -> Value
+    ) async -> Result<Value, Error>? {
+        guard let library, case .open = phase else { return nil }
+        let current = generation
+        let result: Result<Value, Error>
+        do {
+            result = try await worker.run { Result { try body(library) } }
+        } catch {
+            result = .failure(error)
+        }
+        guard current == generation else { return nil }
+        return result
+    }
+
     /// Recover from a failed change without reopening (REC-5).
     public func recover() async {
         guard let library, case .open = phase else { return }

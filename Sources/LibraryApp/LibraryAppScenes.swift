@@ -35,6 +35,14 @@ public struct LibraryAppScenes: Scene {
         .defaultSize(width: 1200, height: 720)
         .defaultLaunchBehavior(model.windowGoal == .library ? .presented : .suppressed)
         .restorationBehavior(.disabled)
+
+        // Opening a subject that already has a window brings that window forward (PRV-4); none are restored (PRV-13).
+        WindowGroup("Preview", id: LibraryAppIdentity.previewWindow, for: PreviewSubject.self) { $subject in
+            PreviewWindowView(model: model, subject: subject)
+        }
+        .defaultSize(width: 900, height: 640)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
     }
 }
 
@@ -43,6 +51,7 @@ public enum LibraryAppIdentity {
     public static let name = "Factorio Blueprint Library"
     public static let selectionWindow = "library-selection"
     public static let libraryWindow = "library"
+    public static let previewWindow = "preview"
 }
 
 /// File menu commands for libraries (screen specs, "Menus and shortcuts"); the full set comes with A15.
@@ -109,6 +118,13 @@ struct LibraryCommands: Commands {
             Button("Enclosing Folder") { Task { await model.browser.goUp() } }
                 .keyboardShortcut(.upArrow)
                 .disabled(model.session.libraryURL == nil || !model.browser.canGoUp)
+            Button("Open in Preview Window") {
+                if let target = model.browser.previewTarget {
+                    openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
+                }
+            }
+            .keyboardShortcut("y")
+            .disabled(model.browser.previewTarget == nil)
             Divider()
             Button("New Folder") { Task { await model.browser.newFolder() } }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
@@ -147,6 +163,7 @@ struct LibraryCommands: Commands {
         }
         SidebarCommands()
         InspectorCommands()
+        PreviewCommands()
     }
 
     /// A choice made from the menu while no window shows selection must still surface its outcome.

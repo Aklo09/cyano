@@ -24,7 +24,7 @@ struct LibraryWindowView: View {
             .background(Color.contentBackground)
         }
         .inspector(isPresented: $showInspector) {
-            ItemInspector(browser: browser)
+            ItemInspector(browser: browser, previews: model.previews, assetsRevision: model.assets.revision)
         }
         .searchable(text: Bindable(browser).filterText, placement: .toolbar, prompt: "Search item names")
         .searchFocused($searchFocused)

@@ -26,7 +26,10 @@ let package = Package(
         .target(name: "LibraryApp", dependencies: ["LibraryCore", "FactorioData", "PreviewRenderer"]),
         .executableTarget(
             name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData", "PreviewRenderer", "PreviewWorker"]),
-        .executableTarget(name: "PreviewWorker", dependencies: ["PreviewRenderer"]),
+        // Inside the app bundle the worker sits in Contents/MacOS and loads the package frameworks the app embeds.
+        .executableTarget(
+            name: "PreviewWorker", dependencies: ["PreviewRenderer"],
+            linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])]),
         .executableTarget(name: "PreviewProbe", dependencies: ["PreviewRenderer", "PreviewWorker", "LibraryCore"]),
         .executableTarget(
             name: "StorageTestDriver", dependencies: ["LibraryCore"], path: "Tests/Support/StorageTestDriver"),

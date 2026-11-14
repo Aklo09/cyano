@@ -21,6 +21,8 @@ public final class LibrarySelectionModel {
     public let browser: LibraryBrowserModel
     /// The asset release for previews and statistics.
     public let assets: AssetSettings
+    /// Preview scheduling for the inspector and preview windows.
+    public let previews: PreviewCenter
     public private(set) var windowGoal: WindowGoal
     public private(set) var recents: [RecentRow] = []
     /// An empty folder chosen with Open Library, awaiting "Create a library in …?" (LIB-2).
@@ -32,10 +34,14 @@ public final class LibrarySelectionModel {
     @ObservationIgnored private var terminating = false
     @ObservationIgnored private var terminationObserver: NSObjectProtocol?
 
-    public init(session: LibrarySession = LibrarySession(), defaults: UserDefaults) {
+    public init(
+        session: LibrarySession = LibrarySession(), defaults: UserDefaults,
+        previewBackend: PreviewBackend = .standard(workerURL: PreviewBackend.bundledWorker)
+    ) {
         self.session = session
         browser = LibraryBrowserModel(session: session)
         assets = AssetSettings(defaults: defaults)
+        previews = PreviewCenter(session: session, assets: assets, backend: previewBackend)
         let assets = assets
         Task { await assets.verifySaved() }
         store = RecentLibraryStore(defaults: defaults)

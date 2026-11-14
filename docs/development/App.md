@@ -99,8 +99,48 @@ Choose an assembled release (a folder with `release.json`, `sprites/`, and `stat
 `.cache/renderer-assets` from the [preview guide](Preview.md#prepare-a-private-release); the raw
 `private-assets/2.1.23` folder is refused. For everyday use, assemble a copy outside the repository's `.cache/`.
 
-Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
-(A14) and previews (A12) exist; no row ever starts a render.
+Rows show their kind symbol. Cached thumbnails (BRW-9) are not built yet: they need a cache-only lookup per row
+(`LibraryPreviewService.cached` now provides one) and a decision on decoding thumbnails from full-size PNGs; no row ever starts a render.
+
+## Previews
+
+`PreviewCenter` (owned by `LibrarySelectionModel` as `previews`) schedules previews for the inspector and preview
+windows (PRV-1 to PRV-12). Each preview area owns a `PreviewDisplay`, whose `PreviewViewer` it passes to
+`show(_:in:)` whenever the `PreviewSubject` (library path, item ID, stored entry path), the item's source hash, or
+`AssetSettings.revision` changes, and to `release(_:)` when it goes away.
+
+- **Lookup first:** a cache-only lookup (`LibraryPreviewService.cached`) uses the identity `AssetSettings` already
+  verified, so a hit neither re-verifies the release (about 0.5 s for the private release) nor waits for a running
+  render (PRV-2). A miss decodes the entry: a blueprint without entities and tiles is "nothing to draw" and starts no
+  worker (PRV-12; the renderer itself would paint a blank 64×64 image). A cached image with no drawing commands is
+  checked the same way, in case the CLI cached an empty blueprint.
+- **One render at a time:** misses queue in request order; one render runs at a time on its own serial queue
+  (`LibrarySession.previewCall`), never on the library worker, so library calls proceed and `close()` cancels the
+  render through the library (PRV-5). Viewers asking for an entry that is waiting or rendering join that job (PRV-7).
+  Leaving drops a waiting viewer; a render is cancelled, through its own `PreviewCancellation`, only when no viewer
+  still wants it (PRV-6).
+- **Results:** a missing item or entry is the deleted state (PRV-11); `SOURCE_CHANGED` and a cancellation with
+  viewers left (a release change) ask again; other failures show their `LibraryMessage` with Retry (PRV-10).
+- **Backend seam:** `PreviewBackend` holds the lookup and render calls; tests use a gated fake that never starts a
+  worker (`PreviewCenterTests`).
+- **Images:** previews always use the default options (2x tier, transparent, at most 2048 pixels), so the cache key
+  never depends on the view. The background (checkerboard, transparent, or a solid color from the color panel) is
+  drawn by the view and not saved (PRV-8a). Two image pixels make one point at Actual Size (100%).
+- **Zoom and pan:** `PreviewViewport` holds the math (tested in `PreviewViewportTests`): Fit is capped at 400% so tiny
+  planner images stay sharp, zoom ranges from 5% to 1,600%, and resizing keeps the fit until the owner zooms or pans.
+  `PreviewCanvasView` maps scroll and pinch (zoom around the pointer), drag (pan), double-click (Fit/Actual Size), and
+  arrow keys (10% of the view, a screen with ⌥).
+- **Windows:** `WindowGroup(id: "preview", for: PreviewSubject.self)`; opening a subject that already has a window
+  brings it forward (PRV-4), and windows are not restored (PRV-13). The title follows renames; a window dismisses
+  itself when its library closes or another one opens (part of LIFE-1, A15; not yet exercised in the real app). Open with Open in Window (inspector), ⌘Y, or Space in the list. The View
+  menu acts on the focused preview: Zoom In/Out (⌘+/⌘−), Actual Size (⌘0), Zoom to Fit (⌘9), Background, Retry
+  Preview (⌘R).
+- **Worker:** the Xcode target embeds the package's `preview-worker` product with a Copy Files phase into
+  `Contents/MacOS` (signed on copy); `PreviewBackend.bundledWorker` finds it with
+  `Bundle.main.url(forAuxiliaryExecutable:)`. The worker target adds an `@executable_path/../Frameworks` rpath
+  (`Package.swift`), because Xcode links it against the package frameworks the app embeds; without it, it would load
+  them only through Xcode's absolute build-folder rpath. Its resource bundle is found through the app's
+  `Contents/Resources`. A missing worker shows a failure that asks to reinstall the app.
 
 The app registers `ApplePersistenceIgnoreState`: AppKit's saved application state is keyed by bundle identifier,
 and after a quit with no windows open it made later launches, even with separate preferences, open no window.
@@ -178,5 +218,5 @@ Space: a directly launched app is not activated, so its window may open on anoth
 
 ## Pending work
 
-- **Preview worker:** the app must carry `preview-worker` inside its bundle before rendering (A12); embedding a
-  SwiftPM executable in the Xcode target is not set up yet.
+- **Cached row thumbnails (BRW-9):** not built; see Browsing.
+- **Copying or saving preview images:** deferred to a later milestone (spec, out of scope).

@@ -63,9 +63,17 @@ for items and book entries, refusing destinations inside the library. Capture on
 (`screencapture -l<window>`), never the whole screen. A10 is done: the inspector has Statistics (placeholder until A13),
 Details, and Comments tabs; comments are added and deleted per item or entry. A11 is done: new folder, rename,
 move (sheet and drag), delete with confirmation, replace source. A14 is done: Settings (⌘,) verifies and remembers the
-asset release, re-verifies it at launch, and loads the prototype map once. Resume with A12 (previews: inspector area
-and preview windows, one render at a time; the app bundle must carry `preview-worker`, which touches bundle contents,
-so run the independence check).
+asset release, re-verifies it at launch, and loads the prototype map once. A12 is done: `PreviewCenter` serves cache
+hits and empty blueprints without a worker, renders one at a time in request order off the library worker, shares a
+render between the inspector and windows, and cancels a render only when no viewer wants it; preview windows
+(⌘Y, Space) zoom, pan, and change background; the app embeds `preview-worker` in `Contents/MacOS` (see the
+[app guide](development/App.md#previews)). Verified with `just lint`, `just test`, `just app-build`, the independence
+check, and a smoke run of a relocated app copy with the build's `PackageFrameworks` moved aside (a real uncached
+render in the inspector, nothing to draw, a planner window from ⌘Y with View-menu zoom, and after quit no worker and an
+idle owner; see [validation](validation/App.md#previews-2026-11-14)). Not yet exercised in the real app, for A17: Space
+in the list, windows closing with the library, rename or replace with a window open, a release change, and one worker
+at most under real renders (covered by tests with a fake backend). Resume with A13 (statistics panel).
+Cached row thumbnails (BRW-9) remain unbuilt.
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 
