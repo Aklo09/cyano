@@ -89,6 +89,16 @@ Replace Source reports comments moved to the root. Originals the Trash refused a
 `operations-quarantine/`. SwiftUI clears an alert's presented value before its button runs, so the delete alert
 passes its value to `confirmDelete(_:)`.
 
+**Settings** (⌘,) holds the asset release. `AssetSettings` verifies a chosen folder off the main thread with
+`AssetRelease.verify` and makes it active only if it verifies and does not overlap the open library; a refused folder
+keeps the previous release. The path is saved in the app's preferences (`assetReleasePath`) and re-verified when the
+app starts, so a missing or changed release shows its problem while everything else works. `availability(for:)`
+gives previews and statistics the release or the reason there is none, and `prototypeMap()` loads the map once per
+release. `revision` increases whenever the active release changes.
+Choose an assembled release (a folder with `release.json`, `sprites/`, and `statistics/prototype-map.json`), such as
+`.cache/renderer-assets` from the [preview guide](Preview.md#prepare-a-private-release); the raw
+`private-assets/2.1.23` folder is refused. For everyday use, assemble a copy outside the repository's `.cache/`.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

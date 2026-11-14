@@ -62,8 +62,10 @@ unpacked) keeps exact bytes and selects the result. A9 is done: Copy String and 
 for items and book entries, refusing destinations inside the library. Capture only app windows
 (`screencapture -l<window>`), never the whole screen. A10 is done: the inspector has Statistics (placeholder until A13),
 Details, and Comments tabs; comments are added and deleted per item or entry. A11 is done: new folder, rename,
-move (sheet and drag), delete with confirmation, replace source. Resume with A14 (settings: asset release location),
-which A12 (previews) and A13 (statistics) need.
+move (sheet and drag), delete with confirmation, replace source. A14 is done: Settings (⌘,) verifies and remembers the
+asset release, re-verifies it at launch, and loads the prototype map once. Resume with A12 (previews: inspector area
+and preview windows, one render at a time; the app bundle must carry `preview-worker`, which touches bundle contents,
+so run the independence check).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

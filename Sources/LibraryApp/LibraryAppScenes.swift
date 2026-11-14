@@ -25,6 +25,10 @@ public struct LibraryAppScenes: Scene {
         .restorationBehavior(.disabled)
         .commands { LibraryCommands(model: model) }
 
+        Settings {
+            SettingsView(model: model)
+        }
+
         Window(LibraryAppIdentity.name, id: LibraryAppIdentity.libraryWindow) {
             LibraryWindowView(model: model)
         }

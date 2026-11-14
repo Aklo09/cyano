@@ -19,6 +19,8 @@ public final class LibrarySelectionModel {
     public let session: LibrarySession
     /// Browsing state for the library window.
     public let browser: LibraryBrowserModel
+    /// The asset release for previews and statistics.
+    public let assets: AssetSettings
     public private(set) var windowGoal: WindowGoal
     public private(set) var recents: [RecentRow] = []
     /// An empty folder chosen with Open Library, awaiting "Create a library in …?" (LIB-2).
@@ -33,6 +35,9 @@ public final class LibrarySelectionModel {
     public init(session: LibrarySession = LibrarySession(), defaults: UserDefaults) {
         self.session = session
         browser = LibraryBrowserModel(session: session)
+        assets = AssetSettings(defaults: defaults)
+        let assets = assets
+        Task { await assets.verifySaved() }
         store = RecentLibraryStore(defaults: defaults)
         windowGoal = .selection
         if let path = store.reopenPath, RecentLibraryStore.isAvailable(path) { windowGoal = .library }

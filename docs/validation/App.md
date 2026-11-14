@@ -170,3 +170,17 @@ Findings fixed during the real-app run:
   run-loop turn.
 
 Not scripted: Move To sheet, Replace Source sheet, renaming from the sidebar menu (model paths tested).
+
+## Settings (2026-11-14)
+
+Milestone 3 subtask A14. Tests written with the implementation (not by the `qa-engineer` subagent); they build a
+minimal release in a temporary folder (`AppTestAssetRelease`), so no private assets are needed.
+
+| Check | Result |
+| --- | --- |
+| `AssetSettingsTests` (5 tests) | SET-1 a chosen release verifies and shows its name and Factorio version; SET-4 it is re-verified at the next launch and a removed folder becomes "The asset release folder is missing"; SET-2 a folder without `release.json` is refused as "This folder isn't a usable asset release" with the previous release kept; SET-3 a release inside or containing the library is refused and never offered for it; SET-5/SET-5a/SET-6 the prototype map loads once per release, changing or clearing the release resets it; STA-6 a release whose map is unsuitable verifies but cannot give statistics |
+| Real app, scripted | ⌘, opened Settings showing "None"; Choose… with the real private release showed "Verified: native-renderer, Factorio 2.1.23" and saved the path; a relaunch with that path saved re-verified it at startup |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Fixed during the run: a folder without `release.json` first read as a disk error (`ENOENT`); every verification
+failure in Settings now reads as an unusable release, with the code and reason in Details.
