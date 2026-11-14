@@ -42,7 +42,9 @@ XCUITest.
 A1, the [native app spec](specs/Native-App.md), is approved (2026-11-14). A0, the two LibraryCore gaps found in
 its review, is done: collision keys now match APFS case-insensitive equivalence on every volume (tested on an
 attached case-sensitive image too), and regular `.DS_Store` files are ignored throughout libraries (see the
-[storage contract](contracts/Storage.md)). Resume with A2 (screen specs, ux-designer role).
+[storage contract](contracts/Storage.md)). A2, the [screen specs](specs/Native-App-Screens.md), is approved
+(2026-11-14): books browse like folders, the inspector keeps the preview above Statistics/Details/Comments tabs, and
+dark mode uses a darker content background (`#121212`). Resume with A3 (app scaffold).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

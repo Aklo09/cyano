@@ -11,6 +11,7 @@ Use the approved plan for scope and validation records for completed work.
 | Follow milestone 2 subtasks and decisions | [Milestone 2](planning/Milestone-2.md) |
 | Follow the approved milestone 3 plan and its decisions | [Milestone 3](planning/Milestone-3.md) |
 | Check the native app's acceptance criteria | [Native app spec](specs/Native-App.md) |
+| Check the native app's screens, states, and shortcuts | [Native app screens](specs/Native-App-Screens.md) |
 | Inspect completed checks | [Foundation validation](validation/Foundation.md) |
 | Decode and export native blueprint strings | [Native codec](development/Codec.md) |
 | Inspect codec admission checks | [Codec validation](validation/Codec.md) |
