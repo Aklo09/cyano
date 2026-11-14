@@ -27,6 +27,12 @@ extension LibraryBrowserModel {
         return selectedRows.filter { $0.folderPath != nil || ($0.itemId != nil && $0.entryPath == nil) }
     }
 
+    /// The Edit menu's delete command: Delete Folder for one folder, otherwise Move to Trash.
+    public var deleteCommandTitle: String {
+        let rows = organizableSelection
+        return rows.count == 1 && rows.first?.kind == .folder ? "Delete Folder" : "Move to Trash"
+    }
+
     public var canRenameSelection: Bool { organizableSelection.count == 1 && selection.count == 1 }
     public var canReplaceSelection: Bool { canRenameSelection && organizableSelection.first?.folderPath == nil }
 

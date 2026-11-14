@@ -54,10 +54,21 @@ public enum LibraryAppIdentity {
     public static let previewWindow = "preview"
 }
 
-/// File menu commands for libraries (screen specs, "Menus and shortcuts"); the full set comes with A15.
+extension FocusedValues {
+    /// Set by the library window, so commands acting on its selection are disabled while another window (a
+    /// preview window or Settings) is key and the selection is out of sight.
+    @Entry var libraryWindowActive: Bool?
+}
+
+/// The menu bar's library commands (screen specs, "Menus and shortcuts"; LIFE-4). Unavailable commands are
+/// disabled, never hidden.
 struct LibraryCommands: Commands {
     let model: LibrarySelectionModel
     @Environment(\.openWindow) private var openWindow
+    @FocusedValue(\.libraryWindowActive) private var libraryWindowActive
+
+    /// Commands on the selection run only while the library window is the key window.
+    private var inLibrary: Bool { libraryWindowActive == true && model.session.libraryURL != nil }
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
@@ -100,43 +111,17 @@ struct LibraryCommands: Commands {
                 .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
             Button("Save As TXT…") { Task { await ExportFlow.saveSelection(model.browser) } }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
-                .disabled(model.browser.exportTarget == nil)
+                .disabled(!inLibrary || model.browser.exportTarget == nil)
             Divider()
             Button("Close Library") { Task { await model.closeLibrary() } }
                 .keyboardShortcut("w", modifiers: [.command, .shift])
                 .disabled(model.session.libraryURL == nil)
         }
-        CommandGroup(after: .textEditing) {
-            Button("Find") { model.browser.requestSearchFocus() }
-                .keyboardShortcut("f")
-                .disabled(model.session.libraryURL == nil)
-        }
-        CommandMenu("Library") {
-            Button("Open") { Task { await model.browser.openSelection() } }
-                .keyboardShortcut(.downArrow)
-                .disabled(!model.browser.canOpenSelection)
-            Button("Enclosing Folder") { Task { await model.browser.goUp() } }
-                .keyboardShortcut(.upArrow)
-                .disabled(model.session.libraryURL == nil || !model.browser.canGoUp)
-            Button("Open in Preview Window") {
-                if let target = model.browser.previewTarget {
-                    openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
-                }
-            }
-            .keyboardShortcut("y")
-            .disabled(model.browser.previewTarget == nil)
+        CommandGroup(after: .pasteboard) {
             Divider()
-            Button("New Folder") { Task { await model.browser.newFolder() } }
-                .keyboardShortcut("n", modifiers: [.command, .shift])
-                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
-            Button("Rename") { model.browser.beginRename() }
-                .disabled(!model.browser.canRenameSelection)
-            Button("Move To…") { model.browser.moveSheetRows = model.browser.organizableSelection }
-                .keyboardShortcut("m", modifiers: [.command, .control])
-                .disabled(model.browser.organizableSelection.isEmpty)
-            Button("Replace Source…") { model.browser.beginReplace() }
-                .disabled(!model.browser.canReplaceSelection)
-            Button("Move to Trash") {
+            Button("Rename…") { model.browser.beginRename() }
+                .disabled(!inLibrary || !model.browser.canRenameSelection)
+            Button(model.browser.deleteCommandTitle) {
                 // ⌘⌫ keeps its text meaning (delete to the start of the line) while a text field has focus.
                 if let text = NSApp.keyWindow?.firstResponder as? NSTextView {
                     text.deleteToBeginningOfLine(nil)
@@ -145,14 +130,45 @@ struct LibraryCommands: Commands {
                 }
             }
             .keyboardShortcut(.delete, modifiers: .command)
-            .disabled(model.browser.organizableSelection.isEmpty)
+            .disabled(!inLibrary || model.browser.organizableSelection.isEmpty)
+        }
+        CommandGroup(after: .textEditing) {
+            Button("Find") { model.browser.requestSearchFocus() }
+                .keyboardShortcut("f")
+                .disabled(!inLibrary)
+        }
+        CommandMenu("Library") {
+            Button("Open") { Task { await model.browser.openSelection() } }
+                .keyboardShortcut(.downArrow)
+                .disabled(!inLibrary || !model.browser.canOpenSelection)
+            Button("Enclosing Folder") { Task { await model.browser.goUp() } }
+                .keyboardShortcut(.upArrow)
+                .disabled(!inLibrary || !model.browser.canGoUp)
+            Button("Open in Preview Window") {
+                if let target = model.browser.previewTarget {
+                    openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
+                }
+            }
+            .keyboardShortcut("y")
+            .disabled(!inLibrary || model.browser.previewTarget == nil)
+            Divider()
+            Button("New Folder") { Task { await model.browser.newFolder() } }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            Button("Move To…") { model.browser.moveSheetRows = model.browser.organizableSelection }
+                .keyboardShortcut("m", modifiers: [.command, .control])
+                .disabled(!inLibrary || model.browser.organizableSelection.isEmpty)
+            Button("Replace Source…") { model.browser.beginReplace() }
+                .disabled(!inLibrary || !model.browser.canReplaceSelection)
             Divider()
             Button("Add Comment") { model.browser.beginComment() }
                 .keyboardShortcut("k", modifiers: [.command, .option])
-                .disabled(model.browser.commentScope == nil)
+                .disabled(!inLibrary || model.browser.commentScope == nil)
             Divider()
             Button("Show Listing Issues") { model.browser.showingIssues = true }
                 .disabled(model.browser.issues.isEmpty)
+            Button("Recover") { Task { await model.session.recover() } }
+                .disabled(!model.session.requiresRecovery)
         }
         CommandGroup(after: .sidebar) {
             ForEach(Array(InspectorTab.allCases.enumerated()), id: \.element) { index, tab in

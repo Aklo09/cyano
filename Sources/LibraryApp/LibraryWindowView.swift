@@ -127,6 +127,7 @@ struct LibraryWindowView: View {
         }
         .frame(minWidth: 900, minHeight: 500)
         .navigationTitle(model.session.libraryURL?.lastPathComponent ?? LibraryAppIdentity.name)
+        .focusedSceneValue(\.libraryWindowActive, true)
         .task {
             guard !launched else { return }
             launched = true

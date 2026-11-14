@@ -156,6 +156,18 @@ public final class LibrarySession {
         _ = try? await call { closed.close() }
     }
 
+    /// Quitting: closes the open library before the app exits, without waiting for earlier session calls
+    /// (LIFE-2, LIFE-3). Closing waits for the library's own queue, so a change in progress finishes; renders are
+    /// cancelled and their workers reaped; later calls are refused. The phase and listing stay as they are,
+    /// because the app is exiting. An open or close still in flight is left to process exit, which releases the
+    /// lease too.
+    public func closeForTermination() {
+        generation += 1
+        guard let closed = library else { return }
+        library = nil
+        closed.close()
+    }
+
     private func serialized(_ operation: @escaping @MainActor () async -> Void) async {
         let previous = lifecycle
         let task = Task { @MainActor in

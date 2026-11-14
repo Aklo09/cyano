@@ -228,3 +228,20 @@ the library was idle.
 Fixed during the run: with a planner selected, the Statistics message asked for more height than the window had, and
 the whole window's content (sidebar included) shifted up under the toolbar. Messages now sit in a scroll view, like the
 Details tab.
+
+## Menus and lifecycle (2026-11-14)
+
+Milestone 3 subtask A15. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `LifecycleTests` (4 cases) | LIFE-1 closing the library during a render cancels it, reaps the worker (a shell-script stand-in that records its ID and blocks), releases ownership, forgets the library, and publishes nothing; LIFE-2 quitting during a render does the same synchronously and keeps the library to reopen, and later calls are refused; LIFE-3 quitting during an import paused before and after `intentPublished` finishes it, and the library reopens with nothing to recover. With the quit-time close disabled, LIFE-2 and LIFE-3 fail |
+| Real app, scripted (owner allowed the screen; private release) | Menu bar read through accessibility with no library, a library open, a folder selected, an item selected, and a preview window in front: every command in the screen specs' table is present with its shortcut; Delete Folder replaces Move to Trash for a folder; selection commands are disabled while a preview window is key, and its zoom commands are enabled. Closing the main window with a preview window open closed the preview window, showed library selection, left no worker, and `fb-native owner` reported the library idle (LIFE-1). Quitting while entry `0.0` of the `bp.txt` book showed "Rendering…" (worker process seen) left no app or worker process, an idle library, no image for that entry, and the library to reopen (LIFE-2). The relaunch reopened the library with no preview windows (PRV-13) |
+| `just lint`, `just test` (twice), `just app-build` | Pass |
+
+Fixed during the run: none. Found in the full `just test` run: two app tests (one Previews, one Lifecycle) timed
+out at 5 s while other test targets ran alongside, because library writes force data to disk; their waits now
+allow 30 s and return as soon as the condition holds.
+
+Observed, not fixed: with no library open, the Window menu lists "Factorio Blueprint Library" twice (the selection
+window and a second, untitled-looking entry); for A16/A17.

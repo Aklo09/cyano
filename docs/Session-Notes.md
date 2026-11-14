@@ -79,7 +79,13 @@ footprint, item groups, and worded warnings from `StatisticsModel`/`StatisticsPr
 tabs keep room. A real-app run checked the tab at minimum window size, a nested book entry, a book, a planner, and
 ⌘C (see [validation](validation/App.md#statistics-2026-11-14)). Scripted runs while the owner uses the Mac: launch
 with `open -g`, use accessibility actions and `screencapture -l` only, and send no keystrokes or clicks without the
-owner's go-ahead. Next: A15 (menus and lifecycle).
+owner's go-ahead. A15 is done in code and tests: quitting closes the library synchronously (a change in progress
+finishes, renders are cancelled and workers reaped, the reopen path is kept), closing the library cancels its render,
+the Edit menu holds Rename… and Move to Trash/Delete Folder, Library adds Recover, and selection commands work only
+while the library window is key (see the [app guide](development/App.md#library-selection-and-windows)). A
+real-app run checked the menu bar against the spec, quitting during a render, the relaunch, and closing the main
+window with a preview window open (see [validation](validation/App.md#menus-and-lifecycle-2026-11-14)). Open: the
+Window menu lists the app name twice with no library open. Next: A16 (accessibility).
 Cached row thumbnails (BRW-9) remain unbuilt.
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.

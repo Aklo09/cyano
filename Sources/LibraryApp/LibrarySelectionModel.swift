@@ -54,7 +54,7 @@ public final class LibrarySelectionModel {
         terminationObserver = NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.terminating = true }
+            MainActor.assumeIsolated { self?.prepareForTermination() }
         }
     }
 
@@ -135,6 +135,13 @@ public final class LibrarySelectionModel {
         guard session.libraryURL != nil else { return false }
         await closeLibrary()
         return true
+    }
+
+    /// The app is quitting: release the library now, keeping it as the one to reopen at the next launch (LIB-11,
+    /// LIFE-2, LIFE-3). Windows that disappear afterwards no longer close or forget it.
+    public func prepareForTermination() {
+        terminating = true
+        session.closeForTermination()
     }
 
     /// The app is about to dismiss the library window itself.

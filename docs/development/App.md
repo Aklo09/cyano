@@ -157,7 +157,7 @@ windows (PRV-1 to PRV-12). Each preview area owns a `PreviewDisplay`, whose `Pre
   arrow keys (10% of the view, a screen with ⌥).
 - **Windows:** `WindowGroup(id: "preview", for: PreviewSubject.self)`; opening a subject that already has a window
   brings it forward (PRV-4), and windows are not restored (PRV-13). The title follows renames; a window dismisses
-  itself when its library closes or another one opens (part of LIFE-1, A15; not yet exercised in the real app). Open with Open in Window (inspector), ⌘Y, or Space in the list. The View
+  itself when its library closes or another one opens (LIFE-1). Open with Open in Window (inspector), ⌘Y, or Space in the list. The View
   menu acts on the focused preview: Zoom In/Out (⌘+/⌘−), Actual Size (⌘0), Zoom to Fit (⌘9), Background, Retry
   Preview (⌘R).
 - **Worker:** the Xcode target embeds the package's `preview-worker` product with a Copy Files phase into
@@ -180,7 +180,20 @@ and after a quit with no windows open it made later launches, even with separate
 - **Launch:** when the library open at the last quit is still reachable, only the library window is presented and
   it reopens that library (LIB-11); otherwise only selection. A failed reopen ends in selection.
 - **Closing:** Close Library (⇧⌘W) or closing the library window releases the library and forgets it for the next
-  launch; quitting keeps it.
+  launch; quitting keeps it. Closing cancels a render in progress and reaps its worker before ownership is released
+  (LIFE-1), and preview windows of that library dismiss themselves.
+- **Quitting:** on `willTerminateNotification`, `prepareForTermination()` calls `LibrarySession.closeForTermination()`,
+  which closes the library synchronously on the main thread: a change already running on the library's queue
+  finishes first (mutations check for closing only when they start), renders are cancelled and their workers
+  reaped, and later calls are refused (LIFE-2, LIFE-3). The reopen path is kept for the next launch. An open or
+  close still in flight is left to process exit, which also releases the lease; workers exit through their
+  parent-death lifeline.
+- **Menus:** every command is in the menu bar (LIFE-4). Edit holds Rename… and Move to Trash (Delete Folder when one
+  folder is selected) after the pasteboard items, and Find; Library adds Recover, enabled while a failed change
+  blocks the library. Commands on the selection are enabled only while the library window is key
+  (`libraryWindowActive`, a focused scene value), so ⌘⌫ or Rename in a preview window or Settings never acts on a
+  selection out of sight. `LifecycleTests` covers LIFE-1 to LIFE-3 with a real child process: a shell-script worker
+  that records its ID and blocks.
 - **Choosing folders:** Open Library on an empty (or `.DS_Store`-only) folder asks before creating a library there;
   New Library on a folder that already holds a library opens it.
 - **Recents:** `RecentLibraryStore` keeps up to ten libraries, newest first, one entry per folder (standardized,

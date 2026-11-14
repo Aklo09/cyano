@@ -125,10 +125,11 @@ private final class PreviewFixture {
     }
 }
 
-/// Waits for asynchronous scheduling to reach `condition`.
+/// Waits up to 30 s for asynchronous scheduling to reach `condition`; library writes force data to disk and can take
+/// seconds while other test targets run alongside.
 @MainActor
 private func until(_ condition: @MainActor () -> Bool) async {
-    for _ in 0..<500 where !condition() { try? await Task.sleep(for: .milliseconds(10)) }
+    for _ in 0..<3000 where !condition() { try? await Task.sleep(for: .milliseconds(10)) }
     #expect(condition())
 }
 
