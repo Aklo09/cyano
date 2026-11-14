@@ -89,6 +89,25 @@ struct LibraryCommandTests {
         #expect(try library.list().folders.isEmpty)
     }
 
+    @Test("A failed export write leaves no partial file at the destination")
+    func failedExportWrite() throws {
+        let target = try CommandLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        let id = try library.importSource(commandBook()).id
+        let size = try library.export(id: id).count
+        library.close()
+        let output = target.parent.appendingPathComponent("export.txt")
+        let failed = try commandChild("StorageTestDriver", ["export-limited", target.url.path, id, output.path, "16"])
+        #expect(failed.0 == 1 && size > 16, "\(String(decoding: failed.2, as: UTF8.self))")
+        #expect(String(decoding: failed.2, as: UTF8.self).contains("errno \(EFBIG)"))
+        #expect(!FileManager.default.fileExists(atPath: output.path))
+        let succeeded = try commandChild(
+            "StorageTestDriver", ["export-limited", target.url.path, id, output.path, "\(size)"])
+        #expect(succeeded.0 == 0)
+        #expect(try Data(contentsOf: output).count == size)
+    }
+
     @Test("Recovery cannot interpret a nonempty folder as an empty-folder deletion")
     func nonemptyDeleteIntent() throws {
         let operationId = LibraryRecords.uuid()

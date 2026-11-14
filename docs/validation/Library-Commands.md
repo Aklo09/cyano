@@ -79,6 +79,8 @@ intent that failed with `EEXIST`, leaving the library unable to open until the o
 A one-off sweep of every BMP scalar and every case-mapped supplementary scalar on a case-insensitive APFS image
 found 200 pairs APFS equates that lowercasing distinguished, 14 that Foundation folding alone distinguished, and
 none for the adopted key.
+`failedExportWrite` (2026-11-14) exports under a 16-byte file-size limit in the storage test driver: the write
+fails with `EFBIG` and no file remains; before the fix the partial file stayed and blocked the next export.
 `LibraryFinderMetadataTests` (2026-11-14) writes `.DS_Store` files into every library, operation, and cache
 directory at every write phase of folder creation, import, comments, renames, item and folder moves, replacement,
 item and empty-folder deletion, unpacking, and cache cleanup, and replays interrupted folder moves and deletions

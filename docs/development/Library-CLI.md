@@ -40,6 +40,7 @@ just library export "$library" "$item_id"
 
 Export stdout contains only original bytes, without JSON or an added newline.
 Use `--output <new-file.txt>` to create a file exclusively; an existing file is refused.
+If writing fails part way, for example on a full disk, the partial file is removed.
 Output beneath the active library root is refused, including through directory aliases.
 Build messages and recipe diagnostics stay on stderr.
 

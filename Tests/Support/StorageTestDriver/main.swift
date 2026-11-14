@@ -14,6 +14,15 @@ do {
         _ = FileHandle.standardInput.readDataToEndOfFile()
     case "probe":
         print(try NativeLibrary.inspectOwnership(at: url).rawValue)
+    case "export-limited":
+        // Exports with a file-size limit so the write fails part way (EFBIG instead of SIGXFSZ).
+        guard args.count == 5, let limit = rlim_t(args[4]) else { exit(2) }
+        signal(SIGXFSZ, SIG_IGN)
+        var bounds = rlimit(rlim_cur: limit, rlim_max: limit)
+        guard setrlimit(RLIMIT_FSIZE, &bounds) == 0 else { exit(3) }
+        let library = try NativeLibrary(at: url)
+        defer { library.close() }
+        _ = try library.export(id: args[2], to: URL(fileURLWithPath: args[3]))
     case "initialize-crash", "import-crash", "comment-crash", "rename-crash", "move-crash", "delete-crash",
         "update-crash", "comment-delete-crash", "folder-move-crash", "folder-delete-crash", "unpack-crash":
         guard let phase = LibraryWritePhase(rawValue: args.last!) else { exit(2) }

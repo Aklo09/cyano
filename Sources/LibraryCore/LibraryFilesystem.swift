@@ -220,21 +220,27 @@ package final class LibraryDirectory {
         try check()
         let descriptor = openat(fd, name, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
-        defer { Darwin.close(descriptor) }
-        try data.withUnsafeBytes { raw in
-            var offset = 0
-            while offset < raw.count {
-                let written = Darwin.write(descriptor, raw.baseAddress!.advanced(by: offset), raw.count - offset)
-                if written < 0 {
-                    if errno == EINTR { continue }
-                    throw NativeLibraryError.io(errno)
+        do {
+            defer { Darwin.close(descriptor) }
+            try data.withUnsafeBytes { raw in
+                var offset = 0
+                while offset < raw.count {
+                    let written = Darwin.write(descriptor, raw.baseAddress!.advanced(by: offset), raw.count - offset)
+                    if written < 0 {
+                        if errno == EINTR { continue }
+                        throw NativeLibraryError.io(errno)
+                    }
+                    guard written > 0 else { throw NativeLibraryError.io(EIO) }
+                    offset += written
                 }
-                guard written > 0 else { throw NativeLibraryError.io(EIO) }
-                offset += written
             }
+            // Host-level flush only; authoritative operations add drive barriers at their commit points.
+            guard fsync(descriptor) == 0 else { throw NativeLibraryError.io(errno) }
+        } catch {
+            // The file was created by this call: never leave a partial file behind.
+            unlinkat(fd, name, 0)
+            throw error
         }
-        // Host-level flush only; authoritative operations add drive barriers at their commit points.
-        guard fsync(descriptor) == 0 else { throw NativeLibraryError.io(errno) }
         try sync()
     }
 

@@ -128,6 +128,8 @@ FIFO rejection does not block waiting for a writer.
 Root aliases may resolve to the same directory before ownership acquisition.
 
 External file reads are bounded before allocating the complete input.
+Files the library creates exclusively (exports, staged files, intents, cache temporaries) are removed again when
+writing or flushing them fails, so a failure never leaves a partial file behind.
 Changing file size or modification state during a read causes refusal.
 Reads do not authorize concurrent external edits to a live library.
 
