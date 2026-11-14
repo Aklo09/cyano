@@ -60,3 +60,19 @@ Findings:
 Not covered by scripts: closing the library window by hand and quitting with ⌘Q (no accessibility access to drive
 the UI); both are left to the owner walkthrough. Termination in the checks above used SIGTERM, which releases the
 kernel lease but is not a normal quit.
+
+## Browsing (2026-11-14)
+
+Milestone 3 subtask A6. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `LibraryBrowserModelTests` (8 tests, fixture library with nested folders, a book, an unpacked book with a description, and a malformed item) | BRW-1 rows and folder tree; sorting by each column with folders first; BRW-4 path bar, opening and Enclosing Folder; BRW-5/BRW-6 whole-library filter ignoring case and accents, results with their folder, no-match state, clearing returns to the folder; BRW-2/BRW-3 empty library and folders; BRW-7 folder description; BRW-8 issues worded without codes; BRW-10 too-large state; location and selection kept valid after changes and reset for a new library; formats |
+| Offscreen render of the library window (throwaway probe, not committed) | Light mode: sidebar with Library and expandable folders, path bar links, table with folders first, local dates, decimal sizes, inspector folder summary, issues footer. Dark mode, sheets, and selection highlights do not render offscreen and are left to the owner walkthrough |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+| `python3 tools/check-independence.py --deny-path ../fb` | PASS after the saved-state fix below |
+
+Finding: after the owner quit the app with no windows open, every later direct launch of `local.fb.library`
+(including the A3 and A5 builds and isolated preferences) opened no window, because AppKit restored the saved state.
+Launching with `-ApplePersistenceIgnoreState YES` showed the window; the app now registers that default.
+Screenshots of the real window are not possible from the terminal without Screen Recording permission (A17).

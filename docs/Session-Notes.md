@@ -51,7 +51,11 @@ launches the app offline. A4 is done: `LibrarySession` runs library calls on a s
 snapshots, handles recovery states, and `LibraryMessage` words every error; `just app-test` runs its suites (also in
 `just test`). A5 is done: `LibrarySelectionModel` drives the selection and library windows, recents, and reopening at
 launch; scripted launches must pass `-FBNativeDefaultsSuite <name>` (see the [app guide](development/App.md)).
-Resume with A6 (browsing: sidebar, item list, path bar, filter, empty and issue states).
+A6 is done: `LibraryBrowserModel` drives the sidebar, path bar, item list, filter, and empty and issue states.
+Verification rule (owner, 2026-11-14): UI subtasks use `just lint`, `just test`, and `just app-build`; the
+independence check runs only for dependency, tooling, bundle, or network changes and at acceptance, and its app launch
+moves to the A17 smoke runs. Resume with A7 (books and planners: open books like folders by stored index,
+descriptions, planner settings).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

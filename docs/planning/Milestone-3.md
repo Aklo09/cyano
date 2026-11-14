@@ -3,7 +3,7 @@
 Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below.
 A1, the [app spec](../specs/Native-App.md), is approved and A0 is done (2026-11-14). A2, the
 [screen specs](../specs/Native-App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
-(2026-11-14). A4, the library session layer, and A5, library selection, are done. Next: A6.
+(2026-11-14). A4, the library session layer, A5, library selection, and A6, browsing, are done. Next: A7.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 3.
 
 ## Scope
@@ -63,7 +63,7 @@ Closing the library closes its preview windows.
 | A14 | Settings | Asset release location, verified when chosen; prototype map loaded once per session | An invalid release is refused clearly; everything else works without assets | A4 |
 | A15 | Menus and lifecycle | Commands and shortcuts; closing the library closes its preview windows; close and quit cancel renders and release the library; clear message when the CLI holds it | Lifecycle tests pass; no stray worker after quit | A5, A12 |
 | A16 | Accessibility | VoiceOver labels, keyboard navigation, contrast in light and dark mode | Main flow works by keyboard alone; checklist recorded | A6–A13 |
-| A17 | Tests and smoke runs | Session tests in `just test`; scripted launch with screenshots of key screens | All pass; screenshots kept private | A4–A15 |
+| A17 | Tests and smoke runs | Session tests in `just test`; scripted launch with screenshots of key screens, including the window-launch check moved out of the independence check | All pass; screenshots kept private | A4–A15 |
 | A18 | Docs and acceptance | User guide, `docs/validation/Milestone-3.md`, offline and no-assets runs, owner walkthrough | Exit condition shown; owner approves | All |
 
 Suggested order: A0 (found in the A1 review) → A1 → A2 → A3 → A4 → A5 → A6; then A7–A11 and A14 in any order; then A12, A13; then A15–A18.

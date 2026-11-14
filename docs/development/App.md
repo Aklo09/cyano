@@ -39,6 +39,25 @@ one serial worker queue off the main thread, in submission order, because `Nativ
 technical text), worded for what the app was doing; it returns nil for renders the owner cancelled.
 `LibraryMessage.listingIssue(code:)` words listing issues.
 
+## Browsing
+
+`LibraryBrowserModel` derives everything the library window shows from the session's listing:
+
+- **Location:** the current folder ("" is the library root), kept valid when the listing changes (a removed folder
+  falls back to its nearest existing ancestor) and reset to the root for a newly opened library.
+- **Rows:** subfolders first by name, then the folder's items sorted by name, kind, updated date, or size. The
+  filter matches item names in every folder, ignoring case and accents, and adds each result's folder.
+- **States:** `content` is loading, rows, library empty, folder empty, no matches, or too large to list (a failed
+  first listing never shows a partial list).
+- **Sidebar and path bar:** `folderTree` and `pathComponents`; listing issues are worded with
+  `LibraryMessage.listingIssue(code:)`.
+
+Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
+(A14) and previews (A12) exist; no row ever starts a render.
+
+The app registers `ApplePersistenceIgnoreState`: AppKit's saved application state is keyed by bundle identifier,
+and after a quit with no windows open it made later launches, even with separate preferences, open no window.
+
 ## Library selection and windows
 
 `LibrarySelectionModel` outlives both windows and decides which one shows through `windowGoal`:
@@ -93,6 +112,14 @@ for macro plugins (`@State`, `@Observable`) can run inside the `sandbox-exec` pr
 | Entitlements | Debug: `get-task-allow` only, for debugging; Release: none |
 
 Developer ID signing and notarization belong to distribution, which is outside v1.
+
+## Verification rule
+
+Ordinary UI subtasks are verified with `just lint`, `just test`, and `just app-build`. The independence check runs
+when a change touches dependencies or resources (`Package.swift`, new packages, files read from outside the
+repository), build tooling (`tools/swift.sh`, `tools/xcode.sh`, the Xcode project), what goes into the bundle, or
+network access, and at milestone acceptance (owner decision, 2026-11-14). The app launch it performs moves to the
+scripted smoke runs of A17.
 
 ## Independence
 

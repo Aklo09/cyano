@@ -27,7 +27,7 @@ just library <args>        # run the fb-native CLI (just library --help)
 just preview <args>        # run preview-probe; real images need verified private assets
 just app-build [Release]   # build the macOS app via tools/xcode.sh (derived data in .cache/xcode)
 just app-run               # build the Debug app and open it
-just app-test              # app model suites: session, messages, selection (also in just test)
+just app-test              # app model suites: session, messages, selection, browsing (also in just test)
 ```
 
 The app bundle comes from the thin Xcode project `App/FactorioBlueprintLibrary.xcodeproj`; build it through
@@ -50,7 +50,9 @@ Node tooling (`tools/`, Node 24.22.1 per `.nvmrc`) is for development only, neve
 optimized build with the private release.
 
 Independence check (builds a relocated copy in a sandbox, with the original web checkout denied):
-`python3 tools/check-independence.py --deny-path ../fb`.
+`python3 tools/check-independence.py --deny-path ../fb`. Run it only when a change touches dependencies or resources,
+build tooling (`tools/*.sh`, the Xcode project), bundle contents, or network access, and at milestone acceptance;
+ordinary UI work is verified with `just lint`, `just test`, and `just app-build`.
 
 ## Architecture
 

@@ -6,6 +6,10 @@ public struct LibraryAppScenes: Scene {
     @State private var model: LibrarySelectionModel
 
     public init() {
+        // The app decides at launch which window to show (LIB-11) and never restores windows (PRV-13). AppKit's
+        // saved application state would otherwise restore "no windows" after a quit with none open, and it is
+        // keyed by bundle identifier, so it also overrides launches with separate preferences.
+        UserDefaults.standard.register(defaults: ["ApplePersistenceIgnoreState": true])
         _model = State(initialValue: LibrarySelectionModel(defaults: LibraryPreferences.defaults()))
     }
 
@@ -77,6 +81,24 @@ struct LibraryCommands: Commands {
                 .keyboardShortcut("w", modifiers: [.command, .shift])
                 .disabled(model.session.libraryURL == nil)
         }
+        CommandGroup(after: .textEditing) {
+            Button("Find") { model.browser.requestSearchFocus() }
+                .keyboardShortcut("f")
+                .disabled(model.session.libraryURL == nil)
+        }
+        CommandMenu("Library") {
+            Button("Open") { model.browser.openSelection() }
+                .keyboardShortcut(.downArrow)
+                .disabled(model.browser.selectedRows.count != 1 || model.browser.selectedRows.first?.folderPath == nil)
+            Button("Enclosing Folder") { model.browser.goUp() }
+                .keyboardShortcut(.upArrow)
+                .disabled(model.session.libraryURL == nil || model.browser.folder.isEmpty)
+            Divider()
+            Button("Show Listing Issues") { model.browser.showingIssues = true }
+                .disabled(model.browser.issues.isEmpty)
+        }
+        SidebarCommands()
+        InspectorCommands()
     }
 
     /// A choice made from the menu while no window shows selection must still surface its outcome.
