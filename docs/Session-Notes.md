@@ -33,12 +33,11 @@ Application scheduling and the macOS UI remain pending.
 
 ## Next implementation
 
-Milestone 3, the native macOS application, is being planned. Resume here (stopped 2026-11-13):
-
-1. The [milestone 3 draft](planning/Milestone-3.md) lists 18 subtasks (A1–A18) and seven open decisions,
-   each with a recommendation. The owner asked to clarify the decisions before choosing; start by asking
-   what they want to clarify, then record their choices in the draft and mark it approved.
-2. Then start with A1 (app spec, product-manager role) and A2 (screen specs, ux-designer role).
+Milestone 3, the native macOS application, is [approved](planning/Milestone-3.md) (2026-11-14) with its seven
+decisions settled: a package UI target with a thin Xcode app target, no App Sandbox, one library per app with
+preview windows for side-by-side comparison, on-demand previews rendered one at a time, a statistics panel with
+names as text, Recover as the only in-app maintenance, and session tests plus scripted screenshots instead of
+XCUITest. Resume with A1 (app spec, product-manager role) and A2 (screen specs, ux-designer role).
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
