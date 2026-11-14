@@ -545,3 +545,41 @@ struct NativeLibraryTests {
         #expect(try Data(contentsOf: metadataURL) == future)
     }
 }
+
+extension NativeLibraryTests {
+    @Test("Opening reports the interrupted operations it completed, and recovery clears a blocked session")
+    func completedOnOpen() throws {
+        struct Interrupted: Error {}
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let setup = try NativeLibrary.initialize(at: target.url)
+        _ = try setup.createFolder(name: "Source")
+        #expect(setup.completedOnOpen.isEmpty && !setup.requiresRecovery)
+        setup.close()
+
+        let interrupted = try NativeLibrary.testingOpen(at: target.url) { phase in
+            if phase == .intentPublished { throw Interrupted() }
+        }
+        #expect(throws: Interrupted.self) { _ = try interrupted.importSource(blueprintFixture(), name: "Pending") }
+        #expect(interrupted.requiresRecovery)
+        #expect(throws: NativeLibraryError.recoveryRequired) { _ = try interrupted.list() }
+        let recovered = try interrupted.recover()
+        #expect(recovered.map(\.kind) == ["import"] && !interrupted.requiresRecovery)
+        #expect(try interrupted.list().items.map(\.name) == ["Pending"])
+        interrupted.close()
+
+        nonisolated(unsafe) var armed = true
+        let moving = try NativeLibrary.testingOpen(at: target.url) { phase in
+            if armed && phase == .intentPublished { throw Interrupted() }
+        }
+        #expect(throws: Interrupted.self) { _ = try moving.moveFolder("Source", parent: "", name: "Moved") }
+        armed = false
+        moving.close()
+
+        let reopened = try NativeLibrary(at: target.url)
+        defer { reopened.close() }
+        #expect(reopened.completedOnOpen.map(\.kind) == ["tree-move"])
+        #expect(reopened.completedOnOpen.allSatisfy { $0.state == "committed" && LibraryRecords.validUUID($0.id) })
+        #expect(try reopened.list().folders == ["Moved"])
+    }
+}

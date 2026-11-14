@@ -250,6 +250,9 @@ and stamp revalidation before deletion. It does not purge operations staging; `s
 ## Recovery and bounded work
 
 Opening an owned library replays committed intents before exposing ordinary operations.
+`NativeLibrary.completedOnOpen` lists the committed operations that opening completed (ID and intent kind), and
+`recover()` returns those it completed, so applications can tell the owner that an interrupted change finished.
+`requiresRecovery` reports whether a failed mutation has blocked the session.
 Explicit `recover` invokes the same replay logic and is safe to repeat.
 Failed mutations block further work in that session until recovery or reopening.
 Unsupported or conflicting intents remain preserved for investigation.

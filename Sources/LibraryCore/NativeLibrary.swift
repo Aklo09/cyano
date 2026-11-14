@@ -21,6 +21,9 @@ public final class NativeLibrary: @unchecked Sendable {
     let formatBytes: Data
     let hook: ((LibraryWritePhase) throws -> Void)?
     var needsRecovery = false
+    /// Committed operations that opening this session replayed, oldest directory name first. An interrupted change
+    /// was completed for each; applications tell the owner (spec REC-1). Empty when nothing was pending.
+    public private(set) var completedOnOpen: [LibraryOperationRecord] = []
     /// Item ID to relative "folder/basename" paths, built by the first full scan and kept current by this
     /// session's own mutations. External edits are unsupported while owned; every hit is still re-verified.
     var itemPaths: [String: [String]]?
@@ -111,7 +114,7 @@ public final class NativeLibrary: @unchecked Sendable {
             operations = try root.child("operations", create: true)
             cache = try root.child("cache", create: true)
             try root.sync()
-            try replay()
+            completedOnOpen = try replay()
         } catch {
             lease.close()
             throw error
@@ -175,14 +178,19 @@ public final class NativeLibrary: @unchecked Sendable {
         }
     }
 
-    public func recover() throws {
+    /// Whether a failed mutation has blocked this session until `recover()` succeeds (spec REC-5).
+    public var requiresRecovery: Bool { queue.sync { needsRecovery } }
+
+    /// Replays committed operations and returns those it completed.
+    @discardableResult public func recover() throws -> [LibraryOperationRecord] {
         try queue.sync {
             guard !isClosing else { throw NativeLibraryError.closed }
             try checkControls()
             itemPaths = nil
             do {
-                try replay()
+                let completed = try replay()
                 needsRecovery = false
+                return completed
             } catch {
                 needsRecovery = true
                 throw error
@@ -539,7 +547,8 @@ public final class NativeLibrary: @unchecked Sendable {
         return names
     }
 
-    func replay() throws {
+    func replay() throws -> [LibraryOperationRecord] {
+        var completed: [LibraryOperationRecord] = []
         for id in try operations.entries(maximum: LibraryBounds.operations) {
             guard LibraryRecords.validUUID(id) else { throw NativeLibraryError.recoveryRequired }
             let stage = try operations.child(id)
@@ -553,10 +562,14 @@ public final class NativeLibrary: @unchecked Sendable {
                 _ = try validateStage(stage)
                 let intent = try LibraryRecords.intent(bytes, operationId: id)
                 try apply(intent, stage: stage)
+                completed.append(LibraryOperationRecord(id: id, state: "committed", kind: intent.kind))
             } else {
-                try applyTransaction(LibraryRecords.transaction(bytes, operationId: id), stage: stage)
+                let transaction = try LibraryRecords.transaction(bytes, operationId: id)
+                try applyTransaction(transaction, stage: stage)
+                completed.append(LibraryOperationRecord(id: id, state: "committed", kind: transaction.kind))
             }
         }
+        return completed
     }
 
     func apply(_ intent: LibraryIntent, stage: LibraryDirectory) throws {

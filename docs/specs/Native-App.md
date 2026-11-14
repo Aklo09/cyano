@@ -102,8 +102,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **REC-1** Given a library with a committed interrupted operation (the app or CLI quit or crashed during a change),
   when the owner opens it, then the operation is completed and the library opens normally, and a non-blocking warning
   says that a change was interrupted and has now been completed, naming the kind of change where its record
-  identifies it; the warning can be dismissed and does not reappear on the next open. (Needs a LibraryCore addition:
-  opening currently replays without reporting which operations it completed.)
+  identifies it; the warning can be dismissed and does not reappear on the next open.
 - **REC-1a** Given only uncommitted staging is left from an interrupted change (it never altered the library), when the
   owner opens it, then no warning is shown; that staging stays a CLI `staging-cleanup` matter (decision 6).
 - **REC-2** Given replay refuses an operation, when the owner opens the library, then the app shows that recovery is
