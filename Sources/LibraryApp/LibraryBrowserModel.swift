@@ -133,6 +133,10 @@ public final class LibraryBrowserModel {
     public private(set) var book: OpenBook?
     /// Details of the selected saved item, decoded on demand (version, description, settings).
     public private(set) var itemDetail: (key: String, detail: EntryDetail)?
+    /// The open Import sheet, if any.
+    public var importSheet: ImportModel?
+    /// Files that failed in the last multi-file import, shown in a summary (IMP-3).
+    public var importSummary: (imported: Int, total: Int, failures: [(name: String, reason: String)])?
 
     @ObservationIgnored private var lastLibrary: URL?
 
@@ -347,6 +351,42 @@ public final class LibraryBrowserModel {
             settings: detail.settings, location: detail.location, entryCount: detail.entryCount)
     }
 
+    // MARK: Import
+
+    /// Where imports go by default: the current folder, or the folder holding the open book (IMP-4).
+    public var importDestination: String {
+        openBookItem?.folder ?? folder
+    }
+
+    /// Opens the Import sheet with pasted text, files, or a drop target folder.
+    public func beginImport(text: String = "", files: [URL] = [], folder target: String? = nil) {
+        guard session.libraryURL != nil else { return }
+        let model = ImportModel(session: session, destination: target ?? importDestination, text: text, files: files)
+        importSheet = model
+        if !text.isEmpty { Task { await model.analyze() } }
+    }
+
+    /// Runs the open sheet's import, closes it on success, and shows what was created (IMP-1, IMP-9, IMP-3).
+    public func runImport() async {
+        guard let sheet = importSheet, let result = await sheet.run() else { return }
+        importSheet = nil
+        switch result {
+        case .imported(let items, let folders):
+            reveal(items: items, folders: folders, in: sheet.destination)
+        case .partial(let imported, let total, let failures, let items, let folders):
+            reveal(items: items, folders: folders, in: sheet.destination)
+            importSummary = (imported, total, failures)
+        }
+    }
+
+    /// Shows `folder` with the given new items and folders selected.
+    public func reveal(items: [String], folders: [String], in target: String) {
+        filterText = ""
+        book = nil
+        folder = target.isEmpty || listing?.folders.contains(target) == true ? target : ""
+        selection = Set(items.map { "item:" + $0 } + folders.map { "folder:" + $0 })
+    }
+
     public func requestSearchFocus() {
         searchFocusRequested = true
     }
@@ -455,6 +495,6 @@ public enum LibraryFormat {
 
     /// The size with its exact byte count, for the inspector.
     public static func exactSize(_ bytes: Int) -> String {
-        "\(size(bytes)) (\(bytes.formatted()) bytes)"
+        bytes < 1000 ? size(bytes) : "\(size(bytes)) (\(bytes.formatted()) bytes)"
     }
 }

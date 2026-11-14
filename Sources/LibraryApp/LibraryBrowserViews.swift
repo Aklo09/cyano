@@ -1,3 +1,4 @@
+import AppKit
 import LibraryCore
 import SwiftUI
 
@@ -12,8 +13,16 @@ struct FolderSidebar: View {
                 set: { if let path = $0 { browser.show(folder: path) } })
         ) {
             Label("Library", systemImage: "books.vertical").tag("")
+                .dropDestination(for: URL.self) { urls, _ in
+                    browser.beginImport(files: urls, folder: "")
+                    return !urls.isEmpty
+                }
             OutlineGroup(browser.folderTree.children ?? [], children: \.children) { node in
                 Label(node.name, systemImage: "folder").tag(node.path)
+                    .dropDestination(for: URL.self) { urls, _ in
+                        browser.beginImport(files: urls, folder: node.path)
+                        return !urls.isEmpty
+                    }
             }
         }
         .listStyle(.sidebar)
@@ -84,12 +93,25 @@ struct ItemList: View {
                 Label("This library is empty", systemImage: "books.vertical")
             } description: {
                 Text("Import a blueprint string from the clipboard or a TXT file.")
+            } actions: {
+                Button("Import…") { browser.beginImport() }
+                Button("Import from Clipboard") { browser.beginImport(text: LibraryPasteboard.text) }
+            }
+            .dropDestination(for: URL.self) { urls, _ in
+                browser.beginImport(files: urls)
+                return !urls.isEmpty
             }
         case .folderEmpty(let name):
             ContentUnavailableView {
                 Label("“\(name)” is empty", systemImage: "folder")
             } description: {
                 Text("Import here, or drag items onto this folder in the sidebar.")
+            } actions: {
+                Button("Import…") { browser.beginImport() }
+            }
+            .dropDestination(for: URL.self) { urls, _ in
+                browser.beginImport(files: urls)
+                return !urls.isEmpty
             }
         case .noMatches(let text):
             ContentUnavailableView {
@@ -189,6 +211,11 @@ struct ItemList: View {
                 case \BrowserRow.sortableSize: .size
                 default: .name
                 }
+        }
+        .onPasteCommand(of: [.plainText]) { _ in browser.beginImport(text: LibraryPasteboard.text) }
+        .dropDestination(for: URL.self) { urls, _ in
+            browser.beginImport(files: urls)
+            return !urls.isEmpty
         }
         .accessibilityLabel("Items")
     }
@@ -369,4 +396,9 @@ private struct IssueRow: Identifiable {
     let id: Int
     let path: String
     let message: String
+}
+
+/// The general pasteboard's text, exactly as copied.
+enum LibraryPasteboard {
+    @MainActor static var text: String { NSPasteboard.general.string(forType: .string) ?? "" }
 }

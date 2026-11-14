@@ -36,6 +36,37 @@ struct LibraryWindowView: View {
         .onChange(of: model.session.revision, initial: true) { browser.listingChanged() }
         .onChange(of: model.session.libraryURL) { browser.listingChanged() }
         .sheet(isPresented: Bindable(browser).showingIssues) { ListingIssuesSheet(browser: browser) }
+        .sheet(
+            isPresented: Binding(get: { browser.importSheet != nil }, set: { if !$0 { browser.importSheet = nil } })
+        ) {
+            if let sheet = browser.importSheet {
+                ImportSheet(
+                    model: sheet,
+                    folders: browser.listing?.folders.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+                        ?? [],
+                    onImport: { Task { await browser.runImport() } }, onCancel: { browser.importSheet = nil })
+            }
+        }
+        .sheet(
+            isPresented: Binding(get: { browser.importSummary != nil }, set: { if !$0 { browser.importSummary = nil } })
+        ) {
+            if let summary = browser.importSummary {
+                ImportSummarySheet(
+                    imported: summary.imported, total: summary.total, failures: summary.failures,
+                    onDone: { browser.importSummary = nil })
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    browser.beginImport()
+                } label: {
+                    Label("Import", systemImage: "square.and.arrow.down")
+                }
+                .help("Import a blueprint string or TXT files (⇧⌘I)")
+                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            }
+        }
         .frame(minWidth: 900, minHeight: 500)
         .navigationTitle(model.session.libraryURL?.lastPathComponent ?? LibraryAppIdentity.name)
         .task {

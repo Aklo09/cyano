@@ -60,6 +60,13 @@ replaced source reopens at the root book, and a deleted item closes the book. `B
 names (rich-text tags such as `[item=iron-plate]` removed, as item names are), packed versions (`major.minor.patch`),
 and planner settings as text; `selectedDetail` feeds the inspector.
 
+**Import** (toolbar, ⇧⌘I, ⇧⌘V or ⌘V in the item list, the empty states, or dropping files on the list or a sidebar
+folder) opens `ImportModel` in a sheet. Pasted text is saved as its exact UTF-8 bytes; files are read with
+`NativeLibrary.readSourceFile(at:)`, so their bytes, line endings, and whitespace are kept. Each source is decoded off
+the main thread first, which names the kind or the problem before saving and refuses unpacking non-books. Several
+files import one by one; failures are listed in a summary while the others stay imported. The destination defaults to
+the current folder, or the open book's folder; afterwards the new items, or the unpacked top folder, are selected.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

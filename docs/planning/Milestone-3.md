@@ -3,7 +3,7 @@
 Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below.
 A1, the [app spec](../specs/Native-App.md), is approved and A0 is done (2026-11-14). A2, the
 [screen specs](../specs/Native-App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
-(2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, and A7, books and planners, are done. Next: A8.
+(2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, A7, books and planners, and A8, import, are done. Next: A9.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 3.
 
 ## Scope

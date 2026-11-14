@@ -57,8 +57,8 @@ independence check runs only for dependency, tooling, bundle, or network changes
 moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibility access, so real-window captures
 (`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
 `-FBNativeDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
-Open finding for A16: Tab never visibly reaches the item list. Resume with A8 (import: paste, TXT files, drag and
-drop, save as one book or unpack).
+Open finding for A16: Tab never visibly reaches the item list. A8 is done: Import (paste, TXT files, drag and drop; one book or
+unpacked) keeps exact bytes and selects the result. Resume with A9 (export: copy root or entry string, save as TXT).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

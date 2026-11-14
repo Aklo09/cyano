@@ -78,6 +78,13 @@ struct LibraryCommands: Commands {
                     .disabled(model.recents.isEmpty)
             }
             Divider()
+            Button("Import…") { model.browser.beginImport() }
+                .keyboardShortcut("i", modifiers: [.command, .shift])
+                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            Button("Import from Clipboard") { model.browser.beginImport(text: LibraryPasteboard.text) }
+                .keyboardShortcut("v", modifiers: [.command, .shift])
+                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            Divider()
             Button("Close Library") { Task { await model.closeLibrary() } }
                 .keyboardShortcut("w", modifiers: [.command, .shift])
                 .disabled(model.session.libraryURL == nil)

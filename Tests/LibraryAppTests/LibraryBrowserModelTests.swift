@@ -212,6 +212,7 @@ struct LibraryBrowserModelTests {
     func formats() {
         #expect(LibraryFormat.size(4_213) == ByteCountFormatter.string(fromByteCount: 4_213, countStyle: .file))
         #expect(LibraryFormat.exactSize(4_213).hasSuffix("(\(4_213.formatted()) bytes)"))
+        #expect(LibraryFormat.exactSize(925) == LibraryFormat.size(925))
         #expect(LibraryFormat.date("2026-11-14T11:09:18.317Z") != nil)
         #expect(LibraryFormat.date("not a date") == nil)
         #expect(ItemKind(stored: "upgrade_planner").label == "Upgrade Planner")

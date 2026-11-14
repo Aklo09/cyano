@@ -110,3 +110,16 @@ Findings:
 - **Keyboard focus (for A16):** with full keyboard access, Tab moves from the sidebar to the issues footer, the
   toolbar, and the search field, and never visibly reaches the item list. Double-click and ⌘↓/⌘↑ work.
 - **Scripting:** System Events `click at` does not select table rows; real mouse events posted with Core Graphics do.
+
+## Import (2026-11-14)
+
+Milestone 3 subtask A8. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `ImportModelTests` (5 tests) | IMP-1/IMP-5 pasted text with CRLF and surrounding whitespace stored byte for byte, label used as the name, the new item selected; IMP-2/IMP-3 file bytes kept, several files with an invalid and an empty one give "Imported 1 of 3 files" with reasons; IMP-4 default destination is the current folder or the open book's folder, drop folders override it; IMP-6 duplicate names get ` (2)`; an explicit name is used; IMP-7/IMP-8 invalid, over-16 MB, empty, and whitespace-only sources are refused and nothing is created; IMP-9 to IMP-12 unpacking selects the new folder with its description, collisions get a suffix, non-books are refused for pasted text and files |
+| Real app, scripted | Clipboard filled with `pbcopy` (RS.txt with a leading `  \r\n` and trailing `\r\n\t `); ⇧⌘V opened the sheet showing "Blueprint"; ⌘↩ imported and selected "Simple RS Latch"; after ⌘Q, `fb-native export` matched the clipboard byte for byte (925 bytes) |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Not scripted: dragging files from Finder onto the list or a sidebar folder (the model path is tested); left to the
+owner walkthrough. The inspector no longer repeats small sizes as "925 bytes (925 bytes)".
