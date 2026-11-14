@@ -16,12 +16,34 @@ Put new interface code in `Sources/LibraryApp`, not in `App/Sources`, so it stay
 The Xcode project holds only bundle settings: change them in Xcode or in `project.pbxproj`, and keep the shared
 scheme `FactorioBlueprintLibrary` committed.
 
+## Library session
+
+`LibrarySession` (main actor, `@Observable`) owns the open library for every window. It runs each library call on
+one serial worker queue off the main thread, in submission order, because `NativeLibrary` methods block.
+
+- **Lifecycle:** `open(_:create:)`, `close()`, and `retryOpen()` run one after another; opening another library
+  closes the current one and releases its ownership first (LIB-9).
+- **State:** `phase` is closed, opening, open, open failed (with a message), or recovery required. Recovery
+  required is chosen when a failed open leaves committed operations pending, whatever the error code. It lists them
+  with a quarantine command for the CLI (REC-2).
+- **Data:** `listing` holds the latest successful listing and `revision` increases with each one. Every change made
+  through `perform(_:refreshing:_:)` refreshes it, so windows observe one snapshot instead of change events. A
+  failed refresh keeps the previous listing and sets `listingFailure`.
+- **Recovery:** `completedNotice` reports interrupted changes that opening completed (REC-1);
+  `requiresRecovery` and `recover()` handle a change that failed mid-session (REC-5).
+- **Late results:** every open and close starts a new generation; results from an earlier one return `.ignored`.
+
+`LibraryMessage.describing(_:activity:libraryName:)` turns any error into a title, guidance, and Details (code and
+technical text), worded for what the app was doing; it returns nil for renders the owner cancelled.
+`LibraryMessage.listingIssue(code:)` words listing issues.
+
 ## Commands
 
 ```sh
 just app-build            # Debug app
 just app-build Release    # Release app
 just app-run              # build the Debug app and open it
+just app-test             # session and message tests (also part of just test)
 ```
 
 The app is written to `.cache/xcode/Build/Products/<configuration>/Factorio Blueprint Library.app`.
@@ -60,4 +82,3 @@ launches it and requires a window within 10 seconds. The launch denies IP networ
   SwiftPM executable in the Xcode target is not set up yet.
 - **Isolated launches:** once the app reopens the last library at launch (LIB-11), scripted launches need isolated
   preferences so they never open the owner's real library (A5, A17).
-- **Tests:** the `LibraryApp` target has no test suite yet; the session layer (A4) adds one to `just test`.

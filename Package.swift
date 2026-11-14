@@ -49,5 +49,8 @@ let package = Package(
                 "LibraryPreviewTestDriver", "FBNativeCLI",
             ]),
         .testTarget(name: "FactorioDataTests", dependencies: ["FactorioData", "LibraryCore", "FBNativeCLI"]),
+        .testTarget(
+            name: "LibraryAppTests",
+            dependencies: ["LibraryApp", "LibraryCore", "FactorioData", "PreviewRenderer"]),
     ]
 )

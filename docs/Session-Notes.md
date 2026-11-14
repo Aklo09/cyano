@@ -47,7 +47,9 @@ attached case-sensitive image too), and regular `.DS_Store` files are ignored th
 dark mode uses a darker content background (`#121212`). A3, the [app scaffold](development/App.md), is done:
 `Sources/LibraryApp` holds the interface, `App/` the thin Xcode target (`local.fb.library`, ad-hoc signed, no
 sandbox), `just app-build`/`just app-run` build through `tools/xcode.sh`, and the independence check builds and
-launches the app offline. Resume with A4 (library session layer, with the first `LibraryApp` tests in `just test`).
+launches the app offline. A4 is done: `LibrarySession` runs library calls on a serial worker, publishes listing
+snapshots, handles recovery states, and `LibraryMessage` words every error; `just app-test` runs its suites (also in
+`just test`). Resume with A5 (library selection: open/create, recents, the selection window and its states).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

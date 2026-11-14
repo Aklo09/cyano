@@ -25,3 +25,14 @@ also blocks local connections; the independence launch therefore denies IP netwo
 Not covered yet: the app has no behavior beyond its placeholder window, and no `LibraryApp` test suite exists
 (A4 adds it). The independence check's test filter still omits `LibraryNameTests` and
 `LibraryFinderMetadataTests`; the first of them attaches a disk image, which has not been tried inside that sandbox.
+
+## Library session layer (2026-11-14)
+
+Milestone 3 subtask A4. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `NativeLibraryTests/completedOnOpen` | Interrupted import and folder move are reported as `import` and `tree-move` when completed; a failed change sets `requiresRecovery` until `recover()` |
+| `LibrarySessionTests` (6 tests) | Create, list, change, and close with ownership released; calls run off the main thread; in use with Try Again; not a library leaves the folder untouched; a refused replay (thrown as `INTEGRITY_CONFLICT`) shows the committed operation with a shell-quoted quarantine command and opens after quarantine; completed-change notice shown once; mid-session block cleared by Recover; overlapping opens leave one library owned and the other released; a result arriving after close is ignored |
+| `LibraryMessageTests` (4 tests) | Every case of `NativeLibraryError`, `BlueprintCodecError` (all limits), `PreviewError`, `PlannerRuntimeError`, `StatisticsError`, `AssetReleaseError`, `PrototypeMapError`, and an unknown error, in every activity, has a title and guidance without codes or errno and the expected code in Details; cancelled renders show nothing; listing issues have their own wording |
+| Repetition | The two app suites passed 15 consecutive runs after the overlapping-open test stopped assuming which open starts first |
