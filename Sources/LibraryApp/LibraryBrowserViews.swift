@@ -243,112 +243,240 @@ extension BrowserRow {
     var sortableSize: Int { sizeBytes ?? -1 }
 }
 
-/// Details of the selected item or the current folder. Preview, statistics, and comments come with A7–A13.
+/// The inspector: a header for the selected item or entry, then Statistics, Details, and Comments tabs (screen specs,
+/// "Inspector"); folders and multiple selections show a summary.
 struct ItemInspector: View {
     @Bindable var browser: LibraryBrowserModel
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                ExportButtons(browser: browser)
-                if browser.showsBook, let detail = browser.selectedDetail {
-                    EntryDetailView(detail: detail, item: detail.location == nil ? browser.openBookItem : nil)
-                } else if let item = browser.selectedItem {
-                    let kind = ItemKind(stored: item.kind)
-                    Text(item.name).font(.title2.weight(.semibold)).textSelection(.enabled)
-                    Label(kind.label, systemImage: kind.symbol)
-                    if let version = browser.selectedDetail?.version {
-                        Text("Factorio \(version)")
-                    } else if browser.selectedDetail != nil {
-                        Text("Version unknown")
+        VStack(alignment: .leading, spacing: 0) {
+            if browser.commentScope != nil {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        InspectorHeader(browser: browser)
                     }
-                    Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
-                        if let updated = LibraryFormat.date(item.metadata.updatedAt) {
-                            GridRow {
-                                Text("Updated").fontWeight(.medium)
-                                Text(LibraryFormat.display(updated))
-                            }
-                        }
-                        if let created = LibraryFormat.date(item.metadata.createdAt) {
-                            GridRow {
-                                Text("Created").fontWeight(.medium)
-                                Text(LibraryFormat.display(created))
-                            }
-                        }
-                        GridRow {
-                            Text("Size").fontWeight(.medium)
-                            Text(LibraryFormat.exactSize(item.sourceBytes))
-                        }
-                        GridRow {
-                            Text("Folder").fontWeight(.medium)
-                            Text(item.folder.isEmpty ? "Library" : item.folder)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                }
+                .frame(maxHeight: 260)
+                .fixedSize(horizontal: false, vertical: true)
+                Picker("Inspector", selection: $browser.inspectorTab) {
+                    ForEach(InspectorTab.allCases, id: \.self) { tab in Text(tab.title).tag(tab) }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                Divider()
+                switch browser.inspectorTab {
+                case .statistics: StatisticsTab(browser: browser)
+                case .details: DetailsTab(browser: browser)
+                case .comments: CommentsTab(browser: browser)
+                }
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        if let row = browser.selectedRows.first, browser.selectedRows.count == 1,
+                            let path = row.folderPath
+                        {
+                            FolderSummary(browser: browser, path: path)
+                        } else if browser.selectedRows.count > 1 {
+                            Text("\(browser.selectedRows.count) items selected")
+                        } else if !browser.folder.isEmpty {
+                            FolderSummary(browser: browser, path: browser.folder)
+                        } else {
+                            Text("Select an item to see its details.")
                         }
                     }
-                    if let detail = browser.selectedDetail { EntryDetailBody(detail: detail) }
-                } else if let row = browser.selectedRows.first, browser.selectedRows.count == 1,
-                    let path = row.folderPath
-                {
-                    FolderSummary(browser: browser, path: path)
-                } else if browser.selectedRows.count > 1 {
-                    Text("\(browser.selectedRows.count) items selected")
-                } else if !browser.folder.isEmpty {
-                    FolderSummary(browser: browser, path: browser.folder)
-                } else {
-                    Text("Select an item to see its details.")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.contentBackground)
-        .inspectorColumnWidth(min: 220, ideal: 260, max: 400)
+        .inspectorColumnWidth(min: 240, ideal: 280, max: 420)
         .task(id: browser.selectedItem.map { $0.id + $0.metadata.sourceSha256 }) {
             await browser.loadSelectedDetail()
         }
     }
 }
 
-/// An entry's (or open book's) header and details.
-private struct EntryDetailView: View {
-    let detail: EntryDetail
-    /// The saved item when the detail is its root, for dates and size.
-    let item: LibraryCore.LibraryItem?
+/// Name, kind, version, position or dates and size, and the export buttons.
+private struct InspectorHeader: View {
+    let browser: LibraryBrowserModel
 
     var body: some View {
-        Text(detail.name).font(.title2.weight(.semibold)).textSelection(.enabled)
-        Label(detail.kind.label, systemImage: detail.kind.symbol)
-        Text(detail.version.map { "Factorio \($0)" } ?? "Version unknown")
-        if let location = detail.location { Text(location) }
+        let detail = browser.selectedDetail
+        let item = browser.showsBook ? (detail?.location == nil ? browser.openBookItem : nil) : browser.selectedItem
+        let name = detail?.name ?? item?.name ?? ""
+        let kind = detail?.kind ?? item.map { ItemKind(stored: $0.kind) } ?? .blueprint
+        Text(name).font(.title2.weight(.semibold)).textSelection(.enabled)
+        Label(kind.label, systemImage: kind.symbol)
+        if let detail { Text(detail.version.map { "Factorio \($0)" } ?? "Version unknown") }
+        if let location = detail?.location { Text(location) }
         if let item {
-            Text("Size \(LibraryFormat.exactSize(item.sourceBytes))")
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 4) {
+                if let updated = LibraryFormat.date(item.metadata.updatedAt) {
+                    GridRow {
+                        Text("Updated").fontWeight(.medium)
+                        Text(LibraryFormat.display(updated))
+                    }
+                }
+                if let created = LibraryFormat.date(item.metadata.createdAt) {
+                    GridRow {
+                        Text("Created").fontWeight(.medium)
+                        Text(LibraryFormat.display(created))
+                    }
+                }
+                GridRow {
+                    Text("Size").fontWeight(.medium)
+                    Text(LibraryFormat.exactSize(item.sourceBytes))
+                }
+                if !browser.showsBook {
+                    GridRow {
+                        Text("Folder").fontWeight(.medium)
+                        Text(item.folder.isEmpty ? "Library" : item.folder)
+                    }
+                }
+            }
         }
-        EntryDetailBody(detail: detail)
+        ExportButtons(browser: browser).padding(.top, 4)
+    }
+}
+
+/// Statistics arrive with A13; books and planners are not applicable (STA-5).
+private struct StatisticsTab: View {
+    let browser: LibraryBrowserModel
+
+    var body: some View {
+        let kind = browser.selectedDetail?.kind ?? browser.selectedItem.map { ItemKind(stored: $0.kind) }
+        VStack(alignment: .leading) {
+            switch kind {
+            case .book?: Text("Statistics don't apply to books. Open the book to see its blueprints.")
+            case .upgradePlanner?, .deconstructionPlanner?: Text("Statistics don't apply to planners.")
+            default: Text("Construction statistics come with a later build.")
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(16)
     }
 }
 
 /// Entry count, description with its line breaks (BOOK-5), and planner settings as text (BOOK-6).
-private struct EntryDetailBody: View {
-    let detail: EntryDetail
+private struct DetailsTab: View {
+    let browser: LibraryBrowserModel
 
     var body: some View {
-        if let count = detail.entryCount {
-            Text(count == 1 ? "1 entry" : "\(count) entries")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 8) {
+                if let detail = browser.selectedDetail {
+                    if let count = detail.entryCount {
+                        Text(count == 1 ? "1 entry" : "\(count) entries")
+                    }
+                    if !detail.description.isEmpty {
+                        Text("Description").font(.headline)
+                        Text(detail.description)
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    if !detail.settings.isEmpty {
+                        Text("Settings").font(.headline)
+                        Text(detail.settings.joined(separator: "\n"))
+                            .font(.system(.body, design: .monospaced))
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    if detail.entryCount == nil && detail.description.isEmpty && detail.settings.isEmpty {
+                        Text("No description.")
+                    }
+                } else {
+                    ProgressView().controlSize(.small)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
         }
-        if !detail.description.isEmpty {
-            Text("Description").font(.headline).padding(.top, 6)
-            Text(detail.description)
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// The scope's comments with an Add field (COM-1 to COM-7).
+private struct CommentsTab: View {
+    @Bindable var browser: LibraryBrowserModel
+    @State private var selected: String?
+    @FocusState private var fieldFocused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if browser.comments.isEmpty {
+                Text("No comments yet.")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(16)
+            } else {
+                List(browser.comments, id: \.id, selection: $selected) { comment in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(LibraryFormat.date(comment.createdAt).map(LibraryFormat.display) ?? comment.createdAt)
+                            .font(.caption.weight(.medium))
+                        Text(comment.text)
+                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 2)
+                    .contextMenu {
+                        Button("Delete Comment") { browser.commentPendingDeletion = comment }
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+                .scrollContentBackground(.hidden)
+                .onDeleteCommand {
+                    browser.commentPendingDeletion = browser.comments.first { $0.id == selected }
+                }
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("New comment").font(.headline)
+                TextEditor(text: $browser.commentDraft)
+                    .frame(height: 70)
+                    .focused($fieldFocused)
+                    .accessibilityLabel("New comment")
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color(nsColor: .separatorColor)))
+                    .onKeyPress(.escape) {
+                        fieldFocused = false
+                        return .handled
+                    }
+                if browser.commentTooLong {
+                    Text("Comments can be up to 64 KB.")
+                }
+                if let failure = browser.commentFailure {
+                    Label("\(failure.title). \(failure.guidance)", systemImage: "exclamationmark.triangle.fill")
+                        .symbolRenderingMode(.multicolor)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                HStack {
+                    Spacer()
+                    Button("Add Comment") { Task { await browser.addComment() } }
+                        .keyboardShortcut(.return, modifiers: .command)
+                        .disabled(!browser.canAddComment)
+                }
+            }
+            .padding(16)
         }
-        if !detail.settings.isEmpty {
-            Text("Settings").font(.headline).padding(.top, 6)
-            Text(detail.settings.joined(separator: "\n"))
-                .font(.system(.body, design: .monospaced))
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
+        .onChange(of: browser.commentFocusRequested, initial: true) { _, requested in
+            guard requested else { return }
+            fieldFocused = true
+            browser.commentFocusRequested = false
         }
-        if detail.kind == .upgradePlanner || detail.kind == .deconstructionPlanner {
-            Text("Statistics don't apply to planners.")
+        .alert(
+            "Delete this comment?",
+            isPresented: Binding(
+                get: { browser.commentPendingDeletion != nil },
+                set: { if !$0 { browser.commentPendingDeletion = nil } }),
+            presenting: browser.commentPendingDeletion
+        ) { comment in
+            Button("Delete Comment", role: .destructive) { Task { await browser.deleteComment(comment) } }
+            Button("Cancel", role: .cancel) {}
+                .keyboardShortcut(.defaultAction)
+        } message: { _ in
+            Text("This can't be undone.")
         }
     }
 }

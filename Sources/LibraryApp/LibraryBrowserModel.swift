@@ -135,6 +135,17 @@ public final class LibraryBrowserModel {
     public private(set) var itemDetail: (key: String, detail: EntryDetail)?
     /// The open Import sheet, if any.
     public var importSheet: ImportModel?
+    /// The inspector tab shown for items and entries.
+    public var inspectorTab: InspectorTab = .details
+    /// Unsaved comment text per item or entry (`CommentScope.key`).
+    public internal(set) var commentDrafts: [String: String] = [:]
+    public internal(set) var addingComment = false
+    /// Why the last comment change failed; shown under the field with the text kept.
+    public var commentFailure: LibraryMessage?
+    /// A comment waiting for "Delete this comment?".
+    public var commentPendingDeletion: LibraryComment?
+    /// Set by Add Comment; the inspector moves focus to the field.
+    public var commentFocusRequested = false
     /// A short confirmation shown at the bottom of the window ("Copied blueprint string").
     public var confirmation: String?
     /// A failed copy or save, shown as an alert.

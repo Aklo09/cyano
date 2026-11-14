@@ -136,3 +136,15 @@ Milestone 3 subtask A9. Tests written with the implementation (not by the `qa-en
 | `just lint`, `just build`, `just test`, `just app-build` | Pass |
 
 Note: the app has no icon yet, so alerts show the generic application icon.
+
+## Comments (2026-11-14)
+
+Milestone 3 subtask A10. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `LibraryCommentsTests` (4 tests) | COM-1 to COM-3 root, entry, and nested-entry comments oldest first with line breaks, kept after reopening with the source unchanged; COM-4/COM-5 empty, whitespace-only, and over-64 KB text refused with the draft kept; drafts stay with their item or entry; COM-6 deletion persists; COM-7 a replacement's promoted comment shows as `[Former book entry 3]` root text; Add Comment opens the Comments tab |
+| Real app, scripted | ⌥⌘K on "Simple RS Latch" opened the Comments tab with the field focused; a two-line comment added with ⌘↩ appeared with its date, the field cleared, and after ⌘Q the stored comment kept its line break while `fb-native export` still matched the original bytes |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Not scripted: deleting through the context menu or Delete key (the model path is tested).

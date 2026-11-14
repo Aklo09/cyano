@@ -60,7 +60,9 @@ moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibi
 Open finding for A16: Tab never visibly reaches the item list. A8 is done: Import (paste, TXT files, drag and drop; one book or
 unpacked) keeps exact bytes and selects the result. A9 is done: Copy String and Save As TXT
 for items and book entries, refusing destinations inside the library. Capture only app windows
-(`screencapture -l<window>`), never the whole screen. Resume with A10 (comments: list, add, delete).
+(`screencapture -l<window>`), never the whole screen. A10 is done: the inspector has Statistics (placeholder until A13),
+Details, and Comments tabs; comments are added and deleted per item or entry. Resume with A11 (organization: new
+folder, rename, move, delete to the Trash, delete empty folder, replace source).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

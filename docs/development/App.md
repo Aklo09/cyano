@@ -74,6 +74,12 @@ reopens; a file the panel agreed to replace goes to the Trash first (honoring `F
 back if the write fails. Both show a two-second confirmation at the bottom of the window, also announced to
 VoiceOver.
 
+**Inspector and comments.** The inspector shows a header (name, kind, version, position or dates and size, export
+buttons) and Statistics, Details, and Comments tabs (⌘1–⌘3). `commentScope` is the selected item's root, the selected
+entry in an open book, or the open book itself; its comments come from the listing, oldest first. Drafts are kept per
+scope, so text typed for one item never goes to another. Add Comment (⌥⌘K, then ⌘↩) refuses empty, whitespace-only,
+and over-64 KB text and keeps it; deleting asks first. The Statistics tab is a placeholder until A13.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

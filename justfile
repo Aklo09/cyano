@@ -17,7 +17,7 @@ format:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|LibraryNameTests|LibraryFinderMetadataTests|AssetReleaseTests|PrototypeMapTests|BlueprintStatisticsTests|StatisticsParityTests|LibraryStatisticsTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|LibraryNameTests|LibraryFinderMetadataTests|AssetReleaseTests|PrototypeMapTests|BlueprintStatisticsTests|StatisticsParityTests|LibraryStatisticsTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests'
     python3 tools/test-asset-release.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
@@ -38,7 +38,7 @@ app-run: app-build
 
 # Exercise the app's library session layer and user-facing messages.
 app-test:
-    sh tools/swift.sh test --filter 'LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests'
+    sh tools/swift.sh test --filter 'LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests'
 
 # Run native CLI commands; export stdout contains only source bytes.
 library *args:

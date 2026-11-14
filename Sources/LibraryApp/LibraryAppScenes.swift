@@ -104,9 +104,19 @@ struct LibraryCommands: Commands {
             Button("Enclosing Folder") { Task { await model.browser.goUp() } }
                 .keyboardShortcut(.upArrow)
                 .disabled(model.session.libraryURL == nil || !model.browser.canGoUp)
+            Button("Add Comment") { model.browser.beginComment() }
+                .keyboardShortcut("k", modifiers: [.command, .option])
+                .disabled(model.browser.commentScope == nil)
             Divider()
             Button("Show Listing Issues") { model.browser.showingIssues = true }
                 .disabled(model.browser.issues.isEmpty)
+        }
+        CommandGroup(after: .sidebar) {
+            ForEach(Array(InspectorTab.allCases.enumerated()), id: \.element) { index, tab in
+                Button(tab.title) { model.browser.inspectorTab = tab }
+                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")))
+                    .disabled(model.browser.commentScope == nil)
+            }
         }
         SidebarCommands()
         InspectorCommands()
