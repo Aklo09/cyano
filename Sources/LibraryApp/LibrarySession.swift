@@ -135,6 +135,7 @@ public final class LibrarySession {
     }
 
     /// Closes the open library after earlier calls finish, releasing ownership (LIFE-1). Safe to repeat.
+    /// Without an open library, a failed open's state stays visible; `reset()` dismisses it.
     public func close() async {
         await serialized { await self.closeNow() }
     }
@@ -142,7 +143,7 @@ public final class LibrarySession {
     private func closeNow() async {
         generation += 1
         guard let closed = library else {
-            phase = .closed
+            if case .opening = phase { phase = .closed }
             return
         }
         library = nil
@@ -229,6 +230,15 @@ public final class LibrarySession {
         } catch {
             guard current == generation else { return }
             recoveryFailure = LibraryMessage.describing(error, activity: .recovering, libraryName: libraryName)
+        }
+    }
+
+    /// Dismisses a failed open (Back in library selection) when no library is open.
+    public func reset() {
+        guard library == nil else { return }
+        switch phase {
+        case .openFailed, .recoveryRequired: phase = .closed
+        default: break
         }
     }
 

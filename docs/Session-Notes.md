@@ -49,7 +49,9 @@ dark mode uses a darker content background (`#121212`). A3, the [app scaffold](d
 sandbox), `just app-build`/`just app-run` build through `tools/xcode.sh`, and the independence check builds and
 launches the app offline. A4 is done: `LibrarySession` runs library calls on a serial worker, publishes listing
 snapshots, handles recovery states, and `LibraryMessage` words every error; `just app-test` runs its suites (also in
-`just test`). Resume with A5 (library selection: open/create, recents, the selection window and its states).
+`just test`). A5 is done: `LibrarySelectionModel` drives the selection and library windows, recents, and reopening at
+launch; scripted launches must pass `-FBNativeDefaultsSuite <name>` (see the [app guide](development/App.md)).
+Resume with A6 (browsing: sidebar, item list, path bar, filter, empty and issue states).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

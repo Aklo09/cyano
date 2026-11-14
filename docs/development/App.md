@@ -33,9 +33,34 @@ one serial worker queue off the main thread, in submission order, because `Nativ
   `requiresRecovery` and `recover()` handle a change that failed mid-session (REC-5).
 - **Late results:** every open and close starts a new generation; results from an earlier one return `.ignored`.
 
+`close()` with no library open leaves a failed open's state visible; `reset()` (Back) dismisses it.
+
 `LibraryMessage.describing(_:activity:libraryName:)` turns any error into a title, guidance, and Details (code and
 technical text), worded for what the app was doing; it returns nil for renders the owner cancelled.
 `LibraryMessage.listingIssue(code:)` words listing issues.
+
+## Library selection and windows
+
+`LibrarySelectionModel` outlives both windows and decides which one shows through `windowGoal`:
+
+- **Two windows:** the selection window (`library-selection`) and the library window (`library`). Each mirrors
+  `windowGoal`, opening the other and dismissing itself, so a failed open from either window lands in selection
+  with its message. Windows are never restored from a previous run.
+- **Launch:** when the library open at the last quit is still reachable, only the library window is presented and
+  it reopens that library (LIB-11); otherwise only selection. A failed reopen ends in selection.
+- **Closing:** Close Library (⇧⌘W) or closing the library window releases the library and forgets it for the next
+  launch; quitting keeps it.
+- **Choosing folders:** Open Library on an empty (or `.DS_Store`-only) folder asks before creating a library there;
+  New Library on a folder that already holds a library opens it.
+- **Recents:** `RecentLibraryStore` keeps up to ten libraries, newest first, one entry per folder (standardized,
+  symlinks resolved); folders that are missing or on an unmounted volume are marked unavailable.
+
+### Preferences and scripted launches
+
+Recents and the library to reopen live in the app's preferences (`local.fb.library`). Launch with
+`-FBNativeDefaultsSuite <name>` to use a separate domain instead; every scripted launch must, so it never reads the
+owner's recents or reopens their library, and should delete the domain afterwards
+(`defaults delete <name>`). `just app-run` uses the owner's real preferences.
 
 ## Commands
 
@@ -50,9 +75,9 @@ The app is written to `.cache/xcode/Build/Products/<configuration>/Factorio Blue
 Open `App/FactorioBlueprintLibrary.xcodeproj` in Xcode for SwiftUI previews and debugging; Xcode then uses its own
 derived data location instead of `.cache/`.
 
-`tools/xcode.sh` passes `-IDEPackageSupportDisableManifestSandbox=YES`, the Xcode counterpart of
-`tools/swift.sh --disable-sandbox`: Xcode's manifest sandbox cannot run inside the `sandbox-exec` profile used by
-the independence check. If `xcodebuild` reports that a required plug-in failed to load, run
+`tools/xcode.sh` passes `-IDEPackageSupportDisableManifestSandbox=YES` and the Swift flag `-disable-sandbox`, the
+Xcode counterparts of `tools/swift.sh --disable-sandbox`: neither Xcode's manifest sandbox nor the compiler's sandbox
+for macro plugins (`@State`, `@Observable`) can run inside the `sandbox-exec` profile used by the independence check. If `xcodebuild` reports that a required plug-in failed to load, run
 `sudo xcodebuild -runFirstLaunch` once to install Xcode's system components.
 
 ## Bundle identity and signing
@@ -73,12 +98,11 @@ Developer ID signing and notarization belong to distribution, which is outside v
 
 `python3 tools/check-independence.py --deny-path ../fb` copies `App/` and both wrappers into a relocated tree,
 builds the Debug app there with the original checkout and the given paths unreadable and networking denied, then
-launches it and requires a window within 10 seconds. The launch denies IP networking only: a blanket
+launches it with a scratch preferences domain and requires a window within 10 seconds. It counts windows on any
+Space: a directly launched app is not activated, so its window may open on another Space. The launch denies IP networking only: a blanket
 `deny network*` also blocks the local connections a GUI app needs, and the app then shows no window.
 
 ## Pending work
 
 - **Preview worker:** the app must carry `preview-worker` inside its bundle before rendering (A12); embedding a
   SwiftPM executable in the Xcode target is not set up yet.
-- **Isolated launches:** once the app reopens the last library at launch (LIB-11), scripted launches need isolated
-  preferences so they never open the owner's real library (A5, A17).

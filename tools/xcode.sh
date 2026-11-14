@@ -1,7 +1,7 @@
 #!/bin/sh
 # Builds the thin Xcode app target with derived data and package checkouts kept under .cache/.
-# Like tools/swift.sh --disable-sandbox, it turns off Xcode's own manifest sandbox, which cannot nest inside
-# sandbox-exec (tools/check-independence.py).
+# Like tools/swift.sh --disable-sandbox, it turns off Xcode's manifest sandbox and the compiler's sandbox for macro
+# plugins, neither of which can nest inside sandbox-exec (tools/check-independence.py).
 set -eu
 project_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 configuration=${1:-Debug}
@@ -24,4 +24,5 @@ exec xcodebuild \
     -packageCachePath "$project_root/.cache/xcode-package-cache" \
     -quiet \
     -IDEPackageSupportDisableManifestSandbox=YES \
+    'OTHER_SWIFT_FLAGS=$(inherited) -disable-sandbox' \
     build "$@"

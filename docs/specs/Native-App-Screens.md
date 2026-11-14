@@ -111,7 +111,7 @@ States:
   the top of the recent list.
 
 New Library… opens a folder panel titled "Choose an Empty Folder for the New Library" with a New Folder button
-(LIB-2). Open Library… opens a folder panel; choosing an empty folder asks "Create a library in “Folder”?" with
+(LIB-2); choosing a folder that already holds a library opens it. Open Library… opens a folder panel; choosing an empty folder asks "Create a library in “Folder”?" with
 Create Library (default) and Cancel.
 
 At launch, the last library reopens without showing this window when it is available (LIB-11).

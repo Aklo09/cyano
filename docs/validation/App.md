@@ -36,3 +36,27 @@ Milestone 3 subtask A4. Tests written with the implementation (not by the `qa-en
 | `LibrarySessionTests` (6 tests) | Create, list, change, and close with ownership released; calls run off the main thread; in use with Try Again; not a library leaves the folder untouched; a refused replay (thrown as `INTEGRITY_CONFLICT`) shows the committed operation with a shell-quoted quarantine command and opens after quarantine; completed-change notice shown once; mid-session block cleared by Recover; overlapping opens leave one library owned and the other released; a result arriving after close is ignored |
 | `LibraryMessageTests` (4 tests) | Every case of `NativeLibraryError`, `BlueprintCodecError` (all limits), `PreviewError`, `PlannerRuntimeError`, `StatisticsError`, `AssetReleaseError`, `PrototypeMapError`, and an unknown error, in every activity, has a title and guidance without codes or errno and the expected code in Details; cancelled renders show nothing; listing issues have their own wording |
 | Repetition | The two app suites passed 15 consecutive runs after the overlapping-open test stopped assuming which open starts first |
+
+## Library selection (2026-11-14)
+
+Milestone 3 subtask A5. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `LibrarySelectionModelTests` (9 tests) | LIB-1 to LIB-11 and REC-2 to REC-4 at model level: first launch, empty and `.DS_Store`-only folders asking before creation, New Library on an existing library, recents order/dedupe/limit/unavailable/remove, foreign folder untouched, `UNSUPPORTED_VERSION`, LIB-6 only through an injected opener (no synchronized folder is created by tests), in use with Try Again, switching releases the first library, reopen at launch kept on quit and app dismissal but forgotten when the owner closes, missing or held last library ending in selection, recovery state surviving `close()` and dismissed by Back, preferences override |
+| Repetition | The three app suites passed 5 consecutive runs |
+| Real app, isolated preferences, launched with `open` | No last library: only the selection window (520 × 232). Last library available: only the library window (900 × 452), `fb-native owner` reports owned, then idle after terminate. Last library held by another process: only the selection window, showing the in-use state (520 × 280); the holder kept running and exited normally |
+| `python3 tools/check-independence.py --deny-path ../fb` | PASS, with the launch using a scratch preferences domain that is deleted afterwards |
+| `just lint`, `just build`, `just test`, `just app-build` (Debug and Release) | Pass |
+
+Findings:
+
+- **Window on another Space:** launched directly (not through `open`), the app is not activated, so its window can
+  open on another Space and never count as on screen; the A3 build in its own worktree still did, the same code
+  built here did not. Launch checks therefore count the windows the app created, or launch through `open`.
+- **Macro plugins under `sandbox-exec`:** with `@State` and `@Observable`, the relocated app build failed until
+  `tools/xcode.sh` passed `-disable-sandbox` to the Swift compiler.
+
+Not covered by scripts: closing the library window by hand and quitting with ⌘Q (no accessibility access to drive
+the UI); both are left to the owner walkthrough. Termination in the checks above used SIGTERM, which releases the
+kernel lease but is not a normal quit.
