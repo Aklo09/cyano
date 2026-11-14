@@ -54,6 +54,6 @@ let package = Package(
         .testTarget(name: "FactorioDataTests", dependencies: ["FactorioData", "LibraryCore", "FBNativeCLI"]),
         .testTarget(
             name: "LibraryAppTests",
-            dependencies: ["LibraryApp", "LibraryCore", "FactorioData", "PreviewRenderer"]),
+            dependencies: ["LibraryApp", "LibraryCore", "FactorioData", "PreviewRenderer", "FBNativeCLI"]),
     ]
 )

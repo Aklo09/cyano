@@ -23,6 +23,8 @@ public final class LibrarySelectionModel {
     public let assets: AssetSettings
     /// Preview scheduling for the inspector and preview windows.
     public let previews: PreviewCenter
+    /// Statistics for the inspector.
+    public let statistics: StatisticsModel
     public private(set) var windowGoal: WindowGoal
     public private(set) var recents: [RecentRow] = []
     /// An empty folder chosen with Open Library, awaiting "Create a library in …?" (LIB-2).
@@ -42,6 +44,7 @@ public final class LibrarySelectionModel {
         browser = LibraryBrowserModel(session: session)
         assets = AssetSettings(defaults: defaults)
         previews = PreviewCenter(session: session, assets: assets, backend: previewBackend)
+        statistics = StatisticsModel(session: session, assets: assets)
         let assets = assets
         Task { await assets.verifySaved() }
         store = RecentLibraryStore(defaults: defaults)

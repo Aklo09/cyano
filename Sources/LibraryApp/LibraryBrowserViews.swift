@@ -297,7 +297,11 @@ extension BrowserRow {
 struct ItemInspector: View {
     @Bindable var browser: LibraryBrowserModel
     let previews: PreviewCenter
+    let statistics: StatisticsModel
     let assetsRevision: Int
+
+    /// The inspector's height, so the header and the preview leave room for the tabs in short windows.
+    @State private var height: CGFloat = 720
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -309,12 +313,15 @@ struct ItemInspector: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
                 }
-                .frame(maxHeight: 260)
+                .frame(maxHeight: min(260, max(80, height * 0.25)))
                 .fixedSize(horizontal: false, vertical: true)
                 if browser.previewTarget != nil {
-                    InspectorPreview(browser: browser, center: previews, assetsRevision: assetsRevision)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 12)
+                    InspectorPreview(
+                        browser: browser, center: previews, assetsRevision: assetsRevision,
+                        height: min(200, max(100, height * 0.25))
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
                 } else if let count = bookEntryCount {
                     BookPreviewNote(browser: browser, entryCount: count)
                         .padding(.horizontal, 16)
@@ -329,7 +336,8 @@ struct ItemInspector: View {
                 .padding(.bottom, 8)
                 Divider()
                 switch browser.inspectorTab {
-                case .statistics: StatisticsTab(browser: browser)
+                case .statistics:
+                    StatisticsTab(browser: browser, model: statistics, assetsRevision: assetsRevision)
                 case .details: DetailsTab(browser: browser)
                 case .comments: CommentsTab(browser: browser)
                 }
@@ -354,6 +362,11 @@ struct ItemInspector: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onGeometryChange(for: CGFloat.self) {
+            $0.size.height
+        } action: {
+            height = $0
+        }
         .background(Color.contentBackground)
         .inspectorColumnWidth(min: 240, ideal: 280, max: 420)
         .task(id: browser.selectedItem.map { $0.id + $0.metadata.sourceSha256 }) {
@@ -431,24 +444,6 @@ private struct InspectorHeader: View {
             }
         }
         ExportButtons(browser: browser).padding(.top, 4)
-    }
-}
-
-/// Statistics arrive with A13; books and planners are not applicable (STA-5).
-private struct StatisticsTab: View {
-    let browser: LibraryBrowserModel
-
-    var body: some View {
-        let kind = browser.selectedDetail?.kind ?? browser.selectedItem.map { ItemKind(stored: $0.kind) }
-        VStack(alignment: .leading) {
-            switch kind {
-            case .book?: Text("Statistics don't apply to books. Open the book to see its blueprints.")
-            case .upgradePlanner?, .deconstructionPlanner?: Text("Statistics don't apply to planners.")
-            default: Text("Construction statistics come with a later build.")
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .padding(16)
     }
 }
 

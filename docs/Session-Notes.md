@@ -72,7 +72,14 @@ check, and a smoke run of a relocated app copy with the build's `PackageFramewor
 render in the inspector, nothing to draw, a planner window from ⌘Y with View-menu zoom, and after quit no worker and an
 idle owner; see [validation](validation/App.md#previews-2026-11-14)). Not yet exercised in the real app, for A17: Space
 in the list, windows closing with the library, rename or replace with a window open, a release change, and one worker
-at most under real renders (covered by tests with a fake backend). Resume with A13 (statistics panel).
+at most under real renders (covered by tests with a fake backend). A13 is done: the Statistics tab shows counts,
+footprint, item groups, and worded warnings from `StatisticsModel`/`StatisticsPresentation`; STA-2 parity with
+`fb-native statistics` for the seven approved blueprints is a test that needs the private release (see the
+[app guide](development/App.md#statistics)). In short windows the inspector now caps its header and preview so the
+tabs keep room. A real-app run checked the tab at minimum window size, a nested book entry, a book, a planner, and
+⌘C (see [validation](validation/App.md#statistics-2026-11-14)). Scripted runs while the owner uses the Mac: launch
+with `open -g`, use accessibility actions and `screencapture -l` only, and send no keystrokes or clicks without the
+owner's go-ahead. Next: A15 (menus and lifecycle).
 Cached row thumbnails (BRW-9) remain unbuilt.
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.

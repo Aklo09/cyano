@@ -78,7 +78,7 @@ VoiceOver.
 buttons) and Statistics, Details, and Comments tabs (⌘1–⌘3). `commentScope` is the selected item's root, the selected
 entry in an open book, or the open book itself; its comments come from the listing, oldest first. Drafts are kept per
 scope, so text typed for one item never goes to another. Add Comment (⌥⌘K, then ⌘↩) refuses empty, whitespace-only,
-and over-64 KB text and keeps it; deleting asks first. The Statistics tab is a placeholder until A13.
+and over-64 KB text and keeps it; deleting asks first. The Statistics tab is described under Statistics.
 
 **Organization** acts on `organizableSelection`: saved items and folders, never entries inside a book. New Folder
 (⇧⌘N) creates the next free "New Folder" name and starts renaming it; Return renames the selected row in place
@@ -101,6 +101,31 @@ Choose an assembled release (a folder with `release.json`, `sprites/`, and `stat
 
 Rows show their kind symbol. Cached thumbnails (BRW-9) are not built yet: they need a cache-only lookup per row
 (`LibraryPreviewService.cached` now provides one) and a decision on decoding thumbnails from full-size PNGs; no row ever starts a render.
+
+## Statistics
+
+`StatisticsModel` (owned by `LibrarySelectionModel` as `statistics`) fills the Statistics tab (STA-1 to STA-6). The
+tab calls `show(_:)` with `LibraryBrowserModel.statisticsTarget` (the inspector's scope: a root item, the selected
+book entry, or the open book itself, with its kind and source hash) whenever the target or `AssetSettings.revision`
+changes. Books and planners are not applicable without touching the release. Then the release state decides: none
+asks for one (STA-4), a checking release shows nothing until its revision changes, a problem or a library overlap
+says the release can't be used, and only a `prototypeMap()` failure after that is "can't provide statistics"
+(STA-6). The map loads once per release (SET-5); the calculation itself (`NativeLibrary.statistics`, the same call
+as `fb-native statistics`) runs through the library worker, because it takes milliseconds. A later request drops
+an earlier result.
+
+`StatisticsPresentation` turns a result into what the tab shows: entity and tile counts, the footprint (complete,
+incomplete with the known bounds as "at least", or incomplete with none), whether requirements are complete, the
+non-empty groups (Construction items, Placement, Modules, Equipment, Other inserted, and Equipment requests, noted as
+not included in the total), and warnings worded from their codes with the entity, item, tile, or quality named and
+the incomplete part stated (STA-3). Counts stay integers and sizes stay numbers, so the view formats them for the
+Mac's locale and tests compare values. Selected rows copy as tab-separated text with ⌘C (`copyText(rows:)`).
+
+`StatisticsParityAppTests` checks STA-2: for the seven approved blueprints it compares the presentation with
+`fb-native statistics` output for the private release in `.cache/renderer-assets`, and is skipped without it.
+
+In short windows the inspector caps its header and the preview at a quarter of its height each (header 80–260 pt,
+preview 100–200 pt), so the tabs keep room at the 500 pt minimum window height.
 
 ## Previews
 

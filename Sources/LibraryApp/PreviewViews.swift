@@ -237,6 +237,8 @@ struct InspectorPreview: View {
     let browser: LibraryBrowserModel
     let center: PreviewCenter
     let assetsRevision: Int
+    /// The image area's height; the inspector shrinks it in short windows.
+    var height: CGFloat = 200
     @State private var display = PreviewDisplay()
     @Environment(\.openWindow) private var openWindow
 
@@ -244,7 +246,7 @@ struct InspectorPreview: View {
         let target = browser.previewTarget
         VStack(alignment: .leading, spacing: 6) {
             PreviewArea(display: display, name: target?.name ?? "")
-                .frame(height: 200)
+                .frame(height: height)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.separator))
             if let target {

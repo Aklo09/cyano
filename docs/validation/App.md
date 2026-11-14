@@ -204,3 +204,27 @@ Not exercised in the real app (scripted input stopped while the owner was using 
 closing with the library, rename or replace with a window open, a release change, and sampling worker processes under
 real renders. During the run a Colors panel opened and the zoom read 332% after one ⌘− keystroke; repeating the same
 steps did not reproduce it, so it is unexplained (possibly outside input).
+
+## Statistics (2026-11-14)
+
+Milestone 3 subtask A13. Tests written with the implementation (not by the `qa-engineer` subagent); they use the
+minimal test release, and the parity test uses the private release when present.
+
+| Check | Result |
+| --- | --- |
+| `StatisticsModelTests` (5 tests) | STA-4 no release asks for one; STA-5 books and planners are not applicable; STA-1 counts, groups, and footprint for a root blueprint and a book entry reached through the browser by stored index; SET-5 the map loads once for several entries; STA-3 warnings worded once with their count, naming the entity or quality, known bounds as "at least", no known bounds as incomplete; refused data shows "Statistics can't be calculated for this blueprint"; STA-6 an unsuitable map says the release can't provide statistics; rows copy as text |
+| `StatisticsParityAppTests` | STA-2: for `RS.txt`, `4x_Rocket_Silo.txt`, `Hazard_Patterns.txt`, `bp.txt` `0.0` and `1.1`, `v0.59.0.txt` `1.1`, and `elevated-rails.bp.txt` `0`, every count, footprint, completeness flag, group row, and warning count shown matches `fb-native statistics` with the private release |
+| `just lint`, `just test`, `just app-build`, independence check (`Package.swift`: `LibraryAppTests` depends on `FBNativeCLI`) | Pass |
+
+Real app, scripted (owner allowed the screen; private release): at the minimum window size (900 × 552 with the
+toolbar) "concrete patterns" showed 0 entities, 437 tiles, footprint 21 × 21, concrete 181 and refined-hazard-concrete
+256, as `fb-native statistics` reported before launch; "Simple RS Latch" showed 7 entities, 4 × 4, and its three
+combinators, also matching; the book showed "Statistics don't apply to books…" and the planner "Statistics don't
+apply to planners."; entry `0.0` of the `bp.txt` book, opened with ⌘↓ twice, showed 1,157 entities, 83 × 43, and a
+legendary fast-inserter row; selecting two rows and pressing ⌘C copied `assembling-machine-3	30` and
+`bulk-inserter	106` (the owner's clipboard was restored afterwards). After quit, no app or worker process remained and
+the library was idle.
+
+Fixed during the run: with a planner selected, the Statistics message asked for more height than the window had, and
+the whole window's content (sidebar included) shifted up under the toolbar. Messages now sit in a scroll view, like the
+Details tab.
