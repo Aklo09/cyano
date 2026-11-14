@@ -18,6 +18,7 @@ extension NativeLibrary {
         _ prepared: [PreparedLibraryChange], cacheIds: [String] = [], removed: LibraryRemovedItem? = nil
     ) throws {
         guard !prepared.isEmpty, prepared.count <= LibraryBounds.changes else { throw NativeLibraryError.invalidInput }
+        removedToQuarantine = false
         var total = 0
         for change in prepared {
             _ = try MutationPath.parts(change.path, file: true)
@@ -299,6 +300,22 @@ extension NativeLibrary {
     }
 }
 
+/// Where the originals of a deleted or replaced item went (spec ORG-9).
+public enum LibraryRemovalPlace: String, Codable, Sendable {
+    /// The macOS Trash (or `FB_NATIVE_TRASH_DIRECTORY`).
+    case trash
+    /// `operations-quarantine/` inside the library, because the Trash refused them.
+    case quarantine
+}
+
+/// The result of replacing an item's source.
+public struct LibraryReplacement: Sendable {
+    public let item: LibraryItem
+    /// Comments whose book entries no longer exist, now on the root with a `[Former book entry …]` prefix.
+    public let promotedComments: Int
+    public let originals: LibraryRemovalPlace
+}
+
 /// Exact preimages of a deleted or replaced item, staged as one folder for the Trash.
 struct LibraryRemovedItem {
     let folder: String
@@ -330,6 +347,7 @@ extension NativeLibrary {
             } catch {
                 let quarantine = try root.child(Self.quarantineName, create: true)
                 try removed.move(name, to: quarantine, as: "\(operationId) \(name)")
+                removedToQuarantine = true
             }
             try hook?(.removedRetained)
         }

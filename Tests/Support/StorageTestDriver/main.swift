@@ -14,6 +14,12 @@ do {
         _ = FileHandle.standardInput.readDataToEndOfFile()
     case "probe":
         print(try NativeLibrary.inspectOwnership(at: url).rawValue)
+    case "delete-report":
+        // Prints where the originals went: "trash" or "quarantine".
+        guard args.count == 3 else { exit(2) }
+        let library = try NativeLibrary(at: url)
+        defer { library.close() }
+        print(try library.deleteItem(id: args[2]).rawValue)
     case "export-limited":
         // Exports with a file-size limit so the write fails part way (EFBIG instead of SIGXFSZ).
         guard args.count == 5, let limit = rlim_t(args[4]) else { exit(2) }

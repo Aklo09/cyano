@@ -21,6 +21,8 @@ public final class NativeLibrary: @unchecked Sendable {
     let formatBytes: Data
     let hook: ((LibraryWritePhase) throws -> Void)?
     var needsRecovery = false
+    /// Set by the last commit when the Trash refused removed originals; read on the queue right after it.
+    var removedToQuarantine = false
     /// Committed operations that opening this session replayed, oldest directory name first. An interrupted change
     /// was completed for each; applications tell the owner (spec REC-1). Empty when nothing was pending.
     public private(set) var completedOnOpen: [LibraryOperationRecord] = []

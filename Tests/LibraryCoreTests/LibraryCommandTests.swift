@@ -33,8 +33,11 @@ private func commandBook() throws -> Data {
         ]}}
         """)
 }
-private func commandChild(_ name: String, _ args: [String]) throws -> (Int32, Data, Data) {
+private func commandChild(_ name: String, _ args: [String], environment: [String: String]? = nil) throws -> (
+    Int32, Data, Data
+) {
     let process = Process()
+    if let environment { process.environment = environment }
     process.executableURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         .deletingLastPathComponent().appendingPathComponent(".build/debug/\(name)")
     process.arguments = args
@@ -87,6 +90,32 @@ struct LibraryCommandTests {
         try library.deleteFolder("Destination/Moved")
         try library.deleteFolder("Destination")
         #expect(try library.list().folders.isEmpty)
+    }
+
+    @Test("Deletion and replacement report promoted comments and where the originals went, Trash or quarantine")
+    func removalOutcomes() throws {
+        let target = try CommandLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        let book = try library.importSource(commandBook())
+        _ = try library.addComment(id: book.id, entryPath: [5, 0], text: "On the leaf")
+        _ = try library.addComment(id: book.id, entryPath: [9], text: "On the planner")
+        _ = try library.addComment(id: book.id, text: "On the root")
+        let replaced = try library.replaceSource(id: book.id, bytes: commandSource())
+        #expect(replaced.promotedComments == 2 && replaced.originals == .trash)
+        #expect(replaced.item.metadata.comments.filter { $0.text.hasPrefix("[Former book entry") }.count == 2)
+        let doomed = try library.importSource(commandSource()).id
+        library.close()
+
+        var environment = ProcessInfo.processInfo.environment
+        environment["FB_NATIVE_TRASH_DIRECTORY"] = "/dev/null/no-trash"
+        let deleted = try commandChild(
+            "StorageTestDriver", ["delete-report", target.url.path, doomed], environment: environment)
+        #expect(deleted.0 == 0, "\(String(decoding: deleted.2, as: UTF8.self))")
+        #expect(String(decoding: deleted.1, as: UTF8.self) == "quarantine\n")
+        let quarantine = try FileManager.default.contentsOfDirectory(
+            atPath: target.url.appendingPathComponent("operations-quarantine").path)
+        #expect(quarantine.count == 1 && quarantine[0].contains("deleted"))
     }
 
     @Test("A failed export write leaves no partial file at the destination")

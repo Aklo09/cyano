@@ -134,7 +134,8 @@ extension NativeLibrary {
             basename: basename)
     }
 
-    public func deleteItem(id: String) throws {
+    /// Deletes an item; its exact originals go to the Trash, or to `operations-quarantine/` if the Trash refuses.
+    @discardableResult public func deleteItem(id: String) throws -> LibraryRemovalPlace {
         try queue.sync {
             try ready()
             let (found, document, metadata) = try load(id: id)
@@ -148,16 +149,24 @@ extension NativeLibrary {
                     PreparedLibraryChange(path: base + ".json", before: metadata, after: nil),
                 ], cacheIds: [id], removed: removed)
             itemPaths?[id] = nil
+            return removedToQuarantine ? .quarantine : .trash
         }
     }
 
     public func updateSource(id: String, bytes: Data) throws -> LibraryItem {
+        try replaceSource(id: id, bytes: bytes).item
+    }
+
+    /// Replaces an item's source, reporting promoted comments and where the previous originals went (ORG-11, ORG-12).
+    public func replaceSource(id: String, bytes: Data) throws -> LibraryReplacement {
         try queue.sync {
             try ready()
             let document = try BlueprintCodec.decode(bytes)
             let (found, oldDocument, before) = try load(id: id)
+            var promoted = 0
             let comments = try found.metadata.comments.map { comment -> LibraryComment in
                 if (try? document.entry(at: comment.entryPath)) != nil { return comment }
+                promoted += 1
                 let text =
                     "[Former book entry \(comment.entryPath.map(String.init).joined(separator: "."))]\n\n"
                     + comment.text
@@ -180,7 +189,9 @@ extension NativeLibrary {
                     PreparedLibraryChange(path: base + ".txt", before: oldDocument.original.bytes, after: bytes),
                     PreparedLibraryChange(path: base + ".json", before: before, after: after),
                 ], cacheIds: [id], removed: removed)
-            return item(metadata: metadata, document: document, folder: found.folder, basename: found.basename)
+            return LibraryReplacement(
+                item: item(metadata: metadata, document: document, folder: found.folder, basename: found.basename),
+                promotedComments: promoted, originals: removedToQuarantine ? .quarantine : .trash)
         }
     }
 

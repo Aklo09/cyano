@@ -227,6 +227,8 @@ Item deletion and source replacement also stage copies of the exact preimage TXT
 and before intent removal, that folder moves to the macOS Trash; replay skips the step once `removed/` is gone,
 so a crash never loses or duplicates it. If the Trash refuses the folder, it moves to `operations-quarantine/`
 inside the library instead, so an unavailable Trash never blocks recovery.
+`deleteItem` reports where the originals went (`trash` or `quarantine`); `replaceSource` returns the updated item,
+the number of comments it promoted to the root, and the same place. `updateSource` returns only the item.
 `FB_NATIVE_TRASH_DIRECTORY`, an absolute path, redirects these folders for tests and development;
 `tools/swift.sh test` sets it to `.cache/test-trash`.
 The multi-file operation becomes consistent through roll-forward recovery; it is not one filesystem-atomic rename.
