@@ -1,4 +1,5 @@
 import Darwin
+import FactorioData
 import Foundation
 import Testing
 
@@ -192,6 +193,45 @@ struct LibraryPreviewTests {
         #expect(try library.export(id: item.id) == bytes)
         #expect(try library.list().items.first?.metadata == commented.metadata)
         #expect(try library.cleanupCache().selection.isEmpty)
+    }
+
+    @Test("Cache-only lookups need no worker or release verification and match only the given asset identity")
+    func cacheOnlyLookup() throws {
+        let target = try PreviewLibrary()
+        defer { target.cleanup() }
+        let assets = try SyntheticPreviewAssets()
+        defer { assets.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.root)
+        defer { library.close() }
+        let item = try library.importSource(try renderSource())
+        let identity = try AssetRelease.verify(at: assets.root).identity
+        let lookups = LibraryPreviewService(workerURL: target.parent.appendingPathComponent("missing-worker"))
+        #expect(
+            try lookups.cached(
+                library: library, id: item.id, assetsURL: assets.root, assetIdentity: identity, options: options)
+                == nil)
+        let rendered = try LibraryPreviewService(workerURL: ownedBinary()).render(
+            library: library, id: item.id, assetsURL: assets.root, options: options)
+        let hit = try #require(
+            try lookups.cached(
+                library: library, id: item.id, assetsURL: assets.root, assetIdentity: identity, options: options))
+        #expect(hit.cacheHit && hit.key == rendered.key && hit.preview.png == rendered.preview.png)
+        #expect(lookups.lastWorkerPID == nil)
+        // Another release identity, or other options, are other cache entries.
+        let other = String(repeating: "0", count: 64)
+        #expect(
+            try lookups.cached(
+                library: library, id: item.id, assetsURL: assets.root, assetIdentity: other, options: options) == nil)
+        #expect(
+            try lookups.cached(library: library, id: item.id, assetsURL: assets.root, assetIdentity: identity) == nil)
+        // A caller's cancellation token cancels its own render before a worker starts.
+        let token = PreviewCancellation()
+        token.cancel()
+        #expect(throws: PreviewError.cancelled) {
+            try LibraryPreviewService(workerURL: ownedBinary()).render(
+                library: library, id: item.id, assetsURL: assets.root, options: options, refresh: true,
+                cancellation: token)
+        }
     }
 
     @Test("Settings distinguish cache identities; source replacement and item deletion invalidate all variants")

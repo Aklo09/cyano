@@ -41,11 +41,59 @@ public final class LibraryPreviewService: @unchecked Sendable {
         process.cancel()
     }
 
+    /// Looks up a published preview for a release the caller verified earlier (its `assetIdentity`), without
+    /// verifying the release again or starting a worker. It does not take the render slot, so it can run while
+    /// another entry renders; nil means the entry needs a render.
+    public func cached(
+        library: NativeLibrary, id: String, entryPath: [Int] = [], assetsURL: URL, assetIdentity: String,
+        options: LibraryPreviewOptions = LibraryPreviewOptions()
+    ) throws -> LibraryPreviewResult? {
+        let started = previewMilliseconds()
+        guard !library.isClosing else { throw NativeLibraryError.closed }
+        try LibraryDirectory.validateURL(assetsURL)
+        let ignoreCancel: @Sendable () -> Void = {}
+        return try library.withPreviewContext(id: id, entryPath: entryPath, onCancel: ignoreCancel) { context in
+            try context.checkAssets(assetsURL)
+            let identity = LibraryCacheIdentity(
+                itemId: id, sourceSha256: context.sourceSha256, entryPath: entryPath,
+                generator: options.generator, assetIdentity: assetIdentity)
+            let key = try identity.key()
+            guard
+                let result = try Self.cachedResult(
+                    context, identity: identity, assetsURL: assetsURL, assetIdentity: assetIdentity,
+                    options: options)
+            else { return nil }
+            return LibraryPreviewResult(
+                key: key, cacheHit: true, cachePath: "cache/\(id)/\(key).png",
+                durationMs: previewMilliseconds() - started, preview: result)
+        }
+    }
+
+    /// A cached image and report that still validate for `identity`, or nil.
+    private static func cachedResult(
+        _ context: LibraryPreviewContext, identity: LibraryCacheIdentity, assetsURL: URL, assetIdentity: String,
+        options: LibraryPreviewOptions
+    ) throws -> PreviewResult? {
+        guard let cached = try context.cached(identity),
+            let report = try? JSONDecoder().decode(PreviewReport.self, from: cached.report)
+        else { return nil }
+        let request = PreviewRequest(
+            source: context.source, entryPath: context.entryPath, assetsPath: assetsURL.path, tier: options.tier,
+            maximumDimension: options.maximumDimension, checkerboard: options.checkerboard)
+        let result = PreviewResult(report: report, png: cached.image)
+        guard (try? PreviewProcess.validate(result, request: request)) != nil, report.assetIdentity == assetIdentity
+        else { return nil }
+        return result
+    }
+
+    /// Renders one entry, or serves it from the cache. `cancellation` lets the caller cancel this job alone;
+    /// `cancel()` cancels whichever job is active.
     public func render(
         library: NativeLibrary, id: String, entryPath: [Int] = [], assetsURL: URL,
-        options: LibraryPreviewOptions = LibraryPreviewOptions(), refresh: Bool = false
+        options: LibraryPreviewOptions = LibraryPreviewOptions(), refresh: Bool = false,
+        cancellation: PreviewCancellation? = nil
     ) throws -> LibraryPreviewResult {
-        let token = PreviewCancellation()
+        let token = cancellation ?? PreviewCancellation()
         lock.lock()
         guard active == nil else {
             lock.unlock()
@@ -78,17 +126,15 @@ public final class LibraryPreviewService: @unchecked Sendable {
             let request = PreviewRequest(
                 source: context.source, entryPath: entryPath, assetsPath: assetsURL.path,
                 tier: options.tier, maximumDimension: options.maximumDimension, checkerboard: options.checkerboard)
-            let cached = try context.cached(identity)
-            if !refresh, let cached, let report = try? JSONDecoder().decode(PreviewReport.self, from: cached.report) {
-                let result = PreviewResult(report: report, png: cached.image)
-                if (try? PreviewProcess.validate(result, request: request)) != nil,
-                    result.report.assetIdentity == verified.identity
-                {
-                    try token.check()
-                    return LibraryPreviewResult(
-                        key: key, cacheHit: true, cachePath: "cache/\(id)/\(key).png",
-                        durationMs: previewMilliseconds() - started, preview: result)
-                }
+            if !refresh,
+                let result = try Self.cachedResult(
+                    context, identity: identity, assetsURL: assetsURL, assetIdentity: verified.identity,
+                    options: options)
+            {
+                try token.check()
+                return LibraryPreviewResult(
+                    key: key, cacheHit: true, cachePath: "cache/\(id)/\(key).png",
+                    durationMs: previewMilliseconds() - started, preview: result)
             }
             try context.willStartWorker()
             try token.check()

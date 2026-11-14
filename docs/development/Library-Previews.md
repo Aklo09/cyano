@@ -62,7 +62,10 @@ Within the owning process, rendering runs off the library queue, so listing, com
 If the item's source changes before publication, the render fails with `SOURCE_CHANGED` and saves nothing.
 
 The shared `LibraryPreviewService` API runs synchronously; an application should call it from background work.
-`cancel()` cancels its current request. `NativeLibrary.close()` marks the library as closing,
+`cancel()` cancels its current request; a caller can instead pass its own `PreviewCancellation` to `render`, which
+cancels only that request. `cached(...)` looks up a published preview for a release identity the caller already
+verified: it never verifies the release again, never starts a worker, and does not take the render slot, so it can
+run while another entry renders (the app uses it for instant cache hits). `NativeLibrary.close()` marks the library as closing,
 cancels every in-flight preview, waits for worker cleanup, and then closes the owner lease.
 Cancellation remains effective before worker launch. Pure asset preflight may finish reading before observing cancellation;
 it cannot launch a worker against a closed library.
