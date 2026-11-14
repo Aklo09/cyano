@@ -161,10 +161,15 @@ struct ItemList: View {
         }
         .scrollContentBackground(.hidden)
         .background(Color.contentBackground)
-        .contextMenu(forSelectionType: String.self) { _ in
+        .contextMenu(forSelectionType: String.self) { ids in
+            RowMenu(browser: browser, ids: ids)
         } primaryAction: { ids in
             browser.selection = ids
             Task { await browser.openSelection() }
+        }
+        .onCopyCommand {
+            Task { await browser.copySelectedString() }
+            return []
         }
         .accessibilityLabel("Book entries")
     }
@@ -196,10 +201,15 @@ struct ItemList: View {
         }
         .scrollContentBackground(.hidden)
         .background(Color.contentBackground)
-        .contextMenu(forSelectionType: String.self) { _ in
+        .contextMenu(forSelectionType: String.self) { ids in
+            RowMenu(browser: browser, ids: ids)
         } primaryAction: { ids in
             browser.selection = ids
             Task { await browser.openSelection() }
+        }
+        .onCopyCommand {
+            Task { await browser.copySelectedString() }
+            return []
         }
         .onChange(of: sortOrder, initial: true) { _, order in
             guard let first = order.first else { return }
@@ -240,6 +250,7 @@ struct ItemInspector: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
+                ExportButtons(browser: browser)
                 if browser.showsBook, let detail = browser.selectedDetail {
                     EntryDetailView(detail: detail, item: detail.location == nil ? browser.openBookItem : nil)
                 } else if let item = browser.selectedItem {
@@ -401,4 +412,40 @@ private struct IssueRow: Identifiable {
 /// The general pasteboard's text, exactly as copied.
 enum LibraryPasteboard {
     @MainActor static var text: String { NSPasteboard.general.string(forType: .string) ?? "" }
+
+    @MainActor static func write(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+    }
+}
+
+/// Context menu for item and entry rows.
+private struct RowMenu: View {
+    let browser: LibraryBrowserModel
+    let ids: Set<String>
+
+    var body: some View {
+        if browser.canOpenSelection && ids == browser.selection {
+            Button("Open") { Task { await browser.openSelection() } }
+        }
+        if ids.count == 1, ids == browser.selection, browser.exportTarget != nil {
+            Button("Copy String") { Task { await browser.copySelectedString() } }
+            Button("Save As TXT…") { Task { await ExportFlow.saveSelection(browser) } }
+        }
+    }
+}
+
+/// Copy String and Save As TXT for the inspector's item or entry.
+struct ExportButtons: View {
+    let browser: LibraryBrowserModel
+
+    var body: some View {
+        if browser.exportTarget != nil {
+            HStack {
+                Button("Copy String") { Task { await browser.copySelectedString() } }
+                Button("Save As TXT…") { Task { await ExportFlow.saveSelection(browser) } }
+            }
+            .controlSize(.small)
+        }
+    }
 }

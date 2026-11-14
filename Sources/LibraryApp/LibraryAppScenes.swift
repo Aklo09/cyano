@@ -84,6 +84,9 @@ struct LibraryCommands: Commands {
             Button("Import from Clipboard") { model.browser.beginImport(text: LibraryPasteboard.text) }
                 .keyboardShortcut("v", modifiers: [.command, .shift])
                 .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            Button("Save As TXT…") { Task { await ExportFlow.saveSelection(model.browser) } }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
+                .disabled(model.browser.exportTarget == nil)
             Divider()
             Button("Close Library") { Task { await model.closeLibrary() } }
                 .keyboardShortcut("w", modifiers: [.command, .shift])

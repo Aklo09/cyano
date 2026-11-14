@@ -123,3 +123,16 @@ Milestone 3 subtask A8. Tests written with the implementation (not by the `qa-en
 
 Not scripted: dragging files from Finder onto the list or a sidebar folder (the model path is tested); left to the
 owner walkthrough. The inspector no longer repeats small sizes as "925 bytes (925 bytes)".
+
+## Export (2026-11-14)
+
+Milestone 3 subtask A9. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `ExportActionsTests` (4 tests) | EXP-1 Copy String puts the exact root bytes (CRLF and surrounding whitespace) on the clipboard; EXP-2 an entry in an open book copies its standalone string; EXP-3 Save As TXT writes the export bytes; EXP-4 replacing moves the previous file to the (test) Trash; EXP-5 destinations inside the library, through a link, or replacing a stored file are refused with nothing changed; EXP-6 a failed save leaves no file and restores a replaced one |
+| Core: `LibraryCommandTests/failedExportWrite` | A write failing part way (file-size limit) leaves no partial file |
+| Real app, scripted | ⌘C on "Simple RS Latch" put exactly the stored 925 bytes on the clipboard and showed "Copied blueprint string"; ⇧⌘E saved through the real save panel a file identical to the stored bytes; saving into the library folder showed "Exports can't be saved inside the library folder" and wrote nothing; the system replace prompt defaulted to Cancel |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Note: the app has no icon yet, so alerts show the generic application icon.

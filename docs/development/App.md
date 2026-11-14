@@ -67,6 +67,13 @@ the main thread first, which names the kind or the problem before saving and ref
 files import one by one; failures are listed in a summary while the others stay imported. The destination defaults to
 the current folder, or the open book's folder; afterwards the new items, or the unpacked top folder, are selected.
 
+**Export** acts on `exportTarget`: the selected item's root, or the selected entry in an open book. Copy String
+(⌘C in the item list, the row menu, or the inspector) puts the exact exported bytes on the clipboard; Save As TXT
+(⇧⌘E) uses a save panel. A destination inside the library is refused before anything changes, and the panel
+reopens; a file the panel agreed to replace goes to the Trash first (honoring `FB_NATIVE_TRASH_DIRECTORY`) and comes
+back if the write fails. Both show a two-second confirmation at the bottom of the window, also announced to
+VoiceOver.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

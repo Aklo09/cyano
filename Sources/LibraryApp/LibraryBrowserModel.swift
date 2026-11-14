@@ -135,6 +135,12 @@ public final class LibraryBrowserModel {
     public private(set) var itemDetail: (key: String, detail: EntryDetail)?
     /// The open Import sheet, if any.
     public var importSheet: ImportModel?
+    /// A short confirmation shown at the bottom of the window ("Copied blueprint string").
+    public var confirmation: String?
+    /// A failed copy or save, shown as an alert.
+    public var exportFailure: LibraryMessage?
+    /// Writes text to the clipboard; tests replace it.
+    @ObservationIgnored public var pasteboardWriter: @MainActor (String) -> Void = LibraryPasteboard.write
     /// Files that failed in the last multi-file import, shown in a summary (IMP-3).
     public var importSummary: (imported: Int, total: Int, failures: [(name: String, reason: String)])?
 

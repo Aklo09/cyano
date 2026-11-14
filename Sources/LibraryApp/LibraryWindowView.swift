@@ -56,6 +56,26 @@ struct LibraryWindowView: View {
                     onDone: { browser.importSummary = nil })
             }
         }
+        .overlay(alignment: .bottom) {
+            if let confirmation = browser.confirmation {
+                Text(confirmation)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(.regularMaterial, in: Capsule())
+                    .padding(.bottom, 16)
+                    .accessibilityHidden(true)
+            }
+        }
+        .alert(
+            browser.exportFailure?.title ?? "",
+            isPresented: Binding(
+                get: { browser.exportFailure != nil }, set: { if !$0 { browser.exportFailure = nil } }),
+            presenting: browser.exportFailure
+        ) { _ in
+            Button("OK") { browser.exportFailure = nil }
+        } message: { message in
+            Text(message.guidance)
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

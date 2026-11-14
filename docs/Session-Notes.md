@@ -58,7 +58,9 @@ moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibi
 (`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
 `-FBNativeDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
 Open finding for A16: Tab never visibly reaches the item list. A8 is done: Import (paste, TXT files, drag and drop; one book or
-unpacked) keeps exact bytes and selects the result. Resume with A9 (export: copy root or entry string, save as TXT).
+unpacked) keeps exact bytes and selects the result. A9 is done: Copy String and Save As TXT
+for items and book entries, refusing destinations inside the library. Capture only app windows
+(`screencapture -l<window>`), never the whole screen. Resume with A10 (comments: list, add, delete).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 
