@@ -27,6 +27,7 @@ public struct LibraryAppScenes: Scene {
         Window(LibraryAppIdentity.name, id: LibraryAppIdentity.libraryWindow) {
             LibraryWindowView(model: model)
         }
+        .defaultSize(width: 1200, height: 720)
         .defaultLaunchBehavior(model.windowGoal == .library ? .presented : .suppressed)
         .restorationBehavior(.disabled)
     }

@@ -21,6 +21,7 @@ struct LibraryWindowView: View {
                 Divider()
                 ItemList(browser: browser)
             }
+            .background(Color.contentBackground)
         }
         .inspector(isPresented: $showInspector) {
             ItemInspector(browser: browser)
@@ -35,7 +36,7 @@ struct LibraryWindowView: View {
         .onChange(of: model.session.revision, initial: true) { browser.listingChanged() }
         .onChange(of: model.session.libraryURL) { browser.listingChanged() }
         .sheet(isPresented: Bindable(browser).showingIssues) { ListingIssuesSheet(browser: browser) }
-        .frame(minWidth: 760, minHeight: 440)
+        .frame(minWidth: 900, minHeight: 500)
         .navigationTitle(model.session.libraryURL?.lastPathComponent ?? LibraryAppIdentity.name)
         .task {
             guard !launched else { return }

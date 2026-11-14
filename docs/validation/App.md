@@ -76,3 +76,19 @@ Finding: after the owner quit the app with no windows open, every later direct l
 (including the A3 and A5 builds and isolated preferences) opened no window, because AppKit restored the saved state.
 Launching with `-ApplePersistenceIgnoreState YES` showed the window; the app now registers that default.
 Screenshots of the real window are not possible from the terminal without Screen Recording permission (A17).
+
+## Window fixes and real-window checks (2026-11-14)
+
+After the owner granted the terminal Screen Recording and Accessibility access, the real app was captured and driven
+by script with isolated preferences and the scratch library from A6.
+
+| Check | Result |
+| --- | --- |
+| Library window size | Opens at 1200 × 720 (was 900 × 452, which truncated names and hid the Size column); inspector 220–400 points, 260 by default |
+| Dark content background | Item list, path bar, and inspector use `contentBackground` (`#121212` in dark mode). Captures are tagged Display P3 and brighten dark grays: the system `#1E1E1E` window background reads `#282828` and the content reads `#171717`, the same proportion |
+| Light mode | Not captured: forcing light appearance for one launch is ignored; light mode keeps system colors only |
+| Closing the library window with its close button (LIFE-1) | Library released (`fb-native owner` idle), reopen-at-launch cleared, selection window shown with the library in its recents |
+| ⌘Q with a library open (LIB-11) | App quits, library released, kept for reopening at the next launch |
+
+The repository also lost a Vim swap file committed by mistake with the A2 screen specs; `.gitignore` now ignores
+Vim swap files.

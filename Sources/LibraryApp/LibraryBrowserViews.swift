@@ -136,6 +136,8 @@ struct ItemList: View {
             }
             .width(min: 60, ideal: 80)
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.contentBackground)
         .contextMenu(forSelectionType: String.self) { _ in
         } primaryAction: { ids in
             browser.selection = ids
@@ -216,7 +218,8 @@ struct ItemInspector: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
         }
-        .inspectorColumnWidth(min: 240, ideal: 300)
+        .background(Color.contentBackground)
+        .inspectorColumnWidth(min: 220, ideal: 260, max: 400)
     }
 }
 

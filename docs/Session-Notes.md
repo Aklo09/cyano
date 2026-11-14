@@ -54,7 +54,9 @@ launch; scripted launches must pass `-FBNativeDefaultsSuite <name>` (see the [ap
 A6 is done: `LibraryBrowserModel` drives the sidebar, path bar, item list, filter, and empty and issue states.
 Verification rule (owner, 2026-11-14): UI subtasks use `just lint`, `just test`, and `just app-build`; the
 independence check runs only for dependency, tooling, bundle, or network changes and at acceptance, and its app launch
-moves to the A17 smoke runs. Resume with A7 (books and planners: open books like folders by stored index,
+moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibility access, so real-window captures
+(`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
+`-FBNativeDefaultsSuite`. Resume with A7 (books and planners: open books like folders by stored index,
 descriptions, planner settings).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
