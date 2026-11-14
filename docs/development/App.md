@@ -80,6 +80,15 @@ entry in an open book, or the open book itself; its comments come from the listi
 scope, so text typed for one item never goes to another. Add Comment (⌥⌘K, then ⌘↩) refuses empty, whitespace-only,
 and over-64 KB text and keeps it; deleting asks first. The Statistics tab is a placeholder until A13.
 
+**Organization** acts on `organizableSelection`: saved items and folders, never entries inside a book. New Folder
+(⇧⌘N) creates the next free "New Folder" name and starts renaming it; Return renames the selected row in place
+(Return commits, Esc cancels, a refused name keeps the field open with the reason). Move To (⌃⌘M) offers only valid
+targets; rows can also be dragged onto a sidebar folder, where TXT files instead open Import. Move to Trash (⌘⌫ as a
+menu shortcut that keeps its text meaning in text fields) asks first; a non-empty folder is explained instead.
+Replace Source reports comments moved to the root. Originals the Trash refused are reported as kept in
+`operations-quarantine/`. SwiftUI clears an alert's presented value before its button runs, so the delete alert
+passes its value to `confirmDelete(_:)`.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

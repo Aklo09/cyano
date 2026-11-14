@@ -135,6 +135,18 @@ public final class LibraryBrowserModel {
     public private(set) var itemDetail: (key: String, detail: EntryDetail)?
     /// The open Import sheet, if any.
     public var importSheet: ImportModel?
+    /// The row being renamed in place (`BrowserRow.id`), if any.
+    public var renamingRow: String?
+    /// Why the last rename failed; the field stays open with the typed text.
+    public var renameFailure: LibraryMessage?
+    /// Why the last organization change failed or what it could not do, shown as an alert.
+    public var organizeFailure: LibraryMessage?
+    /// Items or a folder waiting for delete confirmation.
+    public var pendingDeletion: PendingDeletion?
+    /// Rows shown in the Move To sheet.
+    public var moveSheetRows: [BrowserRow]?
+    /// The open Replace Source sheet.
+    public var replaceSheet: ReplaceModel?
     /// The inspector tab shown for items and entries.
     public var inspectorTab: InspectorTab = .details
     /// Unsaved comment text per item or entry (`CommentScope.key`).

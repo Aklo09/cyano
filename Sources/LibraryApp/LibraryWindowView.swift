@@ -76,6 +76,42 @@ struct LibraryWindowView: View {
         } message: { message in
             Text(message.guidance)
         }
+        .sheet(
+            isPresented: Binding(get: { browser.moveSheetRows != nil }, set: { if !$0 { browser.moveSheetRows = nil } })
+        ) {
+            if let rows = browser.moveSheetRows { MoveToSheet(browser: browser, rows: rows) }
+        }
+        .sheet(
+            isPresented: Binding(get: { browser.replaceSheet != nil }, set: { if !$0 { browser.replaceSheet = nil } })
+        ) {
+            if let sheet = browser.replaceSheet {
+                ReplaceSheet(
+                    model: sheet, onReplace: { Task { await browser.runReplace() } },
+                    onCancel: { browser.replaceSheet = nil })
+            }
+        }
+        .alert(
+            browser.pendingDeletion?.title ?? "",
+            isPresented: Binding(
+                get: { browser.pendingDeletion != nil }, set: { if !$0 { browser.pendingDeletion = nil } }),
+            presenting: browser.pendingDeletion
+        ) { pending in
+            Button(pending.actionTitle, role: .destructive) { Task { await browser.confirmDelete(pending) } }
+            Button("Cancel", role: .cancel) { browser.pendingDeletion = nil }
+                .keyboardShortcut(.defaultAction)
+        } message: { pending in
+            Text(pending.message)
+        }
+        .alert(
+            browser.organizeFailure?.title ?? "",
+            isPresented: Binding(
+                get: { browser.organizeFailure != nil }, set: { if !$0 { browser.organizeFailure = nil } }),
+            presenting: browser.organizeFailure
+        ) { _ in
+            Button("OK") { browser.organizeFailure = nil }
+        } message: { message in
+            Text(message.guidance)
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

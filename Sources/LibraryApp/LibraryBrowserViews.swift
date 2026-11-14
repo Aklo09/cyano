@@ -13,15 +13,40 @@ struct FolderSidebar: View {
                 set: { if let path = $0 { browser.show(folder: path) } })
         ) {
             Label("Library", systemImage: "books.vertical").tag("")
-                .dropDestination(for: URL.self) { urls, _ in
-                    browser.beginImport(files: urls, folder: "")
-                    return !urls.isEmpty
+                .onDrop(of: [.fileURL, .plainText], isTargeted: nil) { browser.drop($0, into: "") }
+                .contextMenu {
+                    Button("New Folder") {
+                        Task {
+                            browser.show(folder: "")
+                            await browser.newFolder()
+                        }
+                    }
                 }
             OutlineGroup(browser.folderTree.children ?? [], children: \.children) { node in
                 Label(node.name, systemImage: "folder").tag(node.path)
-                    .dropDestination(for: URL.self) { urls, _ in
-                        browser.beginImport(files: urls, folder: node.path)
-                        return !urls.isEmpty
+                    .onDrop(of: [.fileURL, .plainText], isTargeted: nil) { browser.drop($0, into: node.path) }
+                    .contextMenu {
+                        Button("New Folder") {
+                            Task {
+                                browser.show(folder: node.path)
+                                await browser.newFolder()
+                            }
+                        }
+                        Button("Rename") {
+                            browser.show(folder: LibraryBrowserModel.parent(node.path))
+                            browser.selection = ["folder:" + node.path]
+                            browser.beginRename()
+                        }
+                        Button("Move To…") {
+                            browser.show(folder: LibraryBrowserModel.parent(node.path))
+                            browser.selection = ["folder:" + node.path]
+                            browser.moveSheetRows = browser.organizableSelection
+                        }
+                        Button("Delete Folder") {
+                            browser.show(folder: LibraryBrowserModel.parent(node.path))
+                            browser.selection = ["folder:" + node.path]
+                            browser.requestDelete()
+                        }
                     }
             }
         }
@@ -175,14 +200,18 @@ struct ItemList: View {
     }
 
     private func table(_ rows: [BrowserRow]) -> some View {
-        Table(rows, selection: $browser.selection, sortOrder: $sortOrder) {
+        Table(of: BrowserRow.self, selection: $browser.selection, sortOrder: $sortOrder) {
             TableColumn("Name", value: \.name, comparator: .localizedStandard) { row in
-                Label {
-                    Text(row.name)
-                } icon: {
-                    Image(systemName: row.kind.symbol).accessibilityHidden(true)
+                if browser.renamingRow == row.id {
+                    RenameField(browser: browser, row: row)
+                } else {
+                    Label {
+                        Text(row.name)
+                    } icon: {
+                        Image(systemName: row.kind.symbol).accessibilityHidden(true)
+                    }
+                    .accessibilityLabel(accessibilityLabel(row))
                 }
-                .accessibilityLabel(accessibilityLabel(row))
             }
             .width(min: 160, ideal: 280)
             if browser.isFiltering {
@@ -198,7 +227,17 @@ struct ItemList: View {
                 Text(row.sizeBytes.map(LibraryFormat.size) ?? "")
             }
             .width(min: 60, ideal: 80)
+        } rows: {
+            ForEach(rows) { row in
+                TableRow(row).draggable(browser.dragPayload(for: row))
+            }
         }
+        .onKeyPress(.return) {
+            guard browser.renamingRow == nil, browser.canRenameSelection else { return .ignored }
+            browser.beginRename()
+            return .handled
+        }
+
         .scrollContentBackground(.hidden)
         .background(Color.contentBackground)
         .contextMenu(forSelectionType: String.self) { ids in
@@ -559,6 +598,148 @@ private struct RowMenu: View {
         if ids.count == 1, ids == browser.selection, browser.exportTarget != nil {
             Button("Copy String") { Task { await browser.copySelectedString() } }
             Button("Save As TXT…") { Task { await ExportFlow.saveSelection(browser) } }
+        }
+        if ids == browser.selection, !browser.organizableSelection.isEmpty {
+            Divider()
+            if browser.canRenameSelection { Button("Rename") { browser.beginRename() } }
+            Button("Move To…") { browser.moveSheetRows = browser.organizableSelection }
+            if browser.canReplaceSelection { Button("Replace Source…") { browser.beginReplace() } }
+            let folder = browser.organizableSelection.first?.folderPath != nil
+            Button(folder && browser.organizableSelection.count == 1 ? "Delete Folder" : "Move to Trash") {
+                browser.requestDelete()
+            }
+        }
+    }
+}
+
+/// The in-place name editor: Return commits, Esc cancels, a refused name keeps the text and explains why (ORG-5).
+private struct RenameField: View {
+    let browser: LibraryBrowserModel
+    let row: BrowserRow
+    @State private var text = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        TextField("Name", text: $text)
+            .labelsHidden()
+            .focused($focused)
+            .onAppear { text = row.name }
+            .task {
+                // The table keeps focus while it finishes handling Return; claim it on the next turn.
+                try? await Task.sleep(for: .milliseconds(80))
+                focused = true
+            }
+            .onSubmit {
+                guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                Task { await browser.rename(row, to: text) }
+            }
+            .onExitCommand { browser.cancelRename() }
+            .popover(
+                isPresented: Binding(
+                    get: { browser.renameFailure != nil }, set: { if !$0 { browser.renameFailure = nil } }),
+                arrowEdge: .bottom
+            ) {
+                if let failure = browser.renameFailure {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(failure.title).font(.headline)
+                        Text(failure.guidance)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: 280)
+                }
+            }
+            .accessibilityLabel("New name for \(row.name)")
+    }
+}
+
+/// The Move To sheet: a folder tree with invalid targets disabled (ORG-6, ORG-7).
+struct MoveToSheet: View {
+    let browser: LibraryBrowserModel
+    let rows: [BrowserRow]
+    @State private var target: String?
+
+    var body: some View {
+        let allowed = Set(browser.moveTargets(for: rows))
+        VStack(alignment: .leading, spacing: 12) {
+            Text(rows.count == 1 ? "Move “\(rows[0].name)” to:" : "Move \(rows.count) items to:").font(.headline)
+            List(selection: $target) {
+                Label("Library", systemImage: "books.vertical").tag("")
+                    .foregroundStyle(allowed.contains("") ? Color.primary : Color.secondary)
+                    .selectionDisabled(!allowed.contains(""))
+                OutlineGroup(browser.folderTree.children ?? [], children: \.children) { node in
+                    Label(node.name, systemImage: "folder").tag(node.path)
+                        .foregroundStyle(allowed.contains(node.path) ? Color.primary : Color.secondary)
+                        .selectionDisabled(!allowed.contains(node.path))
+                }
+            }
+            .frame(minHeight: 260)
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel) { browser.moveSheetRows = nil }
+                    .keyboardShortcut(.cancelAction)
+                Button("Move") {
+                    guard let target else { return }
+                    browser.moveSheetRows = nil
+                    Task { await browser.move(rows, to: target, reveal: true) }
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(target == nil || !allowed.contains(target ?? "\u{0}"))
+            }
+        }
+        .padding(20)
+        .frame(width: 420)
+    }
+}
+
+/// The Replace Source sheet (ORG-11 to ORG-13).
+struct ReplaceSheet: View {
+    @Bindable var model: ReplaceModel
+    let onReplace: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Replace “\(model.itemName)”").font(.title2.weight(.semibold))
+            Text("The current string goes to the Trash. Comments on entries that no longer exist move to the item.")
+                .fixedSize(horizontal: false, vertical: true)
+            if let file = model.file {
+                HStack {
+                    Label(file.lastPathComponent, systemImage: "doc.text")
+                    Spacer()
+                    Button("Use Pasted Text") { model.setFile(nil) }
+                }
+            } else {
+                Text("Blueprint string").font(.headline)
+                TextEditor(text: $model.text)
+                    .font(.system(.body, design: .monospaced))
+                    .frame(height: 120)
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color(nsColor: .separatorColor)))
+                    .accessibilityLabel("Blueprint string")
+                switch model.analysis {
+                case .valid(let kind, _, _): Label(kind.label, systemImage: kind.symbol)
+                case .invalid(let message):
+                    Label(message.title, systemImage: "exclamationmark.triangle.fill").symbolRenderingMode(.multicolor)
+                default: EmptyView()
+                }
+                Button("Choose File…") {
+                    Task { if let url = await ImportSheet.chooseFiles()?.first { model.setFile(url) } }
+                }
+            }
+            if let failure = model.failure { MessageView(message: failure) }
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel, action: onCancel).keyboardShortcut(.cancelAction)
+                Button("Replace", action: onReplace)
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(model.blocker != nil)
+            }
+        }
+        .padding(20)
+        .frame(width: 520)
+        .task(id: model.text) {
+            try? await Task.sleep(for: .milliseconds(200))
+            await model.analyze()
         }
     }
 }

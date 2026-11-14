@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// The application's scenes. The Xcode app target only hosts them, so interface code stays in this package
@@ -104,6 +105,28 @@ struct LibraryCommands: Commands {
             Button("Enclosing Folder") { Task { await model.browser.goUp() } }
                 .keyboardShortcut(.upArrow)
                 .disabled(model.session.libraryURL == nil || !model.browser.canGoUp)
+            Divider()
+            Button("New Folder") { Task { await model.browser.newFolder() } }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+                .disabled(model.session.libraryURL == nil || model.session.requiresRecovery)
+            Button("Rename") { model.browser.beginRename() }
+                .disabled(!model.browser.canRenameSelection)
+            Button("Move To…") { model.browser.moveSheetRows = model.browser.organizableSelection }
+                .keyboardShortcut("m", modifiers: [.command, .control])
+                .disabled(model.browser.organizableSelection.isEmpty)
+            Button("Replace Source…") { model.browser.beginReplace() }
+                .disabled(!model.browser.canReplaceSelection)
+            Button("Move to Trash") {
+                // ⌘⌫ keeps its text meaning (delete to the start of the line) while a text field has focus.
+                if let text = NSApp.keyWindow?.firstResponder as? NSTextView {
+                    text.deleteToBeginningOfLine(nil)
+                } else {
+                    model.browser.requestDelete()
+                }
+            }
+            .keyboardShortcut(.delete, modifiers: .command)
+            .disabled(model.browser.organizableSelection.isEmpty)
+            Divider()
             Button("Add Comment") { model.browser.beginComment() }
                 .keyboardShortcut("k", modifiers: [.command, .option])
                 .disabled(model.browser.commentScope == nil)

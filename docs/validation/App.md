@@ -148,3 +148,25 @@ Milestone 3 subtask A10. Tests written with the implementation (not by the `qa-e
 | `just lint`, `just build`, `just test`, `just app-build` | Pass |
 
 Not scripted: deleting through the context menu or Delete key (the model path is tested).
+
+## Organization (2026-11-14)
+
+Milestone 3 subtask A11. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `OrganizeActionsTests` (6 tests) | ORG-1 New Folder names and rename start; ORG-2 to ORG-5 renames keep identity, dates, and comments, case-only renames work, collisions and invalid names keep the field open; ORG-6/ORG-7 moves keep metadata, invalid targets are excluded, collisions are refused; dragged rows resolve by identifier and book entries never qualify; ORG-8 to ORG-10 confirmation wording, Trash, non-empty folders refused; ORG-11 to ORG-13 replacement keeps identity and name, reports the moved comment, refuses invalid input, stores exact bytes |
+| Core: `LibraryCommandTests/removalOutcomes` | Replacement reports promoted comments; deletion reports `quarantine` when the Trash is unusable |
+| Real app, scripted (scratch library, `FB_NATIVE_TRASH_DIRECTORY` set through `open --env`) | ⇧⌘N created "New Folder" in rename mode, typed "Belts" and Return renamed it; a row dragged onto the Trains sidebar folder moved there; Return then typing renamed "Trains" to "Rail"; ⌘⌫ showed "Move “4x Rocket Silo Beaconed” to the Trash?" with Cancel as default, and Move to Trash put the originals in the scratch Trash |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Findings fixed during the real-app run:
+
+- **⌘⌫ never reached the list:** command-modified keys go through menu key equivalents, not view key handlers. Move
+  to Trash is now a menu shortcut that forwards ⌘⌫ to a focused text field.
+- **Confirmed deletions did nothing:** dismissing the alert cleared `pendingDeletion` before the button's action read
+  it. The alert now passes its value; the test reproduces the order.
+- **Return-to-rename lost focus:** the table kept focus while handling Return; the field now claims it on the next
+  run-loop turn.
+
+Not scripted: Move To sheet, Replace Source sheet, renaming from the sidebar menu (model paths tested).
