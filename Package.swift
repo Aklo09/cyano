@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "LibraryCore", targets: ["LibraryCore"]),
         .library(name: "FactorioData", targets: ["FactorioData"]),
         .library(name: "PreviewRenderer", targets: ["PreviewRenderer"]),
+        .library(name: "LibraryApp", targets: ["LibraryApp"]),
         .executable(name: "fb-native", targets: ["FBNativeCLI"]),
         .executable(name: "preview-probe", targets: ["PreviewProbe"]),
         .executable(name: "preview-worker", targets: ["PreviewWorker"]),
@@ -22,6 +23,7 @@ let package = Package(
             resources: [.copy("Resources")],
             linkerSettings: [.linkedFramework("JavaScriptCore")]
         ),
+        .target(name: "LibraryApp", dependencies: ["LibraryCore", "FactorioData", "PreviewRenderer"]),
         .executableTarget(
             name: "FBNativeCLI", dependencies: ["LibraryCore", "FactorioData", "PreviewRenderer", "PreviewWorker"]),
         .executableTarget(name: "PreviewWorker", dependencies: ["PreviewRenderer"]),

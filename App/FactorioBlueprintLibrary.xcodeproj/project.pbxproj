@@ -1,0 +1,245 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F0A000000000000000000001 /* FactorioBlueprintLibraryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */; };
+		F0A000000000000000000003 /* LibraryApp in Frameworks */ = {isa = PBXBuildFile; productRef = F0A000000000000000000004 /* LibraryApp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorioBlueprintLibraryApp.swift; sourceTree = "<group>"; };
+		F0A000000000000000000005 /* Factorio Blueprint Library.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Factorio Blueprint Library.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F0A000000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0A000000000000000000003 /* LibraryApp in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F0A000000000000000000007 = {
+			isa = PBXGroup;
+			children = (
+				F0A000000000000000000008 /* Sources */,
+				F0A000000000000000000009 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F0A000000000000000000008 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		F0A000000000000000000009 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F0A000000000000000000005 /* Factorio Blueprint Library.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F0A00000000000000000000A /* FactorioBlueprintLibrary */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "FactorioBlueprintLibrary" */;
+			buildPhases = (
+				F0A00000000000000000000C /* Sources */,
+				F0A000000000000000000006 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FactorioBlueprintLibrary;
+			packageProductDependencies = (
+				F0A000000000000000000004 /* LibraryApp */,
+			);
+			productName = FactorioBlueprintLibrary;
+			productReference = F0A000000000000000000005 /* Factorio Blueprint Library.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F0A00000000000000000000D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2720;
+				LastUpgradeCheck = 2720;
+			};
+			buildConfigurationList = F0A00000000000000000000E /* Build configuration list for PBXProject "FactorioBlueprintLibrary" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F0A000000000000000000007;
+			packageReferences = (
+				F0A00000000000000000000F /* XCLocalSwiftPackageReference ".." */,
+			);
+			productRefGroup = F0A000000000000000000009 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F0A00000000000000000000A /* FactorioBlueprintLibrary */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F0A00000000000000000000C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0A000000000000000000001 /* FactorioBlueprintLibraryApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F0A000000000000000000010 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F0A000000000000000000011 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		F0A000000000000000000012 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Factorio Blueprint Library";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.fb.library;
+				PRODUCT_NAME = "Factorio Blueprint Library";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Debug;
+		};
+		F0A000000000000000000013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Factorio Blueprint Library";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.fb.library;
+				PRODUCT_NAME = "Factorio Blueprint Library";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "FactorioBlueprintLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0A000000000000000000012 /* Debug */,
+				F0A000000000000000000013 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F0A00000000000000000000E /* Build configuration list for PBXProject "FactorioBlueprintLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0A000000000000000000010 /* Debug */,
+				F0A000000000000000000011 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		F0A00000000000000000000F /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F0A000000000000000000004 /* LibraryApp */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LibraryApp;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F0A00000000000000000000D /* Project object */;
+}

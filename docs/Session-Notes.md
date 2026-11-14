@@ -29,7 +29,7 @@ Milestone 2 is [accepted](validation/Milestone-2.md), including native construct
 
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
 Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
-Application scheduling and the macOS UI remain pending.
+The macOS app scaffold builds and launches offline; application scheduling and the UI remain pending.
 
 ## Next implementation
 
@@ -44,7 +44,10 @@ its review, is done: collision keys now match APFS case-insensitive equivalence 
 attached case-sensitive image too), and regular `.DS_Store` files are ignored throughout libraries (see the
 [storage contract](contracts/Storage.md)). A2, the [screen specs](specs/Native-App-Screens.md), is approved
 (2026-11-14): books browse like folders, the inspector keeps the preview above Statistics/Details/Comments tabs, and
-dark mode uses a darker content background (`#121212`). Resume with A3 (app scaffold).
+dark mode uses a darker content background (`#121212`). A3, the [app scaffold](development/App.md), is done:
+`Sources/LibraryApp` holds the interface, `App/` the thin Xcode target (`local.fb.library`, ad-hoc signed, no
+sandbox), `just app-build`/`just app-run` build through `tools/xcode.sh`, and the independence check builds and
+launches the app offline. Resume with A4 (library session layer, with the first `LibraryApp` tests in `just test`).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

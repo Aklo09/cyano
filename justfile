@@ -9,11 +9,11 @@ build:
 
 # Check Swift formatting against .swift-format; any finding fails.
 lint:
-    swift format lint -r --strict Package.swift Sources Tests
+    swift format lint -r --strict Package.swift Sources Tests App/Sources
 
 # Rewrite Swift sources in place to the committed .swift-format style.
 format:
-    swift format format -i -r --parallel Package.swift Sources Tests
+    swift format format -i -r --parallel Package.swift Sources Tests App/Sources
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
@@ -27,6 +27,14 @@ storage-test:
 # Verify offline asset inventory, hashes, profiles, declared frame bounds, and prototype maps.
 asset-test:
     sh tools/swift.sh test --filter 'AssetReleaseTests|PrototypeMapTests'
+
+# Build the macOS app (Debug or Release) into .cache/xcode/Build/Products/<configuration>/.
+app-build configuration="Debug":
+    sh tools/xcode.sh "{{configuration}}"
+
+# Build the Debug app and open it.
+app-run: app-build
+    open -n ".cache/xcode/Build/Products/Debug/Factorio Blueprint Library.app"
 
 # Run native CLI commands; export stdout contains only source bytes.
 library *args:

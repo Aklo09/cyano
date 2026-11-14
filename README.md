@@ -8,7 +8,7 @@ deletion, book unpacking, maintenance, and offline asset verification.
 The standalone renderer paints real previews through supervised native workers.
 Saved-item previews reuse validated derived caches.
 Construction statistics report a blueprint's building requirements and footprint from a verified asset release.
-Application scheduling and the macOS interface remain pending.
+The macOS app scaffold builds and launches offline; its interface is being built in milestone 3.
 
 ## Requirements
 
@@ -42,6 +42,15 @@ The probe supports its original planner self-test and real image rendering with 
 The Swift wrapper keeps compiler and package caches inside this repository.
 It disables SwiftPM's subprocess sandbox for these development commands.
 
+Build and open the macOS app (Xcode 27.2 required):
+
+```sh
+just app-build
+just app-run
+```
+
+See the [app guide](docs/development/App.md) for its structure, signing, and caches.
+
 ## Development tooling
 
 ```sh
@@ -64,6 +73,7 @@ These retained JavaScript cases, with `just statistics-golden`, provide the refe
 ## Documentation
 
 - **Read the roadmap:** [approved native plan](docs/planning/macOS-Plan.md).
+- **Build the app:** [app guide](docs/development/App.md) and [validation](docs/validation/App.md).
 - **Inspect evidence:** [foundation validation](docs/validation/Foundation.md).
 - **Use the codec:** [native interfaces](docs/development/Codec.md) and [validation](docs/validation/Codec.md).
 - **Manage a library:** [CLI guide](docs/development/Library-CLI.md), [storage contract](docs/contracts/Storage.md), and [validation](docs/validation/Storage.md).

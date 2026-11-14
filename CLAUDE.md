@@ -18,14 +18,19 @@ Do not call `swift` directly. Shortcuts are in `justfile` (`just --list`).
 
 ```sh
 just build                 # all targets; no Node or private assets needed
-just lint                  # swift-format --strict on Package.swift, Sources, Tests; must pass before committing
+just lint                  # swift-format --strict on Package.swift, Sources, Tests, App/Sources; must pass before committing
 just format                # apply .swift-format (4 spaces, 120 cols); fix leftovers by hand
 just test                  # main suites + python3 tools/test-asset-release.py
 just codec-test | storage-test | asset-test | renderer-test   # focused suites
 just planner-test          # JavaScriptCore planner self-test (no painting)
 just library <args>        # run the fb-native CLI (just library --help)
 just preview <args>        # run preview-probe; real images need verified private assets
+just app-build [Release]   # build the macOS app via tools/xcode.sh (derived data in .cache/xcode)
+just app-run               # build the Debug app and open it
 ```
+
+The app bundle comes from the thin Xcode project `App/FactorioBlueprintLibrary.xcodeproj`; build it through
+`tools/xcode.sh` (or `just app-build`), not bare `xcodebuild`, so caches stay under `.cache/`.
 
 Tests delete items; `tools/swift.sh test` redirects their removed originals to `.cache/test-trash` through
 `FB_NATIVE_TRASH_DIRECTORY`. Running `swift test` directly would send them to the real Trash.
@@ -58,6 +63,8 @@ SwiftPM targets (`Package.swift`):
   (`BlueprintStatisticsCalculator`).
 - `PreviewRenderer`: runs the bundled fpsr planner (`Resources/planner.js`) in system JavaScriptCore, then paints with Core Graphics (`NativePainter`).
   Rendering happens in a supervised child process (`PreviewProcess`, `PreviewChild`). `LibraryPreviewService` connects it to library ownership.
+- `LibraryApp`: the macOS app's SwiftUI scenes, views, and models. All interface code goes here; the Xcode target in
+  `App/` only holds the `@main` entry point and bundle settings (`local.fb.library`, ad-hoc signed, no sandbox).
 - Executables: `fb-native` (CLI), `preview-worker` (helper process), `preview-probe` (standalone render harness).
 - `Tests/Support/*`: helper executables that tests launch as real processes for crash, interruption and worker-lifecycle scenarios.
 
