@@ -24,7 +24,8 @@ and the exact values of the two color tokens.
 - **Dates:** the Mac's time zone and format, medium date with short time (for example "14 Nov 2026 at 14:03").
 - **Sizes:** decimal B/KB/MB (`ByteCountFormatter`, file style); exact bytes are always visible in the inspector,
   never only in a tooltip.
-- **Names:** item and entry names exactly as stored; statistics item names are the prototype names as text
+- **Names:** item and entry names as stored, except that entry names drop Factorio rich-text tags (for example
+  `[item=iron-plate]`) as item names already do; milestone 4 turns the tags into icons (owner decision); statistics item names are the prototype names as text
   (for example `fast-inserter`), matching `fb-native statistics`.
 - **Feedback:** every action changes something visible at once. Library operations taking longer than 0.5 s show
   an indeterminate spinner in the toolbar and disable actions that would queue behind them; renders show their own

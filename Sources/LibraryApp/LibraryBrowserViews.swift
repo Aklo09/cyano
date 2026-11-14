@@ -55,7 +55,7 @@ struct PathBar: View {
                     if index == components.count - 1 {
                         Text(component.name).fontWeight(.semibold)
                     } else {
-                        Button(component.name) { browser.show(folder: component.folder) }
+                        Button(component.name) { Task { await browser.navigate(to: component.target) } }
                             .buttonStyle(.link)
                     }
                 }
@@ -106,9 +106,45 @@ struct ItemList: View {
             } description: {
                 Text(message.guidance)
             }
+        case .bookEmpty:
+            ContentUnavailableView("This book has no entries.", systemImage: "books.vertical")
+        case .bookFailed(let message):
+            ContentUnavailableView {
+                Label(message.title, systemImage: "exclamationmark.triangle.fill")
+                    .symbolRenderingMode(.multicolor)
+            } description: {
+                Text(message.guidance)
+            }
         case .rows(let rows):
-            table(rows)
+            if browser.showsBook { bookTable(rows) } else { table(rows) }
         }
+    }
+
+    /// A book's entries in stored order with their stored indices (BOOK-1, BOOK-2); not sortable.
+    private func bookTable(_ rows: [BrowserRow]) -> some View {
+        Table(rows, selection: $browser.selection) {
+            TableColumn("#") { row in Text(row.storedIndex.map(String.init) ?? "").monospacedDigit() }
+                .width(min: 32, ideal: 44, max: 64)
+            TableColumn("Name") { row in
+                Label {
+                    Text(row.name)
+                } icon: {
+                    Image(systemName: row.kind.symbol).accessibilityHidden(true)
+                }
+                .accessibilityLabel("\(row.name), \(row.kind.label.lowercased()), entry \(row.storedIndex ?? 0)")
+            }
+            .width(min: 160, ideal: 320)
+            TableColumn("Kind") { row in Text(row.kind.label) }
+                .width(min: 80, ideal: 160)
+        }
+        .scrollContentBackground(.hidden)
+        .background(Color.contentBackground)
+        .contextMenu(forSelectionType: String.self) { _ in
+        } primaryAction: { ids in
+            browser.selection = ids
+            Task { await browser.openSelection() }
+        }
+        .accessibilityLabel("Book entries")
     }
 
     private func table(_ rows: [BrowserRow]) -> some View {
@@ -141,7 +177,7 @@ struct ItemList: View {
         .contextMenu(forSelectionType: String.self) { _ in
         } primaryAction: { ids in
             browser.selection = ids
-            browser.openSelection()
+            Task { await browser.openSelection() }
         }
         .onChange(of: sortOrder, initial: true) { _, order in
             guard let first = order.first else { return }
@@ -177,10 +213,17 @@ struct ItemInspector: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
-                if let item = browser.selectedItem {
+                if browser.showsBook, let detail = browser.selectedDetail {
+                    EntryDetailView(detail: detail, item: detail.location == nil ? browser.openBookItem : nil)
+                } else if let item = browser.selectedItem {
                     let kind = ItemKind(stored: item.kind)
                     Text(item.name).font(.title2.weight(.semibold)).textSelection(.enabled)
                     Label(kind.label, systemImage: kind.symbol)
+                    if let version = browser.selectedDetail?.version {
+                        Text("Factorio \(version)")
+                    } else if browser.selectedDetail != nil {
+                        Text("Version unknown")
+                    }
                     Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
                         if let updated = LibraryFormat.date(item.metadata.updatedAt) {
                             GridRow {
@@ -203,6 +246,7 @@ struct ItemInspector: View {
                             Text(item.folder.isEmpty ? "Library" : item.folder)
                         }
                     }
+                    if let detail = browser.selectedDetail { EntryDetailBody(detail: detail) }
                 } else if let row = browser.selectedRows.first, browser.selectedRows.count == 1,
                     let path = row.folderPath
                 {
@@ -220,6 +264,54 @@ struct ItemInspector: View {
         }
         .background(Color.contentBackground)
         .inspectorColumnWidth(min: 220, ideal: 260, max: 400)
+        .task(id: browser.selectedItem.map { $0.id + $0.metadata.sourceSha256 }) {
+            await browser.loadSelectedDetail()
+        }
+    }
+}
+
+/// An entry's (or open book's) header and details.
+private struct EntryDetailView: View {
+    let detail: EntryDetail
+    /// The saved item when the detail is its root, for dates and size.
+    let item: LibraryCore.LibraryItem?
+
+    var body: some View {
+        Text(detail.name).font(.title2.weight(.semibold)).textSelection(.enabled)
+        Label(detail.kind.label, systemImage: detail.kind.symbol)
+        Text(detail.version.map { "Factorio \($0)" } ?? "Version unknown")
+        if let location = detail.location { Text(location) }
+        if let item {
+            Text("Size \(LibraryFormat.exactSize(item.sourceBytes))")
+        }
+        EntryDetailBody(detail: detail)
+    }
+}
+
+/// Entry count, description with its line breaks (BOOK-5), and planner settings as text (BOOK-6).
+private struct EntryDetailBody: View {
+    let detail: EntryDetail
+
+    var body: some View {
+        if let count = detail.entryCount {
+            Text(count == 1 ? "1 entry" : "\(count) entries")
+        }
+        if !detail.description.isEmpty {
+            Text("Description").font(.headline).padding(.top, 6)
+            Text(detail.description)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        if !detail.settings.isEmpty {
+            Text("Settings").font(.headline).padding(.top, 6)
+            Text(detail.settings.joined(separator: "\n"))
+                .font(.system(.body, design: .monospaced))
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        if detail.kind == .upgradePlanner || detail.kind == .deconstructionPlanner {
+            Text("Statistics don't apply to planners.")
+        }
     }
 }
 

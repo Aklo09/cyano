@@ -113,12 +113,12 @@ struct LibraryBrowserModelTests {
         let (session, browser) = await openBrowser(fixture.url)
         defer { Task { await session.close() } }
         browser.selection = ["folder:Trains"]
-        browser.openSelection()
+        await browser.openSelection()
         #expect(browser.folder == "Trains" && rows(browser).map(\.name) == ["Stations", "Loop"])
         browser.show(folder: "Trains/Stations")
         #expect(browser.pathComponents.map(\.name) == ["Library", "Trains", "Stations"])
-        #expect(browser.pathComponents.map(\.folder) == ["", "Trains", "Trains/Stations"])
-        browser.goUp()
+        #expect(browser.pathComponents.map(\.target) == [.folder(""), .folder("Trains"), .folder("Trains/Stations")])
+        await browser.goUp()
         #expect(browser.folder == "Trains" && browser.selection == ["folder:Trains/Stations"])
         browser.show(folder: "Missing")
         #expect(browser.folder == "Trains")

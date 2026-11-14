@@ -342,6 +342,8 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **Thumbnail grids, cards, and thumbnails for uncached rows:** milestone 4 (decision 4); list rows show a thumbnail
   only when one is already cached.
 - **Icons:** blueprint and book name icons and item icons in statistics need the private sprite atlases; milestone 4.
+  Until then, Factorio rich-text tags (for example `[item=iron-plate]`) are removed from displayed names; milestone 4
+  turns them into icons (owner decision, 2026-11-14).
 - **Saved Factorio versions in list rows:** listing hashes sources without decoding them, so it has no version.
 - **Maintenance screens:** cache and staging cleanup, quarantine, operations listing, and disk usage stay in the CLI
   (decision 6); so does the web app's information page.

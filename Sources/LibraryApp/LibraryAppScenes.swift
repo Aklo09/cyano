@@ -88,12 +88,12 @@ struct LibraryCommands: Commands {
                 .disabled(model.session.libraryURL == nil)
         }
         CommandMenu("Library") {
-            Button("Open") { model.browser.openSelection() }
+            Button("Open") { Task { await model.browser.openSelection() } }
                 .keyboardShortcut(.downArrow)
-                .disabled(model.browser.selectedRows.count != 1 || model.browser.selectedRows.first?.folderPath == nil)
-            Button("Enclosing Folder") { model.browser.goUp() }
+                .disabled(!model.browser.canOpenSelection)
+            Button("Enclosing Folder") { Task { await model.browser.goUp() } }
                 .keyboardShortcut(.upArrow)
-                .disabled(model.session.libraryURL == nil || model.browser.folder.isEmpty)
+                .disabled(model.session.libraryURL == nil || !model.browser.canGoUp)
             Divider()
             Button("Show Listing Issues") { model.browser.showingIssues = true }
                 .disabled(model.browser.issues.isEmpty)

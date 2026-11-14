@@ -65,7 +65,7 @@ Make this repository self-contained:
 | **1. Foundation and feasibility** | Independent toolchain, minimal library CLI, recovery protocol, JavaScriptCore/Core Graphics preview harness | Storage and representative real images pass the checks below |
 | **2. Complete library core** | Replacement, folder/item organization, unpacked-book import, deletion, maintenance, and statistics | Shared operations preserve identities, comments, originals, and recovery guarantees |
 | **3. Native application** | Library selection, browsing, nested books, import/export, comments, organization, and image viewport | Everyday workflows work offline, including without renderer assets |
-| **4. Rendering integration** | Visible-item scheduling, bounded queues, cache identity, progress, cancellation, warnings, and retry | Full supplied corpus receives native rendering and visual qualification |
+| **4. Rendering integration** | Visible-item scheduling, bounded queues, cache identity, progress, cancellation, warnings, and retry; icons from the private sprite atlases for Factorio rich-text tags in item and entry names (owner decision, 2026-11-14) and for statistics items | Full supplied corpus receives native rendering and visual qualification |
 | **5. Personal-use qualification** | App/CLI installation, lifecycle handling, documentation, and workload measurements | The 1,000-root library and 149-leaf book meet recorded native acceptance targets |
 
 Do not carry forward the assessment's full-rewrite estimate as a delivery commitment. Re-estimate after milestone 1 establishes renderer reuse costs.

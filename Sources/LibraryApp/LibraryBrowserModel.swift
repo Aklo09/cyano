@@ -49,6 +49,11 @@ public struct BrowserRow: Identifiable, Equatable, Sendable {
     public let updated: Date?
     public let created: Date?
     public let sizeBytes: Int?
+    /// For entries inside an open book: their stored indices from the root book (BOOK-2).
+    public var entryPath: [Int]? = nil
+
+    /// The entry's own stored index, shown in the # column.
+    public var storedIndex: Int? { entryPath?.last }
 
     static func folder(_ path: String) -> BrowserRow {
         BrowserRow(
@@ -63,6 +68,27 @@ public struct BrowserRow: Identifiable, Equatable, Sendable {
             folderPath: nil, itemId: item.id, updated: LibraryFormat.date(item.metadata.updatedAt),
             created: LibraryFormat.date(item.metadata.createdAt), sizeBytes: item.sourceBytes)
     }
+}
+
+extension BrowserRow {
+    static func entry(_ entry: BlueprintEntry, itemId: String) -> BrowserRow {
+        BrowserRow(
+            id: "entry:" + BlueprintEntryReader.pathText(entry.path), name: BlueprintEntryReader.name(entry),
+            kind: BlueprintEntryReader.kind(entry), folder: "", folderPath: nil, itemId: itemId, updated: nil,
+            created: nil, sizeBytes: nil, entryPath: entry.path)
+    }
+}
+
+/// Where a path bar component leads.
+public enum PathTarget: Equatable, Sendable {
+    case folder(String)
+    /// A book inside the open item, by stored indices ([] is the root book).
+    case book([Int])
+}
+
+public struct PathComponent: Equatable, Sendable {
+    public let name: String
+    public let target: PathTarget
 }
 
 /// A folder in the sidebar tree; the root has the empty path.
@@ -86,6 +112,10 @@ public final class LibraryBrowserModel {
         case folderEmpty(String)
         case noMatches(String)
         case tooLarge(LibraryMessage)
+        /// An open book with no entries (BOOK-4).
+        case bookEmpty
+        /// An open book that could not be read.
+        case bookFailed(LibraryMessage)
     }
 
     public let session: LibrarySession
@@ -99,6 +129,10 @@ public final class LibraryBrowserModel {
     public var showingIssues = false
     /// Set by the Find command; the window moves focus to the search field and clears it.
     public var searchFocusRequested = false
+    /// The book shown in the item list instead of a folder's contents, if any.
+    public private(set) var book: OpenBook?
+    /// Details of the selected saved item, decoded on demand (version, description, settings).
+    public private(set) var itemDetail: (key: String, detail: EntryDetail)?
 
     @ObservationIgnored private var lastLibrary: URL?
 
@@ -115,10 +149,19 @@ public final class LibraryBrowserModel {
     private var filterQuery: String { filterText.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     public var content: Content {
-        Self.content(
+        if let book, !isFiltering {
+            if let failure = book.failure { return .bookFailed(failure) }
+            guard let entry = book.entry else { return .loading }
+            let rows = BlueprintEntryReader.children(of: entry).map { BrowserRow.entry($0, itemId: book.itemId) }
+            return rows.isEmpty ? .bookEmpty : .rows(rows)
+        }
+        return Self.content(
             listing: listing, failure: session.listingFailure, folder: folder, filter: filterQuery, key: sortKey,
             ascending: ascending)
     }
+
+    /// Whether the item list shows a book's entries (columns #, Name, Kind; stored order).
+    public var showsBook: Bool { book != nil && !isFiltering }
 
     nonisolated static func content(
         listing: LibraryListing?, failure: LibraryMessage?, folder: String, filter: String, key: SortKey,
@@ -135,13 +178,18 @@ public final class LibraryBrowserModel {
         return .rows(rows)
     }
 
-    /// Path bar components, root first, each with the folder it opens (BRW-4).
-    public var pathComponents: [(name: String, folder: String)] {
-        var result = [(name: "Library", folder: "")]
+    /// Path bar components, root first, each with the folder or book it opens (BRW-4, BOOK-3).
+    public var pathComponents: [PathComponent] {
+        var result = [PathComponent(name: "Library", target: .folder(""))]
         var current = ""
         for part in folder.split(separator: "/").map(String.init) {
             current = current.isEmpty ? part : current + "/" + part
-            result.append((name: part, folder: current))
+            result.append(PathComponent(name: part, target: .folder(current)))
+        }
+        if let book {
+            for (depth, name) in book.trail.enumerated() {
+                result.append(PathComponent(name: name, target: .book(Array(book.path.prefix(depth)))))
+            }
         }
         return result
     }
@@ -170,27 +218,133 @@ public final class LibraryBrowserModel {
         return listing?.items.first { $0.id == itemId }
     }
 
+    /// The saved item that is open as a book.
+    public var openBookItem: LibraryItem? {
+        guard let book else { return nil }
+        return listing?.items.first { $0.id == book.itemId }
+    }
+
+    /// What the inspector shows: the selected entry, or the open book itself when nothing is selected inside it,
+    /// or the selected saved item once its details are loaded.
+    public var selectedDetail: EntryDetail? {
+        if let book, !isFiltering, let entry = book.entry {
+            let bookName = book.trail.last ?? book.itemName
+            if selection.count == 1, let id = selection.first, id.hasPrefix("entry:"),
+                let child = BlueprintEntryReader.children(of: entry).first(where: {
+                    "entry:" + BlueprintEntryReader.pathText($0.path) == id
+                })
+            {
+                return BlueprintEntryReader.detail(child, bookName: bookName)
+            }
+            if selection.isEmpty {
+                let detail = BlueprintEntryReader.detail(entry, bookName: book.trail.dropLast().last ?? book.itemName)
+                return entry.path.isEmpty ? Self.renamed(detail, to: book.itemName) : detail
+            }
+            return nil
+        }
+        guard let item = selectedItem, let loaded = itemDetail, loaded.key == Self.detailKey(item) else { return nil }
+        return loaded.detail
+    }
+
     // MARK: Navigation
 
     public func show(folder path: String) {
         guard path.isEmpty || listing?.folders.contains(path) == true else { return }
         filterText = ""
+        book = nil
         folder = path
         selection = []
     }
 
-    /// Opens the selected folder (⌘↓, double-click). Books open with A7.
-    public func openSelection() {
-        guard selectedRows.count == 1, let row = selectedRows.first, let path = row.folderPath else { return }
-        show(folder: path)
+    /// Whether the single selected row is a folder or book that Open can enter.
+    public var canOpenSelection: Bool {
+        guard selectedRows.count == 1, let row = selectedRows.first else { return false }
+        return row.folderPath != nil || row.kind == .book
     }
 
-    /// Goes to the enclosing folder (⌘↑), selecting the folder just left.
-    public func goUp() {
+    /// Opens the selected folder or book (⌘↓, double-click).
+    public func openSelection() async {
+        guard selectedRows.count == 1, let row = selectedRows.first else { return }
+        if let path = row.folderPath {
+            show(folder: path)
+        } else if row.kind == .book, let itemId = row.itemId {
+            if let entryPath = row.entryPath, let book {
+                await openBook(itemId: itemId, path: entryPath, trail: book.trail + [row.name])
+            } else if let item = listing?.items.first(where: { $0.id == itemId }) {
+                filterText = ""
+                folder = item.folder
+                await openBook(itemId: itemId, path: [], trail: [item.name])
+            }
+        }
+    }
+
+    /// Goes to the enclosing book or folder (⌘↑), selecting the one just left.
+    public func goUp() async {
+        if let book {
+            if book.path.isEmpty {
+                self.book = nil
+                selection = ["item:" + book.itemId]
+            } else {
+                let left = "entry:" + BlueprintEntryReader.pathText(book.path)
+                await openBook(itemId: book.itemId, path: Array(book.path.dropLast()), trail: book.trail.dropLast())
+                selection = [left]
+            }
+            return
+        }
         guard !folder.isEmpty else { return }
         let left = folder
         show(folder: Self.parent(folder))
         selection = ["folder:" + left]
+    }
+
+    public var canGoUp: Bool { book != nil || !folder.isEmpty }
+
+    /// Follows a path bar component.
+    public func navigate(to target: PathTarget) async {
+        switch target {
+        case .folder(let path):
+            show(folder: path)
+        case .book(let path):
+            guard let book, path.count < book.path.count else { return }
+            await openBook(itemId: book.itemId, path: path, trail: Array(book.trail.prefix(path.count + 1)))
+        }
+    }
+
+    /// Decodes the selected saved item for the inspector, once per item and source.
+    public func loadSelectedDetail() async {
+        guard book == nil || isFiltering, let item = selectedItem else { return }
+        let key = Self.detailKey(item)
+        if itemDetail?.key == key { return }
+        let id = item.id
+        guard case .success(let entry) = await session.perform(.listing, refreshing: false, { try $0.entry(id: id) })
+        else { return }
+        guard selectedItem.map(Self.detailKey) == key else { return }
+        itemDetail = (key, Self.renamed(BlueprintEntryReader.detail(entry), to: item.name))
+    }
+
+    private func openBook(itemId: String, path: [Int], trail: [String]) async {
+        guard let item = listing?.items.first(where: { $0.id == itemId }) else { return }
+        book = OpenBook(
+            itemId: itemId, itemName: item.name, sourceSha256: item.metadata.sourceSha256, path: path, trail: trail,
+            entry: nil, failure: nil)
+        selection = []
+        let outcome = await session.perform(.listing, refreshing: false) { try $0.entry(id: itemId, entryPath: path) }
+        guard book?.itemId == itemId, book?.path == path else { return }
+        switch outcome {
+        case .success(let entry) where entry.kind == .book: book?.entry = entry
+        case .success: book?.failure = LibraryMessage(title: "This entry isn't a book", guidance: "Go back up a level.")
+        case .failure(let message): book?.failure = message
+        case .ignored: break
+        }
+    }
+
+    private static func detailKey(_ item: LibraryItem) -> String { item.id + ":" + item.metadata.sourceSha256 }
+
+    /// The root of a saved item is shown with the item's own (possibly renamed) name.
+    private static func renamed(_ detail: EntryDetail, to name: String) -> EntryDetail {
+        EntryDetail(
+            name: name, kind: detail.kind, version: detail.version, description: detail.description,
+            settings: detail.settings, location: detail.location, entryCount: detail.entryCount)
     }
 
     public func requestSearchFocus() {
@@ -205,11 +359,26 @@ public final class LibraryBrowserModel {
             filterText = ""
             selection = []
             showingIssues = false
+            book = nil
+            itemDetail = nil
             return
         }
         guard let listing else { return }
         let folders = Set(listing.folders)
         while !folder.isEmpty && !folders.contains(folder) { folder = Self.parent(folder) }
+        if let open = book {
+            if let item = listing.items.first(where: { $0.id == open.itemId }) {
+                // A move keeps the book open in its new folder; a replaced source reloads from the root book.
+                folder = item.folder
+                if item.metadata.sourceSha256 != open.sourceSha256 {
+                    Task { await openBook(itemId: open.itemId, path: [], trail: [item.name]) }
+                }
+            } else {
+                book = nil
+                selection = []
+            }
+        }
+        guard book == nil else { return }
         let items = Set(listing.items.map { "item:" + $0.id })
         selection = selection.filter { items.contains($0) || folders.contains(String($0.dropFirst(7))) }
     }

@@ -52,6 +52,14 @@ technical text), worded for what the app was doing; it returns nil for renders t
 - **Sidebar and path bar:** `folderTree` and `pathComponents`; listing issues are worded with
   `LibraryMessage.listingIssue(code:)`.
 
+**Books** open like folders (double-click or ⌘↓). `book` holds the saved item and the stored indices of the book
+shown; its entries come from one `NativeLibrary.entry(id:entryPath:)` call and are listed in stored order with their
+stored index, in a table with #, Name, and Kind and no sorting. The path bar continues through the book and nested
+books, and ⌘↑ goes back one level, selecting the entry just left. A moved book stays open in its new folder, a
+replaced source reopens at the root book, and a deleted item closes the book. `BlueprintEntryReader` reads children,
+names (rich-text tags such as `[item=iron-plate]` removed, as item names are), packed versions (`major.minor.patch`),
+and planner settings as text; `selectedDetail` feeds the inspector.
+
 Rows show their kind symbol. Cached thumbnails (BRW-9) need the asset release identity, so they appear once Settings
 (A14) and previews (A12) exist; no row ever starts a render.
 

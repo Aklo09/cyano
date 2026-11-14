@@ -92,3 +92,21 @@ by script with isolated preferences and the scratch library from A6.
 
 The repository also lost a Vim swap file committed by mistake with the A2 screen specs; `.gitignore` now ignores
 Vim swap files.
+
+## Books and planners (2026-11-14)
+
+Milestone 3 subtask A7. Tests written with the implementation (not by the `qa-engineer` subagent).
+
+| Check | Result |
+| --- | --- |
+| `LibraryBookTests` (6 tests, a book stored out of index order with sparse indices, a nested and an empty book, both planner kinds, untitled and rich-text labels, unknown fields) | BOOK-1/BOOK-2 stored order and indices; BOOK-3 nested books through Open, the path bar, and Enclosing Folder; BOOK-4 empty books; BOOK-5 descriptions with line breaks (planners from `settings.description`); BOOK-5a `2.0.55` and invalid versions; BOOK-6 mappings and filters as text; BOOK-8 export and stored bytes unchanged after browsing; a replaced source reloads, a deleted item closes the book, search works from inside a book |
+| Real app, driven with mouse events and keystrokes | `bp.txt` (book `(2026-06)`): entries 0, 1, 3, 4, 5, 6, 7, 8, 12, 18 in stored order; nested `Starter Quality` with 0, 1, 6, 7, 12; path bar `Library › Trains › (2026-06) › Starter Quality`; inspector `Entry 0.0 in Starter Quality`, `Factorio 2.0.77`, description with line breaks; ⌘↑ returns with the nested book selected |
+| `just lint`, `just build`, `just test`, `just app-build` | Pass |
+
+Findings:
+
+- **Rich-text labels:** entry names showed raw tags (`[item=uranium-235,quality=legendary]U235`) while item names,
+  derived from the same labels for filenames, did not; entry names now drop tags too.
+- **Keyboard focus (for A16):** with full keyboard access, Tab moves from the sidebar to the issues footer, the
+  toolbar, and the search field, and never visibly reaches the item list. Double-click and ⌘↓/⌘↑ work.
+- **Scripting:** System Events `click at` does not select table rows; real mouse events posted with Core Graphics do.

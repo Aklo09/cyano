@@ -56,8 +56,9 @@ Verification rule (owner, 2026-11-14): UI subtasks use `just lint`, `just test`,
 independence check runs only for dependency, tooling, bundle, or network changes and at acceptance, and its app launch
 moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibility access, so real-window captures
 (`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
-`-FBNativeDefaultsSuite`. Resume with A7 (books and planners: open books like folders by stored index,
-descriptions, planner settings).
+`-FBNativeDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
+Open finding for A16: Tab never visibly reaches the item list. Resume with A8 (import: paste, TXT files, drag and
+drop, save as one book or unpack).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

@@ -3,7 +3,7 @@
 Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below.
 A1, the [app spec](../specs/Native-App.md), is approved and A0 is done (2026-11-14). A2, the
 [screen specs](../specs/Native-App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
-(2026-11-14). A4, the library session layer, A5, library selection, and A6, browsing, are done. Next: A7.
+(2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, and A7, books and planners, are done. Next: A8.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 3.
 
 ## Scope
@@ -19,6 +19,8 @@ Out of scope, owned by later milestones or excluded from v1:
   and full-corpus visual qualification (milestone 4).
 - Installation, the 1,000-root workload targets, and power-loss qualification (milestone 5).
 - Copying or saving a preview image: required, deferred by the owner to a later milestone (not yet assigned).
+- Icons for Factorio rich-text tags in item and entry names (milestone 4, owner decision 2026-11-14); milestone 3
+  removes the tags from displayed names.
 - Backup/restore, App Store submission, and public distribution (excluded from v1).
 
 The original web application's workflows are a reference, not a specification
