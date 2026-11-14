@@ -68,6 +68,8 @@ Moving keeps item identity, metadata bytes, comments, dates, and original TXT by
 Renaming changes the display override, portable filenames, and update date.
 Folder moves also rename when the optional final name is supplied.
 Case-only names are supported; collisions and moving a folder into itself are refused.
+Names that differ only by letter case, including full Unicode case folding such as `Straße`/`STRASSE`, collide
+on every volume, case-sensitive or not.
 
 Replacement keeps the item UUID, creation time, chosen name, and comment identities.
 Comments on missing book entries become root comments prefixed with `[Former book entry 5.0]` and two newlines.

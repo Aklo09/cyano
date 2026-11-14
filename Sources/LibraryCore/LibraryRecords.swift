@@ -221,8 +221,13 @@ enum LibraryRecords {
 }
 
 enum LibraryNames {
+    /// Collision key matching APFS case-insensitive name equivalence on every volume, including case-sensitive ones.
+    /// Lowercasing alone misses pairs such as `ß`/`SS` and `σ`/`ς`; Foundation's folding alone misses
+    /// Unicode 9 letters such as U+1C80. Round-tripping through uppercase first covers both, and is stricter than
+    /// APFS only for dotless `ı`, which it equates with `i`.
     static func key(_ name: String) -> String {
-        name.precomposedStringWithCanonicalMapping.lowercased().precomposedStringWithCanonicalMapping
+        name.precomposedStringWithCanonicalMapping.uppercased().lowercased()
+            .folding(options: .caseInsensitive, locale: nil).precomposedStringWithCanonicalMapping
     }
 
     static func validateBasename(_ value: String) throws {

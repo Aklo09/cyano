@@ -99,7 +99,12 @@ Missing or unusable names receive kind-specific untitled names.
 
 The initial basename is capped at 180 UTF-8 bytes.
 Duplicate imports receive ` (2)`, ` (3)`, and subsequent suffixes.
-Collision keys use NFC normalization and lowercase comparison.
+Collision keys reproduce APFS case-insensitive name equivalence on every volume, including case-sensitive ones:
+NFC normalization, then uppercasing, lowercasing, and Unicode case folding (so `ß`/`SS`, `σ`/`ς`, and U+1C80/`в`
+collide). A sweep of every BMP scalar and every case-mapped supplementary scalar against a case-insensitive APFS
+volume found no pair that APFS equates and the key distinguishes; the key is stricter only for dotless `ı`, which
+it equates with `i`. Collision checks never depend on the filesystem reporting one, and two existing names in one
+folder with the same key are listing issues.
 Existing physical names are revalidated before publication.
 Publication of new files also uses the filesystem's exclusive-rename primitive.
 

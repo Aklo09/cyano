@@ -71,6 +71,14 @@ Identity, original bytes, creation dates, and retained comments survive.
 A separate conflicting-rename case preserves foreign destination bytes, the committed intent, and exact staged preimages.
 Recovery also rejects a nonempty tree described as an empty-folder deletion.
 Case-only item/folder names, collisions, cycles, and description-only folder deletion are covered.
+`LibraryNameTests` (2026-11-14) covers folded collisions (`Straße`/`STRASSE`, `σ`/`ς`, U+1C80/`в`, `ﬀ`/`ff`) for
+folder creation, import suffixes, renames, and moves on the case-insensitive temporary volume and on a freshly
+attached case-sensitive APFS disk image, and existing folded duplicates as listing issues. Before the fix, the
+case-sensitive volume accepted both names, and on the case-insensitive volume a folded `folder-create` committed an
+intent that failed with `EEXIST`, leaving the library unable to open until the operation was quarantined.
+A one-off sweep of every BMP scalar and every case-mapped supplementary scalar on a case-insensitive APFS image
+found 200 pairs APFS equates that lowercasing distinguished, 14 that Foundation folding alone distinguished, and
+none for the adopted key.
 
 ## Maintenance and asset admission
 
