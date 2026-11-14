@@ -37,7 +37,14 @@ Milestone 3, the native macOS application, is [approved](planning/Milestone-3.md
 decisions settled: a package UI target with a thin Xcode app target, no App Sandbox, one library per app with
 preview windows for side-by-side comparison, on-demand previews rendered one at a time, a statistics panel with
 names as text, Recover as the only in-app maintenance, and session tests plus scripted screenshots instead of
-XCUITest. Resume with A1 (app spec, product-manager role) and A2 (screen specs, ux-designer role).
+XCUITest.
+
+A1, the [native app spec](specs/Native-App.md), is approved (2026-11-14). The owner's review found two
+LibraryCore gaps, scheduled as A0 before A2: collision keys use `lowercased()` instead of full Unicode case folding
+(`ß`/`ss` and `σ`/`ς` can coexist on case-sensitive volumes), and a `.DS_Store` in `operations/` or an operation
+directory blocks opening with `RECOVERY_REQUIRED` while folder move/delete inventories include `.DS_Store` files.
+Resume with A0 (spec GEN-6–GEN-8), then A2 (screen specs, ux-designer role).
+Copying or saving preview images is required but deferred to a later milestone.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
