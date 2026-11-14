@@ -251,7 +251,7 @@ extension NativeLibrary {
             }
             func walk(_ directory: LibraryDirectory, prefix: String, fixed: String?, level: Int) throws {
                 guard level <= 64, ContinuousClock.now < deadline else { throw NativeLibraryError.limitExceeded }
-                for name in try directory.entries() {
+                for name in try directory.entries(includingFinderMetadata: true) {
                     visited += 1
                     guard visited <= LibraryBounds.directoryEntries, ContinuousClock.now < deadline else {
                         throw NativeLibraryError.limitExceeded

@@ -257,7 +257,7 @@ extension NativeLibrary {
         if let source = intent.sourceFolder { try probe(source, tag: "source") }
         if let destination = intent.destinationFolder { try probe(destination, tag: "destination") }
         if try stage.info("tree") != nil { found.append(("stage", try stage.child("tree"))) }
-        guard found.count == 1, let location = found.first, let expected = intent.tree,
+        guard found.count == 1, let location = found.first, let expected = intent.tree?.withoutFinderMetadata,
             try LibraryTrees.inventory(location.1, identity: expected.rootInode != nil) == expected
         else { throw NativeLibraryError.integrity }
         return location.0

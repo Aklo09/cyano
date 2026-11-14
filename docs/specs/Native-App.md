@@ -65,8 +65,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
   while an operation runs or between an interrupted operation and its recovery, when the library is opened, listed,
   recovered, or changed, then they never cause a refusal, listing issue, recovery requirement, or integrity conflict,
   and they are never treated as library content; a folder containing only `.DS_Store` (and a folder description)
-  counts as empty (ORG-10). (Needs LibraryCore changes: a `.DS_Store` in `operations/` or in an operation directory
-  currently blocks opening with `RECOVERY_REQUIRED`, and folder move/delete inventories include `.DS_Store` files.)
+  counts as empty (ORG-10). (LibraryCore behavior since milestone 3 subtask A0.)
 - **GEN-5** Given the main window, when the owner uses only the keyboard, then every workflow in this spec can be
   completed. (Detailed checks: A16.)
 

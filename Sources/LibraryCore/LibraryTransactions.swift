@@ -19,6 +19,16 @@ struct LibraryTreeInventory: Codable, Equatable {
     let files: [LibraryTreeFile]
     /// Root directory inode for moves: a rename keeps it, and APFS inode numbers survive remounts.
     let rootInode: UInt64?
+
+    /// Inventories leave out Finder metadata; intents written by earlier builds may still list `.DS_Store` files.
+    var withoutFinderMetadata: LibraryTreeInventory {
+        LibraryTreeInventory(
+            directories: directories,
+            files: files.filter { file in
+                file.path.split(separator: "/").last.map(String.init) != LibraryDirectory.finderMetadata
+            },
+            rootInode: rootInode)
+    }
 }
 
 struct LibraryTransaction: Codable {
@@ -62,6 +72,8 @@ enum MutationPath {
     static func join(_ parent: String, _ name: String) -> String { parent.isEmpty ? name : parent + "/" + name }
 }
 
+/// A member's identity and state. Directories compare by identity only: adding or removing entries (including
+/// Finder's `.DS_Store`) changes a directory's size and times, and every member is stamped on its own.
 struct TreeStamp: Equatable {
     let path: String
     let directory: Bool
@@ -85,6 +97,17 @@ struct TreeStamp: Equatable {
         modifiedNanoseconds = info.st_mtimespec.tv_nsec
         changedSeconds = info.st_ctimespec.tv_sec
         changedNanoseconds = info.st_ctimespec.tv_nsec
+    }
+
+    static func == (left: TreeStamp, right: TreeStamp) -> Bool {
+        guard left.path == right.path, left.directory == right.directory, left.device == right.device,
+            left.inode == right.inode
+        else { return false }
+        return left.directory
+            || (left.bytes == right.bytes && left.allocated == right.allocated
+                && left.modifiedSeconds == right.modifiedSeconds
+                && left.modifiedNanoseconds == right.modifiedNanoseconds
+                && left.changedSeconds == right.changedSeconds && left.changedNanoseconds == right.changedNanoseconds)
     }
 }
 

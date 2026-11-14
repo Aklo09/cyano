@@ -29,7 +29,8 @@ The format is `fb-native-library`; its current version is integer `1`.
 Identity uses a canonical lowercase UUID; dates use UTC with millisecond precision.
 The marker is immutable during ordinary library sessions.
 
-Initialization refuses unknown nonempty directories, including a bare foreign lockfile.
+Initialization refuses unknown nonempty directories, including a bare foreign lockfile; a directory holding only
+Finder metadata counts as empty.
 A strict `.format.pending` record identifies an interrupted native bootstrap.
 Only this control record may be created before kernel ownership is acquired.
 Publishing the marker and creating managed directories happen under ownership.
@@ -113,6 +114,16 @@ Managed components reject traversal, hidden names, control characters, and reser
 Managed access uses directory descriptors, no-follow opens, and inode/device checks.
 Root and source URLs reject remote hosts and decoded NUL characters before filesystem access.
 Regular files must have one link; symlinks, hardlinks, and special files are refused.
+
+Finder can create or rewrite a `.DS_Store` file in any directory it displays, and the library cannot prevent it.
+A regular file named `.DS_Store` anywhere beneath the chosen root is therefore never library content: listing,
+opening, replay, operation and staging validation, folder deletion, cache cleanup, and tree inventories ignore it,
+whether it appears, changes, or disappears during an operation or between an interruption and its recovery.
+Version 2 tree inventories omit such files; replay also ignores `.DS_Store` members recorded by earlier builds.
+Removing a directory also removes its `.DS_Store`. Tree snapshots compare directories by identity, not size or
+times, because adding such a file changes both; every file is still compared in full.
+Any other filesystem object named `.DS_Store` is refused like other unsafe members.
+Disk usage still counts these files, and asset-release verification does not apply this rule.
 FIFO rejection does not block waiting for a writer.
 Root aliases may resolve to the same directory before ownership acquisition.
 

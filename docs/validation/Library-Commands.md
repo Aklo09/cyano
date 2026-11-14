@@ -79,6 +79,13 @@ intent that failed with `EEXIST`, leaving the library unable to open until the o
 A one-off sweep of every BMP scalar and every case-mapped supplementary scalar on a case-insensitive APFS image
 found 200 pairs APFS equates that lowercasing distinguished, 14 that Foundation folding alone distinguished, and
 none for the adopted key.
+`LibraryFinderMetadataTests` (2026-11-14) writes `.DS_Store` files into every library, operation, and cache
+directory at every write phase of folder creation, import, comments, renames, item and folder moves, replacement,
+item and empty-folder deletion, unpacking, and cache cleanup, and replays interrupted folder moves and deletions
+after those files appear, change, or disappear, including an intent that records a `.DS_Store` member. Before the
+fix, a `.DS_Store` in `operations/` or in an operation directory blocked opening with `RECOVERY_REQUIRED`, Finder
+writes during an operation forced recovery, and a folder holding only a `.DS_Store` could not become a library.
+Non-regular objects named `.DS_Store` remain listing issues.
 
 ## Maintenance and asset admission
 

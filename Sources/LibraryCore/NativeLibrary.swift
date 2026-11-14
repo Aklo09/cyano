@@ -399,7 +399,7 @@ public final class NativeLibrary: @unchecked Sendable {
                         guard info.st_mode & S_IFMT == S_IFREG, info.st_nlink == 1 else {
                             throw NativeLibraryError.unsafePath
                         }
-                    } else if name != ".DS_Store" {
+                    } else {
                         throw NativeLibraryError.unsafePath
                     }
                 } catch NativeLibraryError.limitExceeded { throw NativeLibraryError.limitExceeded } catch {

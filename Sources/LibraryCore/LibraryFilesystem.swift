@@ -113,7 +113,10 @@ package final class LibraryDirectory {
         return value
     }
 
-    package func entries(maximum: Int = 100_000) throws -> [String] {
+    /// Directory members in byte order. Regular `.DS_Store` files are Finder metadata the library cannot prevent;
+    /// they are left out unless `includingFinderMetadata` is set, so they never affect library consistency.
+    /// Any other kind of filesystem object named `.DS_Store` is still listed and refused by the callers' checks.
+    package func entries(maximum: Int = 100_000, includingFinderMetadata: Bool = false) throws -> [String] {
         try check()
         let descriptor = openat(fd, ".", O_RDONLY | O_DIRECTORY | O_CLOEXEC)
         guard descriptor >= 0 else { throw NativeLibraryError.io(errno) }
@@ -136,6 +139,7 @@ package final class LibraryDirectory {
             }
             guard let name else { throw NativeLibraryError.unsafePath }
             if name == "." || name == ".." { continue }
+            if !includingFinderMetadata, name == Self.finderMetadata, try isRegularFile(name) { continue }
             guard names.count < maximum else { throw NativeLibraryError.limitExceeded }
             names.append(name)
         }
@@ -247,10 +251,35 @@ package final class LibraryDirectory {
         try sync()
     }
 
+    package static let finderMetadata = ".DS_Store"
+
+    private func isRegularFile(_ name: String) throws -> Bool {
+        var value = stat()
+        if fstatat(fd, name, &value, AT_SYMLINK_NOFOLLOW) != 0 {
+            if errno == ENOENT { return false }
+            throw NativeLibraryError.io(errno)
+        }
+        return value.st_mode & S_IFMT == S_IFREG
+    }
+
+    /// Removes a file, or a directory whose only remaining members are Finder metadata files.
+    /// Finder can recreate `.DS_Store` between its removal and the directory's, so that race is retried.
     package func remove(_ name: String, directory: Bool = false) throws {
         try component(name)
         try check()
-        guard unlinkat(fd, name, directory ? AT_REMOVEDIR : 0) == 0 else { throw NativeLibraryError.io(errno) }
+        var attempts = 0
+        while unlinkat(fd, name, directory ? AT_REMOVEDIR : 0) != 0 {
+            let error = errno
+            attempts += 1
+            guard directory, error == ENOTEMPTY || error == EEXIST, attempts <= 3 else {
+                throw NativeLibraryError.io(error)
+            }
+            let child = try LibraryDirectory(parent: self, name: name)
+            guard try child.isRegularFile(Self.finderMetadata) else { throw NativeLibraryError.io(error) }
+            guard unlinkat(child.fd, Self.finderMetadata, 0) == 0 || errno == ENOENT else {
+                throw NativeLibraryError.io(errno)
+            }
+        }
         try sync()
     }
 

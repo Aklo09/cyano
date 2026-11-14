@@ -70,7 +70,6 @@ extension NativeLibrary {
                 switch name {
                 case ".folder.json":
                     _ = try LibraryRecords.folderMetadata(selected.read(name, maximum: LibraryBounds.metadata))
-                case ".DS_Store": _ = try selected.read(name, maximum: BlueprintCodecLimits.standard.sourceBytes)
                 default: throw NativeLibraryError.folderNotEmpty
                 }
             }

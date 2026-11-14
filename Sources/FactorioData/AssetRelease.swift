@@ -130,7 +130,7 @@ public enum AssetRelease {
         var snapshot: [String: [Int64]] = [:]
         func scan(_ directory: LibraryDirectory, prefix: String, depth: Int) throws {
             try require(depth <= 32 && snapshot.count <= 20_000, "Asset directory limits exceeded.")
-            for name in try directory.entries(maximum: 20_000) {
+            for name in try directory.entries(maximum: 20_000, includingFinderMetadata: true) {
                 let path = prefix.isEmpty ? name : prefix + "/" + name
                 _ = try safe(path)
                 guard let info = try directory.info(name) else {

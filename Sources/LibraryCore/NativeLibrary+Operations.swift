@@ -15,7 +15,7 @@ public struct StagingCleanupReport: Codable, Sendable {
 extension NativeLibrary {
     static let quarantineName = "operations-quarantine"
     static let allowedRootEntries: Set<String> = [
-        ".owner.lock", ".library-format.json", "library", "operations", "cache", quarantineName, ".DS_Store",
+        ".owner.lock", ".library-format.json", "library", "operations", "cache", quarantineName,
     ]
 
     /// Ownership without replay, so operations that block opening can still be inspected and quarantined.
