@@ -198,8 +198,12 @@ release, off the main thread, like the prototype map, and drops it when the rele
   the sidebar, the path bar, and the inspector header. `textForm` (icon tags removed, other tags kept, icon names
   when nothing else is left) gives window titles, Save As names, the entry location line, and the name sort key
   (`BrowserRow.sortName`); `spoken(showing:)` gives VoiceOver labels. Entry names are the labels as stored.
+- **Statistics (R7):** Statistics rows draw the item's icon before its name and the quality icon beside the
+  quality, at text height; names stay the prototype names as text, so ⌘C and parity with `fb-native statistics`
+  are unchanged. Without an icon the name stands alone.
 - **Tests:** `IconCatalogTests` use a generated release with a PNG atlas; `PrivateIconCatalogTests` decode the real
-  WebP atlases when `.cache/renderer-assets` exists; `EntryIconTests` cover rows, details, layout, and spoken names; `RichTextNameTests` cover tags, text forms,
+  WebP atlases when `.cache/renderer-assets` exists, and `PrivateStatisticsIconTests` check that every item and
+  quality in its prototype map has an icon; `EntryIconTests` cover rows, details, layout, and spoken names; `RichTextNameTests` cover tags, text forms,
   sorting, and file names.
 
 ## Library selection and windows

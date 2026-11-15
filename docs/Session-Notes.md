@@ -145,7 +145,9 @@ reads icons from the verified release and `AssetSettings.iconCatalog()` loads it
 index is schema 2 with root entry icons, rows show the kind symbol then the icons, and the inspector shows the
 game's icon tile (see the [app guide](development/App.md#icons)). R6 is done in code and tests
 (2026-11-15): names keep their tags and show icons in place; imports and unpacked leaves save tagged labels as
-`displayNameOverride` (see the [storage contract](contracts/Storage.md#portable-names-and-confined-access)). Next: R7.
+`displayNameOverride` (see the [storage contract](contracts/Storage.md#portable-names-and-confined-access)). R7 is done in code and tests
+(2026-11-15): Statistics rows show item and quality icons; all 342 map items and every quality have one in the
+release. A real-app check of R6 and R7 is pending (owner: later). Next: R8 (render warnings).
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

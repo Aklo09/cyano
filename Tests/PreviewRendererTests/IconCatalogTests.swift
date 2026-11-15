@@ -1,4 +1,5 @@
 import CoreGraphics
+import FactorioData
 import Foundation
 import ImageIO
 import Testing
@@ -255,5 +256,26 @@ struct PrivateIconCatalogTests {
             #expect(catalog.qualityBadge(quality) != nil, "\(quality)")
         }
         #expect(catalog.decodeFailures == 0)
+    }
+}
+
+@Suite("Statistics icons with the private release")
+struct PrivateStatisticsIconTests {
+    @Test(
+        "ICN-9: every item and quality in the private prototype map has an icon in the same release",
+        .enabled(
+            if: FileManager.default.fileExists(atPath: iconPrivateRelease.appendingPathComponent("release.json").path),
+            "Needs the private release in .cache/renderer-assets"))
+    func everyMapItem() throws {
+        let catalog = try IconCatalog.load(release: iconPrivateRelease)
+        let map = try PrototypeMap.load(release: iconPrivateRelease)
+        let missing = map.items.keys.filter { name in
+            IconReference(signalType: nil, name: name).map { !catalog.contains($0) } ?? true
+        }
+        #expect(missing.isEmpty, "\(missing.sorted())")
+        #expect(map.items.count == 342)
+        for quality in map.qualities where quality != "normal" {
+            #expect(IconReference(tagKind: "quality", name: quality).map(catalog.contains) == true, "\(quality)")
+        }
     }
 }

@@ -1,5 +1,6 @@
 import AppKit
 import FactorioData
+import PreviewRenderer
 import SwiftUI
 
 /// The inspector's Statistics tab (screen specs, "Statistics tab"; STA-1 to STA-6).
@@ -60,6 +61,21 @@ struct StatisticsTab: View {
     }
 }
 
+/// An item or quality icon at text height in a Statistics row, or nothing when the release has none (ICN-9).
+private struct StatisticsIcon: View {
+    let reference: IconReference?
+    @Environment(\.iconCatalog) private var catalog
+    @ScaledMetric(relativeTo: .body) private var size: CGFloat = 16
+
+    var body: some View {
+        if let reference, let image = catalog?.image(for: reference) {
+            Image(decorative: image, scale: 1).resizable().interpolation(.high)
+                .frame(width: size, height: size)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
 /// "Calculating…" with a spinner, shown only after 0.5 s so quick results never flash it.
 private struct CalculatingView: View {
     @State private var visible = false
@@ -101,9 +117,12 @@ private struct StatisticsList: View {
             ForEach(presentation.groups) { group in
                 Section {
                     ForEach(group.rows) { row in
-                        HStack(alignment: .firstTextBaseline) {
+                        HStack(alignment: .center, spacing: 4) {
+                            // Icons from the release before the item and its quality; names stay text (ICN-9).
+                            StatisticsIcon(reference: IconReference(signalType: nil, name: row.name))
                             Text(row.name)
                             if let quality = row.quality {
+                                StatisticsIcon(reference: IconReference(tagKind: "quality", name: quality))
                                 // Hierarchy by size, not lighter text (screen specs, "Color and contrast").
                                 Text(quality).font(.callout)
                             }
