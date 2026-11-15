@@ -153,7 +153,10 @@ kept the planner's wording. R9 is done in code and tests (2026-11-15):
 Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) hand out the cached PNG unchanged. R10 is done (2026-11-15):
 `tools/check-artwork.py` runs in `just test`; the smoke run checks icons, tagged names, warnings, and Copy Image (31 of
 31 with assets; 27 and 5 skipped without); the visual check of R6 to R9 found rows with tag icons too tall, now fixed
-(see [validation](validation/App.md#milestone-4-smoke-runs-2026-11-15)). Next: R11, acceptance.
+(see [validation](validation/App.md#milestone-4-smoke-runs-2026-11-15)). R11 (2026-11-15): every check passes on
+`fa8d7f8` (see the [milestone 4 acceptance record](validation/Milestone-4.md)); the first Release smoke runs found an
+inspector layout loop (crash on the Comments tab) caused by the larger header, fixed before the passing runs. The user
+guide covers icons, tags, warnings, and image copy/save. Next: the owner's walkthrough and approval of milestone 4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

@@ -48,6 +48,17 @@ The main window has the folder **sidebar**, the **path bar** above the item list
 Books open like folders and list their entries by stored index (the `#` column). The inspector shows the selected
 item's or entry's details: kind, game version, dates, size, description, and planner settings.
 
+With an asset release set up, names look as they do in the game:
+
+- **Entry icons:** each row shows its kind symbol and then the blueprint's own icons (up to four), with quality
+  badges; the inspector shows them as the game's square symbol.
+- **Rich-text tags:** tags in names such as `[item=iron-plate]` or `[planet=gleba]` appear as their icons, in rows,
+  the sidebar, the path bar, and the inspector title. A tag the release has no icon for, or a formatting tag such as
+  `[color=red]`, stays as written, and without a release every tag shows as text. Search finds the tag text too
+  (`iron-plate`). Window titles and suggested file names leave icon tags out.
+- **Imported names keep their tags:** a string whose label has tags is saved with that label as its name; its file
+  name on disk leaves the tags out. Items imported earlier keep their names. You can type tags when renaming.
+
 ## Import blueprint strings
 
 - **From the clipboard:** ⇧⌘V, or ⌘V with the item list focused.
@@ -88,6 +99,9 @@ Previews and statistics need an assembled asset release. Make one from your Fact
 [asset preparation guide](development/Asset-Preparation.md#regenerate), assemble it with the
 [preview guide](development/Preview.md#prepare-a-private-release), then open Settings (⌘,) and click **Choose…**.
 The app verifies the release and remembers it. Keep the release outside the repository's `.cache/` for everyday use.
+Releases assembled before the planet icons were added (2026-11-15) still work, but show planet tags as text and leave
+planet entry icons out; assemble the release again from the regenerated `private-assets/2.1.24` to get them.
+The app reads Factorio artwork only from this release; none is built into the app.
 
 ## Previews
 
@@ -100,15 +114,24 @@ their own windows with ⌘Y or Space; several can be open at once, and opening o
 | Pan | Drag, or the arrow keys |
 | Background | View ▸ Background: Checkerboard, Transparent, or Solid Color… |
 | Try a failed render again | ⌘R |
+| Copy the image | ⌥⌘C (⌘C in a preview window), or right-click the preview |
+| Save the image as PNG | ⌥⇧⌘E, or right-click the preview |
+| See render warnings | Click "N warnings" below the preview (in a window, in its toolbar), or View ▸ Show Render Warnings |
 
 One preview renders at a time; others say they are waiting. Previews are cached, so an item you have viewed appears
 at once next time. Preview windows follow their item: a rename changes the title, a replaced string re-renders, and a
 deleted item says so. Closing the library closes its preview windows; they are not reopened at the next launch.
 Alt-mode details are drawn as in the game, including inserter pickup and drop markers.
 
+Copy Image and Save Image As give the preview exactly as rendered (2x, transparent background), not the background
+or zoom you chose; they are available once the preview is ready. Saving refuses folders inside the library and moves a
+file it replaces to the Trash. When the renderer reports warnings, for example an entity from a mod it doesn't know,
+"N warnings" lists them with their counts; the preview is still usable.
+
 ## Statistics
 
-The Statistics tab (⌘1) lists a blueprint's entity and tile counts, footprint, and the items needed to build it.
+The Statistics tab (⌘1) lists a blueprint's entity and tile counts, footprint, and the items needed to build it, each
+item with its icon and quality.
 Books and planners have no statistics. Without an asset release, the tab says what it needs.
 
 ## When something goes wrong
@@ -127,9 +150,8 @@ The `fb-native` CLI works on the same library (see the [CLI guide](development/L
 can hold it at a time: close the library in the app (⇧⌘W) before running a CLI command that changes it. Cache
 cleanup, staging cleanup, quarantine, and usage reports are CLI-only.
 
-## Not available yet
+## Not available
 
-Thumbnail grids, copying or saving a preview image, and icons for Factorio rich-text tags in names (tags are removed
-from displayed names) are planned for later milestones. List rows show each item's kind symbol, not a thumbnail.
+Thumbnails and thumbnail grids were dropped: the inspector's preview of the selected item takes their place.
 
 All menu commands and shortcuts are listed in the [screen specs](specs/Native-App-Screens.md#menus-and-shortcuts).

@@ -35,6 +35,7 @@ Use the approved plan for scope and validation records for completed work.
 | Inspect milestone 1 acceptance | [Milestone 1 acceptance](validation/Milestone-1.md) |
 | Inspect milestone 2 acceptance | [Milestone 2 acceptance](validation/Milestone-2.md) |
 | Inspect milestone 3 acceptance | [Milestone 3 acceptance](validation/Milestone-3.md) |
+| Inspect milestone 4 acceptance | [Milestone 4 acceptance](validation/Milestone-4.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.

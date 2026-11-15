@@ -18,6 +18,7 @@ Based on the [initial assessment](macOS-Assessment.md), with the scope decisions
 - [x] Core revisions after milestone 1 review ([decisions](Core-Revisions.md)).
 - [x] Native construction statistics: contract, strict prototype map, calculator, reference parity, library/CLI integration, and measurements ([validation](../validation/Statistics.md)).
 - [x] Milestone 2 acceptance ([acceptance record](../validation/Milestone-2.md)).
+- [ ] Milestone 4 acceptance: all checks pass; owner approval pending ([acceptance record](../validation/Milestone-4.md)).
 
 See [foundation validation](../validation/Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
