@@ -354,3 +354,23 @@ captures prefer on-screen windows; System Events cannot find the Settings Clear 
 empty), so buttons are pressed through the native accessibility API.
 
 
+
+## Entry icons (2026-11-15)
+
+Milestone 4, R5. A real-app check with the owner's permission: a copy of the Debug app, a scratch library holding
+`v0.59.0.txt`, `space-age.bp.txt`, `bp.txt`, and `RS.txt`, a separate preferences domain, and the R3 release in
+`.cache/renderer-assets`. Rows were selected and books opened through accessibility actions only (no keystrokes or
+clicks); window captures stayed in the scratch directory.
+
+| Check | Result |
+|---|---|
+| Folder rows (ICN-1) | Kind symbol, then the root's icons in slot order, then the name: R and S signals for the RS latch, four item icons for the Space Age book, the legendary quality icon for `bp.txt`, two parameter signals for `v0.59.0.txt` |
+| Inspector tile (ICN-2) | Four icons in the 2 × 2 grid (Space Age book), two side by side (`v0.59.0.txt`), three in the top-left, top-right, bottom-left slots (`v0.59.0.txt` `1.4`), one with its badge (`bp.txt` `8`) |
+| Planets (ICN-11) | Nauvis, Vulcanus, Gleba, Fulgora, and Aquilo icons in `v0.59.0.txt` book `1` rows and the inspector |
+| Quality badges | Legendary badges in the bottom-left corner of row and inspector icons (`bp.txt` `4`, `6`, `7`, `8`) |
+| No icons (ICN-3) | Book entries without icons show the kind symbol only |
+| Quit | Quit through the app menu; no worker left; the preferences domain was removed |
+
+Seen but outside R5: tagged names still lose their tags (`bp.txt` shows "(2026-06)", "U235", "Carbon fiber"), which
+R6 changes; and right after selecting a large entry the preview area briefly showed an empty checkerboard, with no
+Waiting or Rendering text, before the image appeared. The latter is to be checked in R10's smoke run.
