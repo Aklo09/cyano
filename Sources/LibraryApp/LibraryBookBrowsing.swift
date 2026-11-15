@@ -46,11 +46,10 @@ public enum BlueprintEntryReader {
         ItemKind(stored: entry.kind.rawValue)
     }
 
-    /// The entry's label without rich-text tags such as `[item=iron-plate]`, as item names are shown, or a
-    /// kind-specific untitled name. Icons for those tags come with milestone 4; the saved label is untouched.
+    /// The entry's label as stored, rich-text tags included (shown as icons, ICN-5), or a kind-specific untitled name
+    /// when it has none.
     public static func name(_ entry: BlueprintEntry) -> String {
-        let label = (entry.label ?? "").replacingOccurrences(of: "\\[[^\\]]*\\]", with: "", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let label = (entry.label ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         return label.isEmpty ? "Untitled " + kind(entry).label : label
     }
 
@@ -74,7 +73,8 @@ public enum BlueprintEntryReader {
         return EntryDetail(
             name: name(entry), kind: kind, version: version(entry.version), description: entry.description,
             settings: kind == .upgradePlanner || kind == .deconstructionPlanner ? settings(entry) : [],
-            location: entry.path.isEmpty ? nil : "Entry \(pathText(entry.path)) in \(bookName ?? "the book")",
+            location: entry.path.isEmpty
+                ? nil : "Entry \(pathText(entry.path)) in \(bookName.map { RichTextName($0).textForm } ?? "the book")",
             entryCount: entry.kind == .book ? children(of: entry).count : nil, icons: entry.icons)
     }
 

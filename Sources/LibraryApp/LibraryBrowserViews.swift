@@ -23,31 +23,36 @@ struct FolderSidebar: View {
                     }
                 }
             OutlineGroup(browser.folderTree.children ?? [], children: \.children) { node in
-                Label(node.name, systemImage: "folder").tag(node.path)
-                    .onDrop(of: [.fileURL, .plainText], isTargeted: nil) { browser.drop($0, into: node.path) }
-                    .contextMenu {
-                        Button("New Folder") {
-                            Task {
-                                browser.show(folder: node.path)
-                                await browser.newFolder()
-                            }
-                        }
-                        Button("Rename") {
-                            browser.show(folder: LibraryBrowserModel.parent(node.path))
-                            browser.selection = ["folder:" + node.path]
-                            browser.beginRename()
-                        }
-                        Button("Move To…") {
-                            browser.show(folder: LibraryBrowserModel.parent(node.path))
-                            browser.selection = ["folder:" + node.path]
-                            browser.moveSheetRows = browser.organizableSelection
-                        }
-                        Button("Delete Folder") {
-                            browser.show(folder: LibraryBrowserModel.parent(node.path))
-                            browser.selection = ["folder:" + node.path]
-                            browser.requestDelete()
+                Label {
+                    RichNameText(name: node.name)
+                } icon: {
+                    Image(systemName: "folder")
+                }
+                .tag(node.path)
+                .onDrop(of: [.fileURL, .plainText], isTargeted: nil) { browser.drop($0, into: node.path) }
+                .contextMenu {
+                    Button("New Folder") {
+                        Task {
+                            browser.show(folder: node.path)
+                            await browser.newFolder()
                         }
                     }
+                    Button("Rename") {
+                        browser.show(folder: LibraryBrowserModel.parent(node.path))
+                        browser.selection = ["folder:" + node.path]
+                        browser.beginRename()
+                    }
+                    Button("Move To…") {
+                        browser.show(folder: LibraryBrowserModel.parent(node.path))
+                        browser.selection = ["folder:" + node.path]
+                        browser.moveSheetRows = browser.organizableSelection
+                    }
+                    Button("Delete Folder") {
+                        browser.show(folder: LibraryBrowserModel.parent(node.path))
+                        browser.selection = ["folder:" + node.path]
+                        browser.requestDelete()
+                    }
+                }
             }
         }
         .listStyle(.sidebar)
@@ -87,10 +92,14 @@ struct PathBar: View {
                         Image(systemName: "chevron.right").font(.caption).accessibilityHidden(true)
                     }
                     if index == components.count - 1 {
-                        Text(component.name).fontWeight(.semibold)
+                        RichNameText(name: component.name).fontWeight(.semibold)
                     } else {
-                        Button(component.name) { Task { await browser.navigate(to: component.target) } }
-                            .buttonStyle(.link)
+                        Button {
+                            Task { await browser.navigate(to: component.target) }
+                        } label: {
+                            RichNameText(name: component.name)
+                        }
+                        .buttonStyle(.link)
                     }
                 }
             }
@@ -108,6 +117,7 @@ struct PathBar: View {
 struct ItemList: View {
     @Bindable var browser: LibraryBrowserModel
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.iconCatalog) private var iconCatalog
     @State private var sortOrder = [KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard)]
     @FocusState private var listFocused: Bool
     @State private var refocusList = false
@@ -222,11 +232,12 @@ struct ItemList: View {
             TableColumn("Name") { row in
                 HStack(spacing: 6) {
                     EntryIconStrip(kind: row.kind, icons: row.icons)
-                    Text(row.name)
+                    RichNameText(name: row.name)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(
-                    Self.withIcons("\(row.name), \(row.kind.label.lowercased()), entry \(row.storedIndex ?? 0)", row))
+                    Self.withIcons(
+                        "\(spokenName(row)), \(row.kind.label.lowercased()), entry \(row.storedIndex ?? 0)", row))
             }
             .width(min: 160, ideal: 320)
             TableColumn("Kind") { row in Text(row.kind.label) }
@@ -264,7 +275,7 @@ struct ItemList: View {
                 } else {
                     HStack(spacing: 6) {
                         EntryIconStrip(kind: row.kind, icons: row.icons)
-                        Text(row.name)
+                        RichNameText(name: row.name)
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(accessibilityLabel(row))
@@ -355,11 +366,14 @@ struct ItemList: View {
     }
 
     private func accessibilityLabel(_ row: BrowserRow) -> String {
-        var parts = [row.name, row.kind.label.lowercased()]
+        var parts = [spokenName(row), row.kind.label.lowercased()]
         if let updated = row.updated { parts.append("updated \(updated.formatted(date: .long, time: .omitted))") }
         if let size = row.sizeBytes { parts.append(LibraryFormat.size(size)) }
         return Self.withIcons(parts.joined(separator: ", "), row)
     }
+
+    /// The row's name as VoiceOver reads it, with icons named in place (ICN-7).
+    private func spokenName(_ row: BrowserRow) -> String { RichTextName(row.name).spoken(showing: iconCatalog) }
 
     /// Entry icons are read after the rest of the row: "…, icons: iron plate, rare; copper cable".
     private static func withIcons(_ label: String, _ row: BrowserRow) -> String {
@@ -498,7 +512,7 @@ private struct InspectorHeader: View {
         HStack(alignment: .top, spacing: 10) {
             EntryIconTile(kind: kind, icons: detail?.icons ?? item?.entryIcons ?? [], side: 48)
             VStack(alignment: .leading, spacing: 4) {
-                Text(name).font(.title2.weight(.semibold)).textSelection(.enabled)
+                RichNameText(name: name, pointSize: 22).font(.title2.weight(.semibold)).textSelection(.enabled)
                 Label(kind.label, systemImage: kind.symbol)
             }
         }

@@ -8,9 +8,11 @@ public struct ExportTarget: Equatable, Sendable {
     public let entryPath: [Int]
     public let name: String
 
-    /// The proposed file name: the item or entry name with path separators replaced, plus `.txt`.
+    /// The proposed file name: the text form of the item or entry name (ICN-7) with path separators replaced, plus
+    /// `.txt`.
     public var fileName: String {
-        let clean = name.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: "-")
+        let clean = RichTextName(name).textForm.replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
         return (clean.isEmpty ? "Blueprint" : clean) + ".txt"
     }
 }

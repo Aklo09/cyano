@@ -89,8 +89,8 @@ struct LibraryBookTests {
         #expect(entries.map(\.storedIndex) == [9, 0, 5, 12, 14, 20, 21, 22])
         #expect(
             entries.map(\.name) == [
-                "Depot", "Stop 1", "Stations", "Belts", "Untitled Deconstruction Planner", "Ancient", "Iron plate",
-                "Untitled Blueprint",
+                "Depot", "Stop 1", "Stations", "Belts", "Untitled Deconstruction Planner", "Ancient",
+                "[item=iron-plate,quality=legendary]Iron plate [virtual-signal=signal-A]", "[item=iron-plate]",
             ])
         #expect(
             entries.map(\.kind) == [

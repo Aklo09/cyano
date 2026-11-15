@@ -143,7 +143,9 @@ reads icons from the verified release and `AssetSettings.iconCatalog()` loads it
 (2026-11-15), so R2 is done with no corrections. R5 is done (2026-11-15; real-app check in
 [validation](validation/App.md#entry-icons-2026-11-15)): the source
 index is schema 2 with root entry icons, rows show the kind symbol then the icons, and the inspector shows the
-game's icon tile (see the [app guide](development/App.md#icons)). Next: R6 and R7.
+game's icon tile (see the [app guide](development/App.md#icons)). R6 is done in code and tests
+(2026-11-15): names keep their tags and show icons in place; imports and unpacked leaves save tagged labels as
+`displayNameOverride` (see the [storage contract](contracts/Storage.md#portable-names-and-confined-access)). Next: R7.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

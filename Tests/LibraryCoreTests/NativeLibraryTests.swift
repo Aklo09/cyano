@@ -423,6 +423,46 @@ struct NativeLibraryTests {
         #expect(try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL)) == rebuilt)
     }
 
+    @Test("ICN-8: a tagged label becomes the item's name with its tags; the file name drops them")
+    func taggedNames() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        defer { library.close() }
+        func source(_ json: String) throws -> Data {
+            Data(("0" + (try ZlibCodec.compress(Data(json.utf8), maximum: 1_000_000)).base64EncodedString()).utf8)
+        }
+        let label = "[item=iron-plate,quality=rare]Smelter 480/s"
+        let tagged = try source(#"{"blueprint":{"version":1,"label":"\#(label)"}}"#)
+        let first = try library.importSource(tagged)
+        #expect(first.name == label && first.basename == "Smelter 480 s")
+        #expect(first.metadata.displayNameOverride == label)
+        let second = try library.importSource(tagged)
+        #expect(second.name == label + " (2)" && second.basename == "Smelter 480 s (2)")
+        let only = try library.importSource(try source(#"{"blueprint":{"version":1,"label":"[item=fusion-reactor]"}}"#))
+        #expect(only.name == "[item=fusion-reactor]" && only.basename == "Untitled Blueprint")
+        let plain = try library.importSource(try source(#"{"blueprint":{"version":1,"label":"Plain 1/2"}}"#))
+        #expect(plain.metadata.displayNameOverride == nil && plain.name == "Plain 1 2")
+        let named = try library.importSource(tagged, name: "Chosen")
+        #expect(named.name == "Chosen")
+        let long = String(repeating: "x", count: 1025) + "[item=iron-plate]"
+        let tooLong = try library.importSource(try source(#"{"blueprint":{"version":1,"label":"\#(long)"}}"#))
+        #expect(tooLong.metadata.displayNameOverride == nil)
+        let renamed = try library.renameItem(id: plain.id, name: "[item=copper-plate] Copper")
+        #expect(renamed.name == "[item=copper-plate] Copper" && renamed.basename == "Copper")
+        let book = try source(
+            """
+            {"blueprint_book":{"version":1,"label":"[planet=gleba]Gleba","blueprints":[
+              {"index":6,"blueprint":{"version":1,"label":"[item=iron-plate]Iron"}},
+              {"index":7,"blueprint":{"version":1,"label":"Plain"}}]}}
+            """)
+        let unpacked = try library.importUnpacked(book)
+        let leaves = try library.list().items.filter { $0.folder == unpacked.folder }
+        #expect(unpacked.folder == "Gleba")
+        #expect(leaves.map(\.name).sorted() == ["6 - [item=iron-plate]Iron", "7 - Plain"])
+        #expect(leaves.map(\.basename).sorted() == ["6 - Iron", "7 - Plain"])
+    }
+
     @Test("ICN-1: entry icons are read in slot order; malformed members and repeated slots are left out")
     func entryIconParsing() throws {
         let icons = """

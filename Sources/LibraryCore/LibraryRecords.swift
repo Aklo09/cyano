@@ -252,6 +252,16 @@ enum LibraryNames {
         return parts
     }
 
+    /// The label itself when it holds rich-text tags such as `[item=iron-plate]`, which the file name drops, so the
+    /// item keeps them as its name (spec ICN-8); nil for labels without tags or over the 1,024-character name limit.
+    static func taggedName(_ label: String?) -> String? {
+        guard let label, label.count <= 1024, label.utf8.count <= LibraryBounds.metadata,
+            label.range(of: "\\[[^\\]]*\\]", options: .regularExpression) != nil,
+            !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return nil }
+        return label
+    }
+
     static func basename(label: String?, kind: BlueprintEntryKind) -> String {
         let fallback: String
         switch kind {

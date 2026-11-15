@@ -288,7 +288,8 @@ extension NativeLibrary {
                         let metadata = LibraryItemMetadata(
                             schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: now,
                             updatedAt: now, sourceSha256: OriginalSource(bytes: source).sha256,
-                            displayNameOverride: nil, comments: [])
+                            displayNameOverride: LibraryNames.taggedName(child.label).map { prefix + $0 },
+                            comments: [])
                         try put(source, at: relative + ".txt")
                         try put(
                             LibraryRecords.encode(metadata, maximum: LibraryBounds.metadata), at: relative + ".json")

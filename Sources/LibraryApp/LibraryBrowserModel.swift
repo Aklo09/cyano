@@ -57,6 +57,9 @@ public struct BrowserRow: Identifiable, Equatable, Sendable {
     /// The entry's own stored index, shown in the # column.
     public var storedIndex: Int? { entryPath?.last }
 
+    /// The name sorts by its text form, so rich-text tags never decide the order (ICN-7).
+    public var sortName: String { RichTextName(name).textForm }
+
     static func folder(_ path: String) -> BrowserRow {
         BrowserRow(
             id: "folder:" + path, name: LibraryBrowserModel.lastComponent(path), kind: .folder,
@@ -505,13 +508,13 @@ public final class LibraryBrowserModel {
         rows.sorted { left, right in
             let order: ComparisonResult =
                 switch key {
-                case .name: left.name.localizedStandardCompare(right.name)
+                case .name: left.sortName.localizedStandardCompare(right.sortName)
                 case .kind: left.kind.label.localizedStandardCompare(right.kind.label)
                 case .updated: compare(left.updated ?? .distantPast, right.updated ?? .distantPast)
                 case .size: compare(left.sizeBytes ?? 0, right.sizeBytes ?? 0)
                 }
             if order != .orderedSame { return ascending ? order == .orderedAscending : order == .orderedDescending }
-            let byName = left.name.localizedStandardCompare(right.name)
+            let byName = left.sortName.localizedStandardCompare(right.sortName)
             return byName == .orderedSame ? left.id < right.id : byName == .orderedAscending
         }
     }

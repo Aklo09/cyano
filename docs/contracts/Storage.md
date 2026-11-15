@@ -53,7 +53,7 @@ JSON metadata version `1` contains:
 | `createdAt` | Creation timestamp |
 | `updatedAt` | Last metadata-change timestamp |
 | `sourceSha256` | Lowercase SHA-256 of exact TXT bytes |
-| `displayNameOverride` | Optional explicit import or rename name |
+| `displayNameOverride` | Optional name: an explicit import or rename name, or a label with rich-text tags (below) |
 | `comments` | Array of scoped comments |
 
 Every comment contains exactly `id`, `entryPath`, `text`, and `createdAt`.
@@ -98,6 +98,11 @@ They also retain the removed originals, as described under file and tree mutatio
 Initial basenames derive from the source label or explicit import name.
 Filename projection examines at most 4,096 UTF-8 bytes before normalization.
 It strips rich-text tags and replaces forbidden filename characters.
+When an import without an explicit name, or an unpacked leaf, has a label with rich-text tags (a bracketed `[…]`),
+the label as written becomes `displayNameOverride`, so the item keeps its tags as its name while the basename drops
+them (spec ICN-8, milestone 4 decision 3). An import that receives a ` (2)`-style collision suffix adds the same
+suffix to that name; an unpacked leaf's name keeps its `<index> - ` prefix. Labels over 1,024 characters keep the
+basename as their name. Items imported before this rule keep their names; the metadata schema is unchanged.
 It preserves source content independently from the resulting name.
 Missing or unusable names receive kind-specific untitled names.
 

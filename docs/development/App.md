@@ -192,8 +192,15 @@ release, off the main thread, like the prototype map, and drops it when the rele
   half size in the bottom-left corner, leaving out icons the release lacks; `EntryIconTile` draws the inspector's
   48-point tile in the game's layout (`EntryIconLayout.frames`) or the kind symbol. Row VoiceOver labels end with
   "icons: …" (`EntryIconLayout.spokenNames`).
+- **Names (R6):** `RichTextName` splits a name into text, icon tags (kinds the catalog maps, `planet`, and
+  `img=category/name`), and other tags. `RichNameText` draws icon tags the release has as inline images at the text
+  size (`IconCatalog.badgedImage` adds the quality badge) and leaves every other tag as written; it is used in rows,
+  the sidebar, the path bar, and the inspector header. `textForm` (icon tags removed, other tags kept, icon names
+  when nothing else is left) gives window titles, Save As names, the entry location line, and the name sort key
+  (`BrowserRow.sortName`); `spoken(showing:)` gives VoiceOver labels. Entry names are the labels as stored.
 - **Tests:** `IconCatalogTests` use a generated release with a PNG atlas; `PrivateIconCatalogTests` decode the real
-  WebP atlases when `.cache/renderer-assets` exists; `EntryIconTests` cover rows, details, layout, and spoken names.
+  WebP atlases when `.cache/renderer-assets` exists; `EntryIconTests` cover rows, details, layout, and spoken names; `RichTextNameTests` cover tags, text forms,
+  sorting, and file names.
 
 ## Library selection and windows
 

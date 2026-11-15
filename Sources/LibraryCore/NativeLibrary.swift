@@ -224,9 +224,12 @@ public final class NativeLibrary: @unchecked Sendable {
                 suffix += 1
             }
             let now = LibraryRecords.now()
+            // A label with rich-text tags keeps them as the item's name; the file name drops them (ICN-8).
+            let tagged = name == nil ? LibraryNames.taggedName(document.root.label) : nil
             let metadata = LibraryItemMetadata(
                 schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: now, updatedAt: now,
-                sourceSha256: document.original.sha256, displayNameOverride: name, comments: []
+                sourceSha256: document.original.sha256,
+                displayNameOverride: name ?? tagged.map { $0 + basename.dropFirst(base.count) }, comments: []
             )
             let result = item(metadata: metadata, document: document, folder: folder, basename: basename)
             try transact(

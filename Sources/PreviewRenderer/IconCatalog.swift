@@ -121,6 +121,33 @@ public final class IconCatalog: Sendable {
         return image(for: reference)
     }
 
+    /// The icon with its quality badge drawn in the bottom-left corner at half size, for places that draw one image,
+    /// such as icons inline in a name; without a quality other than normal, the plain icon.
+    public func badgedImage(for reference: IconReference, quality: String?) -> CGImage? {
+        guard let image = image(for: reference) else { return nil }
+        guard let quality, let badge = qualityBadge(quality) else { return image }
+        let key = reference.description + "|" + quality
+        return state.withLock { state -> CGImage? in
+            state.tick += 1
+            if let cached = state.images[key] {
+                state.images[key] = (cached.image, state.tick)
+                return cached.image
+            }
+            guard let context = try? makeBitmap(width: image.width, height: image.height) else { return image }
+            let rect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+            context.draw(image, in: rect)
+            context.draw(badge, in: CGRect(x: 0, y: 0, width: rect.width / 2, height: rect.height / 2))
+            guard let composed = context.makeImage() else { return image }
+            if state.images.count >= Self.iconCacheLimit,
+                let oldest = state.images.min(by: { $0.value.tick < $1.value.tick })
+            {
+                state.images.removeValue(forKey: oldest.key)
+            }
+            state.images[key] = (composed, state.tick)
+            return composed
+        }
+    }
+
     /// How many lookups found an icon whose atlas could not be decoded; tests and diagnostics read it.
     public var decodeFailures: Int { state.withLock { $0.decodeFailures } }
 

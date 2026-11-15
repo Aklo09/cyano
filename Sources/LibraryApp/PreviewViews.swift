@@ -19,12 +19,12 @@ extension LibraryBrowserModel {
             else { return nil }
             return PreviewTarget(
                 subject: PreviewSubject(libraryPath: library, itemId: book.itemId, entryPath: path), kind: row.kind,
-                name: row.name)
+                name: RichTextName(row.name).textForm)
         }
         guard let item = selectedItem, ItemKind(stored: item.kind) != .book else { return nil }
         return PreviewTarget(
             subject: PreviewSubject(libraryPath: library, itemId: item.id, entryPath: []),
-            kind: ItemKind(stored: item.kind), name: item.name)
+            kind: ItemKind(stored: item.kind), name: RichTextName(item.name).textForm)
     }
 }
 
@@ -301,8 +301,9 @@ struct PreviewWindowView: View {
         return model.session.listing?.items.first { $0.id == subject.itemId }
     }
 
+    /// The text form of the item name (ICN-7): window titles cannot draw icons.
     private var title: String {
-        let name = item?.name ?? lastName
+        let name = RichTextName(item?.name ?? lastName).textForm
         guard let subject, !subject.entryPath.isEmpty else { return name }
         return "\(name) — Entry \(BlueprintEntryReader.pathText(subject.entryPath))"
     }
