@@ -137,8 +137,9 @@ pixel-identical (see [validation](validation/Renderer.md#planet-icons-2026-11-15
 be reassembled to get the icons; their script needs no version change. R1 is done (2026-11-15): `just qualify-corpus`
 (`tools/qualify-corpus.py`) renders the 239-leaf corpus into `.cache/qualification/<time>/` with `report.json` and an
 `index.html` contact sheet; the first run rendered every leaf with one known warning (see
-[validation](validation/Renderer.md#corpus-run-2026-11-15)). Next: the owner reviews the contact sheet (input to R2),
-then R4.
+[validation](validation/Renderer.md#corpus-run-2026-11-15)). R4 is done (2026-11-15): `IconCatalog`
+reads icons from the verified release and `AssetSettings.iconCatalog()` loads it once per release (see the
+[app guide](development/App.md#icons)). Next: the owner reviews the contact sheet (input to R2); R5 to R7 build on R4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

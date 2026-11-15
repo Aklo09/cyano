@@ -2,6 +2,7 @@ import FactorioData
 import Foundation
 import LibraryCore
 import Observation
+import PreviewRenderer
 
 /// The asset release previews and statistics use (spec SET-1 to SET-6; screen specs, "Settings").
 /// Everything else in the app works without one.
@@ -30,6 +31,9 @@ public final class AssetSettings {
     /// The prototype map, loaded once per verified release (SET-5).
     private var map: (identity: String, map: PrototypeMap)?
     private var mapTask: Task<Result<PrototypeMap, LibraryMessage>, Never>?
+    /// The icon catalog, loaded once per verified release (milestone 4, decision 5).
+    private var icons: IconCatalog?
+    private var iconTask: Task<Result<IconCatalog, LibraryMessage>, Never>?
 
     public init(defaults: UserDefaults) {
         self.defaults = defaults
@@ -70,6 +74,8 @@ public final class AssetSettings {
             defaults.set(RecentLibraryStore.normalizedPath(url), forKey: Self.pathKey)
             map = nil
             mapTask = nil
+            icons = nil
+            iconTask = nil
             revision += 1
         case .problem(_, let message):
             choiceFailure = message
@@ -93,6 +99,8 @@ public final class AssetSettings {
         defaults.removeObject(forKey: Self.pathKey)
         map = nil
         mapTask = nil
+        icons = nil
+        iconTask = nil
         revision += 1
     }
 
@@ -147,6 +155,50 @@ public final class AssetSettings {
 
     /// How many times the prototype map was loaded; tests check it loads once (SET-5).
     public private(set) var mapLoads = 0
+
+    /// Factorio icons for names, entry icons, and statistics, read from the verified release at most once per release
+    /// and session (spec ICN-10). Without a usable release the failure says why; callers then show text (ICN-3).
+    public func iconCatalog() async -> Result<IconCatalog, LibraryMessage> {
+        guard case .verified(let url, _, _, let identity) = state else {
+            return .failure(availabilityMessage)
+        }
+        if let icons, icons.identity == identity { return .success(icons) }
+        let task: Task<Result<IconCatalog, LibraryMessage>, Never>
+        if let iconTask {
+            task = iconTask
+        } else {
+            task = Task.detached {
+                do { return .success(try IconCatalog.load(release: url)) } catch {
+                    return .failure(
+                        LibraryMessage.describing(error, activity: .verifyingAssets)
+                            ?? LibraryMessage(
+                                title: "Icons are unavailable", guidance: "Check the asset release in Settings."))
+                }
+            }
+            iconTask = task
+        }
+        let result = await task.value
+        iconTask = nil
+        // A release changed or cleared while loading must not leave the previous release's icons in place.
+        guard case .verified(_, _, _, let still) = state, still == identity else {
+            return .failure(availabilityMessage)
+        }
+        switch result {
+        case .success(let loaded) where loaded.identity == identity:
+            icons = loaded
+            iconLoads += 1
+            return .success(loaded)
+        case .success:
+            return .failure(
+                LibraryMessage(
+                    title: "The asset release changed", guidance: "Choose it again in Settings to verify it."))
+        case .failure(let message):
+            return .failure(message)
+        }
+    }
+
+    /// How many times the icon catalog was loaded; tests check it loads once per release (ICN-10).
+    public private(set) var iconLoads = 0
 
     private var availabilityMessage: LibraryMessage {
         if case .failure(let message) = availability(for: nil) { return message }

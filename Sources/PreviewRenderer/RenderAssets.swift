@@ -35,9 +35,13 @@ final class RenderAssets: FrameSource {
     private var images: [Int: (image: CGImage, tick: Int, bytes: Int)] = [:]
     private var tick = 0
     private var decodedBytes = 0
-    private let cacheLimit = 128 * 1024 * 1024
+    private let cacheLimit: Int
 
-    init(path: String, tier: String, afterVerification: (() throws -> Void)? = nil) throws {
+    init(
+        path: String, tier: String, cacheLimit: Int = 128 * 1024 * 1024, loadsFont: Bool = true,
+        afterVerification: (() throws -> Void)? = nil
+    ) throws {
+        self.cacheLimit = cacheLimit
         let url = URL(fileURLWithPath: path)
         let verified = try AssetRelease.verify(at: url)
         try afterVerification?()
@@ -76,7 +80,7 @@ final class RenderAssets: FrameSource {
                 frame.y + frame.packedHeight <= Double(descriptors[frame.a].h)
             else { throw PreviewError.assetDecode }
         }
-        if let descriptor = manifest.fonts.first {
+        if loadsFont, let descriptor = manifest.fonts.first {
             let bytes = try read(descriptor)
             guard let provider = CGDataProvider(data: bytes as CFData), let loaded = CGFont(provider) else {
                 throw PreviewError.assetDecode

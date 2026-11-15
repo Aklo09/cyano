@@ -138,6 +138,44 @@ struct AssetSettingsTests {
         #expect(message.title == "No asset release is configured")
     }
 
+    @Test("ICN-10: the icon catalog loads once per release; changing or clearing the release replaces it")
+    func iconCatalogOnce() async throws {
+        let fixture = try SettingsFixture()
+        defer { fixture.cleanup() }
+        let first = try AppTestAssetRelease(in: fixture.parent, name: "First")
+        let second = try AppTestAssetRelease(in: fixture.parent, name: "Second")
+        let settings = AssetSettings(defaults: fixture.defaults)
+        guard case .failure(let none) = await settings.iconCatalog() else {
+            Issue.record("icons without a release")
+            return
+        }
+        #expect(none.title == "No asset release is configured")
+        await settings.choose(first.root, library: nil)
+        guard case .success(let catalog) = await settings.iconCatalog(),
+            case .success(let again) = await settings.iconCatalog()
+        else {
+            Issue.record("the icon catalog did not load")
+            return
+        }
+        #expect(catalog === again && settings.iconLoads == 1)
+        guard case .verified(_, _, _, let identity) = settings.state else {
+            Issue.record("\(settings.state)")
+            return
+        }
+        #expect(catalog.identity == identity && catalog.keys == ["item/wooden-chest"])
+        await settings.choose(second.root, library: nil)
+        guard case .success(let replaced) = await settings.iconCatalog() else {
+            Issue.record("the second release gave no icons")
+            return
+        }
+        #expect(replaced !== catalog && settings.iconLoads == 2)
+        settings.clear()
+        guard case .failure = await settings.iconCatalog() else {
+            Issue.record("a cleared release still gave icons")
+            return
+        }
+    }
+
     @Test("STA-6: a release whose prototype map is unsuitable verifies but cannot give statistics")
     func unsuitableMap() async throws {
         let fixture = try SettingsFixture()

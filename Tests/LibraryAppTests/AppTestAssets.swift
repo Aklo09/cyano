@@ -18,7 +18,8 @@ func removeTestPreferences(_ suite: String) {
     try? FileManager.default.removeItem(at: file)
 }
 
-/// A minimal asset release that passes `AssetRelease.verify` and loads a one-entity prototype map
+/// A minimal asset release that passes `AssetRelease.verify`, loads a one-entity prototype map, and lists one icon
+/// whose atlas is deliberately not an image, so the icon catalog loads but cannot decode it
 /// (adapted from `FactorioDataTests/AssetReleaseTests.swift` and `PrototypeMapTests.swift`; no private assets).
 struct AppTestAssetRelease {
     let root: URL
@@ -36,7 +37,8 @@ struct AppTestAssetRelease {
         let db = try Self.json([
             "schema": 2, "gameVersion": version, "mods": mods, "assetDensity": 2,
             "atlases": [["file": "atlas.webp", "width": 100, "height": 100]],
-            "frames": [["a": 0, "x": 0, "y": 0, "w": 10, "h": 10]],
+            "frames": [["a": 0, "x": 0, "y": 0, "w": 10, "h": 10, "ox": 0, "oy": 0, "sw": 10, "sh": 10]],
+            "icons": ["item/wooden-chest": 0],
         ])
         func descriptor(_ file: String, _ data: Data) -> [String: Any] {
             ["file": file, "bytes": data.count, "sha256": OriginalSource(bytes: data).sha256]

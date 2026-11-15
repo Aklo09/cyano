@@ -4,6 +4,7 @@ Date: 2026-11-15. Status: approved by the owner on 2026-11-15, with every decisi
 R0, the spec amendments, is done: the owner approved them on 2026-11-15. R3, planet icons in the release, is done
 ([validation](../validation/Renderer.md#planet-icons-2026-11-15)). R1, the corpus harness, is done: the first run
 rendered all 239 leaves ([validation](../validation/Renderer.md#corpus-run-2026-11-15)); the owner's review is next.
+R4, the icon catalog, is done ([app guide](../development/App.md#icons)).
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope

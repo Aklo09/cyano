@@ -170,6 +170,24 @@ windows (PRV-1 to PRV-12). Each preview area owns a `PreviewDisplay`, whose `Pre
 The app registers `ApplePersistenceIgnoreState`: AppKit's saved application state is keyed by bundle identifier,
 and after a quit with no windows open it made later launches, even with separate preferences, open no window.
 
+## Icons
+
+`IconCatalog` (`Sources/PreviewRenderer/IconCatalog.swift`, milestone 4 R4) reads Factorio icons at runtime from the
+verified release, never from the bundle (spec GEN-9). `AssetSettings.iconCatalog()` loads it at most once per
+release, off the main thread, like the prototype map, and drops it when the release changes or is cleared (ICN-10).
+
+- **Loading:** `IconCatalog.load(release:)` verifies the release and reads the 2x tier's icon table from the render
+  database (`<category>/<name>` to frame). A malformed table is refused. Fonts are not loaded.
+- **Lookups:** `image(for:)` decodes the icon's atlas on first use (Image I/O, at most 32 MiB of atlases kept) and
+  returns the icon at its logical size, 64 × 64 for game icons, with the trimmed frame at its offset; composed icons
+  stay in memory (at most 2,048), never on disk. An unknown icon, or an atlas that changed after verification, gives
+  nil, so callers show text (ICN-4, ICN-6). `qualityBadge(_:)` gives the badge for qualities other than normal.
+- **References:** `IconReference(signalType:name:)` maps entry-icon signals (no type means `item`, `virtual` means
+  `virtual-signal`); `IconReference(tagKind:name:)` maps rich-text tags (`planet` means `space-location`);
+  `IconReference(imagePath:)` reads `[img=category/name]` and `[img=category.name]`.
+- **Tests:** `IconCatalogTests` use a generated release with a PNG atlas; `PrivateIconCatalogTests` decode the real
+  WebP atlases when `.cache/renderer-assets` exists.
+
 ## Library selection and windows
 
 `LibrarySelectionModel` outlives both windows and decides which one shows through `windowGoal`:

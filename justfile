@@ -17,7 +17,7 @@ format:
 
 # Test source preservation, bounded decoding, and real JavaScriptCore planner execution.
 test:
-    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|LibraryNameTests|LibraryFinderMetadataTests|AssetReleaseTests|PrototypeMapTests|BlueprintStatisticsTests|StatisticsParityTests|LibraryStatisticsTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests|OrganizeActionsTests|AssetSettingsTests|PreviewCenterTests|PreviewViewportTests|StatisticsModelTests|StatisticsParityAppTests|LifecycleTests'
+    sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|LibraryNameTests|LibraryFinderMetadataTests|AssetReleaseTests|PrototypeMapTests|BlueprintStatisticsTests|StatisticsParityTests|LibraryStatisticsTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|IconCatalogTests|PrivateIconCatalogTests|LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests|OrganizeActionsTests|AssetSettingsTests|PreviewCenterTests|PreviewViewportTests|StatisticsModelTests|StatisticsParityAppTests|LifecycleTests'
     python3 tools/test-asset-release.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
@@ -62,7 +62,7 @@ planner-test:
 
 # Exercise native composition and supervised worker success/failure paths without private assets.
 renderer-test:
-    sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
+    sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|IconCatalogTests|PrivateIconCatalogTests'
     python3 tools/test-asset-release.py
 
 # Render every leaf of the supplied corpus (release build, private release); report and contact sheet in .cache/qualification/.
