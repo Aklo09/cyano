@@ -11,6 +11,7 @@ Use the approved plan for scope and validation records for completed work.
 | Follow the post-milestone-1 core revisions | [Core revisions](planning/Core-Revisions.md) |
 | Follow milestone 2 subtasks and decisions | [Milestone 2](planning/Milestone-2.md) |
 | Follow the approved milestone 3 plan and its decisions | [Milestone 3](planning/Milestone-3.md) |
+| Follow the approved milestone 4 plan and its decisions | [Milestone 4](planning/Milestone-4.md) |
 | Check the native app's acceptance criteria | [Native app spec](specs/Native-App.md) |
 | Check the native app's screens, states, and shortcuts | [Native app screens](specs/Native-App-Screens.md) |
 | Build and run the macOS app | [App guide](development/App.md) |

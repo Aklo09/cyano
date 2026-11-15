@@ -5,6 +5,7 @@ Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified o
 images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
 Milestone 2 is [accepted](validation/Milestone-2.md), including native construction statistics approved by the owner.
 Milestone 3, the native macOS app, is [accepted](validation/Milestone-3.md) after the owner's walkthrough (2026-11-15).
+Milestone 4, rendering integration, is [approved](planning/Milestone-4.md) (2026-11-15).
 
 ## Current state
 
@@ -115,7 +116,17 @@ Local fpsr changes are kept as ordered patches in `tools/vendor/fpsr-patches/` a
 `BASE`; `just tools-check` fails if they drift from `tools/vendor/fpsr`. Patch and upgrade steps are in the
 [asset preparation guide](development/Asset-Preparation.md#local-fpsr-patches).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
-Copying or saving preview images is required but deferred to a later milestone.
+Copying or saving preview images is assigned to milestone 4 (R9).
+
+
+Milestone 4 is [approved](planning/Milestone-4.md) (2026-11-15) with all decisions settled by the owner: no
+thumbnails (visible-item scheduling and bounded queues dropped from the roadmap), entry icons in list rows (a line
+before the name, after the kind symbol) and as the game's 2 × 2 arrangement in the inspector, rich-text tags shown as
+icons and kept as written when no icon exists, tags kept in filenames for new imports (storage contract change), planet
+icons added to the private release by regenerating `private-assets/2.1.24` (profile unchanged), icons read by the app
+at runtime from the release and never embedded, render warnings shown, image copy/save, the 239-leaf corpus reviewed
+from contact sheets, and a `just test` check that no Factorio artwork reaches git, package resources, or the app
+bundle. Next: R0, the spec amendments, for owner approval; R1 (corpus harness) and R3 (planet icons) can start at once.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

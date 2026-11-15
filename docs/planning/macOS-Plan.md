@@ -1,6 +1,7 @@
 # Native macOS port: roadmap and first milestone
 
-Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, and 3 are accepted.
+Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, and 3 are accepted, and the
+[milestone 4 plan](Milestone-4.md) is approved.
 Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
@@ -22,7 +23,7 @@ See [foundation validation](../validation/Foundation.md) for evidence and limita
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Application rendering scheduling remains milestone 4 work.
+Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Milestone 4, rendering integration, is [approved](Milestone-4.md) (2026-11-15).
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
 The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
@@ -65,7 +66,7 @@ Make this repository self-contained:
 | **1. Foundation and feasibility** | Independent toolchain, minimal library CLI, recovery protocol, JavaScriptCore/Core Graphics preview harness | Storage and representative real images pass the checks below |
 | **2. Complete library core** | Replacement, folder/item organization, unpacked-book import, deletion, maintenance, and statistics | Shared operations preserve identities, comments, originals, and recovery guarantees |
 | **3. Native application** | Library selection, browsing, nested books, import/export, comments, organization, and image viewport | Everyday workflows work offline, including without renderer assets |
-| **4. Rendering integration** | Visible-item scheduling, bounded queues, cache identity, progress, cancellation, warnings, and retry; icons from the private sprite atlases for Factorio rich-text tags in item and entry names (owner decision, 2026-11-14) and for statistics items | Full supplied corpus receives native rendering and visual qualification |
+| **4. Rendering integration** | Cache identity, cancellation, retry, and render warnings; entry icons in list rows and the inspector, icons for Factorio rich-text tags in names and for statistics items, and planet icons in the private release (owner decisions, 2026-11-14 and 2026-11-15); copying and saving preview images. Thumbnails, visible-item scheduling, and bounded queues were dropped (2026-11-15) | Full supplied corpus receives native rendering and visual qualification |
 | **5. Personal-use qualification** | App/CLI installation, lifecycle handling, documentation, and workload measurements | The 1,000-root library and 149-leaf book meet recorded native acceptance targets |
 
 Do not carry forward the assessment's full-rewrite estimate as a delivery commitment. Re-estimate after milestone 1 establishes renderer reuse costs.

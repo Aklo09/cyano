@@ -314,4 +314,4 @@ static text (System Events reports some SwiftUI button labels as empty).
 
 ## Pending work
 
-- **Copying or saving preview images:** deferred to a later milestone (spec, out of scope).
+- **Copying or saving preview images:** assigned to milestone 4, subtask R9 ([plan](../planning/Milestone-4.md)).
