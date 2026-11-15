@@ -86,6 +86,8 @@ Cross-cutting invariants (full contracts in `docs/contracts/`):
   neither changes source metadata. Cleanup is scoped to known formats.
 - **Independence.** Builds and runtime must not depend on the original web checkout, Node or game files.
   `planner.js` is generated: after changing `tools/planner-entry.ts` or the vendored fpsr, run `just planner-build` and commit the resource and metadata together.
+  Every local change to `tools/vendor/fpsr` must also be recorded as a patch in `tools/vendor/fpsr-patches/`
+  (`just tools-check` enforces it); see `docs/development/Asset-Preparation.md` for writing patches and upgrading fpsr.
   Record copied or adapted files in `tools/provenance.json`.
 - **Private artwork.** Factorio assets live in the gitignored `private-assets/`. Never commit them or add them to package resources.
 

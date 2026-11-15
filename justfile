@@ -77,9 +77,10 @@ planner-build:
 planner-check:
     npm run --prefix tools planner:check
 
-# Verify copied sources, fixture hashes, local dependency versions, and references.
+# Verify copied sources, fixture hashes, local dependency versions, references, and local fpsr patches.
 tools-check:
     node tools/check-foundation.mjs
+    sh tools/check-fpsr-patches.sh
 
 # Import the local asset pipeline without launching Factorio.
 assets-check:

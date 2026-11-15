@@ -16,6 +16,60 @@ Its calculator and preparation helpers now resolve local dependencies and fixtur
 Adapted files retain their original hashes alongside their current hashes.
 Unmodified supplied blueprint strings are packaged as test resources.
 
+## Local fpsr patches
+
+Local changes to the vendored fpsr live as ordered patches in `tools/vendor/fpsr-patches/`, with paths relative to
+the fpsr root so they also apply to a fresh upstream checkout:
+
+| Patch | Change |
+|---|---|
+| `0001-inserter-indications.patch` | Alt-mode inserter pickup/drop markers: pipeline exports `pickup_position`/`insert_position` and `utility/indication-line`; `alt-mode.ts` draws them |
+
+`tools/vendor/fpsr-patches/BASE` names the commit of this repository whose `tools/vendor/fpsr` is the pristine
+upstream copy. `just tools-check` runs `tools/check-fpsr-patches.sh`, which extracts that tree, applies the patches
+in order, and fails unless the result matches `tools/vendor/fpsr` exactly.
+
+Keep the patches current whenever you change anything under `tools/vendor/fpsr`:
+
+1. Make and commit the change as usual (`just planner-build` when renderer or planner inputs change; record the new
+   hashes in `tools/provenance.json`, keeping each file's `sourceSha256`/`sourceBytes` and setting `adapted`).
+2. Write the change as the next patch, from the commit before it to the commit with it:
+
+   ```sh
+   git diff --relative=tools/vendor/fpsr <commit before> <commit with change> -- tools/vendor/fpsr \
+     > tools/vendor/fpsr-patches/0002-<short-name>.patch
+   ```
+
+   To amend an existing patch instead, regenerate that patch over its own range, or fold the change into it.
+3. Add the patch to the table above and run `just tools-check`. Commit the patch with the change, or right after it.
+
+Never edit `BASE` except during an upgrade.
+
+## Upgrade fpsr
+
+1. Replace `tools/vendor/fpsr` with the new upstream revision's renderer and pipeline sources, owned placeholder
+   artwork, required fixtures, and license (the same subset as now; compare with `git ls-files tools/vendor/fpsr`).
+2. Update the pinned revision everywhere it appears: `tools/planner-entry.ts`, `tools/build-planner.mjs`,
+   `Sources/PreviewRenderer/PreviewProcess.swift`, `Sources/PreviewRenderer/PreviewWorker.swift`,
+   `Tests/PreviewRendererTests/PlannerRuntimeTests.swift`, `tools/provenance.json` (`sources.fpsr.revision` and every
+   fpsr file's revision, hashes, and byte counts, with no `adapted` entries yet), and the revision at the top of this
+   guide. `git grep <old revision>` finds them.
+3. Run `just planner-build`, `just tools-install` if dependencies changed, then commit this pristine import on its
+   own and write its full hash to `tools/vendor/fpsr-patches/BASE` in the next step.
+4. Apply the patches in order from the repository root:
+
+   ```sh
+   git apply --3way --directory=tools/vendor/fpsr tools/vendor/fpsr-patches/0001-inserter-indications.patch
+   ```
+
+   Resolve conflicts by hand. Drop a patch that upstream now covers, and remove its row above. Regenerate each
+   remaining patch from the pristine import (step 2 of the previous section), so it applies cleanly again.
+5. Run `just planner-build`, mark the patched files `adapted` in `tools/provenance.json`, and run `just tools-check`,
+   `just planner-check`, `just assets-check`, `just lint`, and `just test`.
+6. If the pipeline output changed, regenerate the private assets ([Regenerate](#regenerate)), reassemble the release,
+   run `just statistics-golden`, and compare render databases as in the
+   [2.1.24 validation](../validation/Renderer.md#inserter-indications-2026-11-15). Run the independence check.
+
 ## Install and verify
 
 Use the Node version in the root `.nvmrc`.

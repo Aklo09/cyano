@@ -93,6 +93,9 @@ profile moved from 2.1.23 to 2.1.24 (owner's decision: replace, not both). Relea
 now refused: reassemble any everyday release from `private-assets/2.1.24` and `private-assets/statistics-reference`
 (see the [asset preparation guide](development/Asset-Preparation.md#regenerate) and
 [validation](validation/Renderer.md#inserter-indications-2026-11-15)).
+Local fpsr changes are kept as ordered patches in `tools/vendor/fpsr-patches/` against the pristine baseline in
+`BASE`; `just tools-check` fails if they drift from `tools/vendor/fpsr`. Patch and upgrade steps are in the
+[asset preparation guide](development/Asset-Preparation.md#local-fpsr-patches).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 
