@@ -27,6 +27,8 @@ public struct EntryDetail: Equatable, Sendable {
     /// For entries inside a book: "Entry 5.0 in Rail Book".
     public let location: String?
     public let entryCount: Int?
+    /// The entry's icons in slot order (ICN-2).
+    public let icons: [EntryIcon]
 }
 
 /// Reads books, entries, versions, and planner settings from decoded blueprint JSON.
@@ -73,7 +75,7 @@ public enum BlueprintEntryReader {
             name: name(entry), kind: kind, version: version(entry.version), description: entry.description,
             settings: kind == .upgradePlanner || kind == .deconstructionPlanner ? settings(entry) : [],
             location: entry.path.isEmpty ? nil : "Entry \(pathText(entry.path)) in \(bookName ?? "the book")",
-            entryCount: entry.kind == .book ? children(of: entry).count : nil)
+            entryCount: entry.kind == .book ? children(of: entry).count : nil, icons: entry.icons)
     }
 
     /// Planner settings as readable lines (BOOK-6): mappings, filters, then every other setting as compact JSON.

@@ -25,6 +25,8 @@ public struct LibraryItem: Codable, Sendable {
     public let kind: String
     public let sourceBytes: Int
     public let metadata: LibraryItemMetadata
+    /// The root entry's icons (ICN-1), from the derived source index when listed.
+    public let entryIcons: [EntryIcon]
 }
 
 public struct LibraryIssue: Codable, Sendable {

@@ -1,3 +1,4 @@
+import PreviewRenderer
 import SwiftUI
 
 /// The main library window: folder sidebar, path bar, item list, and inspector (screen specs, "Main window").
@@ -8,6 +9,8 @@ struct LibraryWindowView: View {
     @State private var launched = false
     @State private var showInspector = true
     @FocusState private var searchFocused: Bool
+    /// Icons from the configured release; reloaded whenever the release changes (ICN-10).
+    @State private var iconCatalog: IconCatalog?
 
     private var browser: LibraryBrowserModel { model.browser }
 
@@ -28,6 +31,8 @@ struct LibraryWindowView: View {
                 browser: browser, previews: model.previews, statistics: model.statistics,
                 assetsRevision: model.assets.revision)
         }
+        .environment(\.iconCatalog, iconCatalog)
+        .task(id: model.assets.revision) { iconCatalog = try? await model.assets.iconCatalog().get() }
         .searchable(text: Bindable(browser).filterText, placement: .toolbar, prompt: "Search item names")
         .searchFocused($searchFocused)
         .onChange(of: browser.searchFocusRequested) { _, requested in

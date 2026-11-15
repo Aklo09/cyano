@@ -376,6 +376,7 @@ struct NativeLibraryTests {
             index.kinds == [
                 book.metadata.sourceSha256: "blueprint_book", small.metadata.sourceSha256: small.kind,
             ])
+        #expect(index.schemaVersion == 2 && index.icons.keys.sorted() == index.kinds.keys.sorted())
         for damage in [Data("not json".utf8), nil] {
             if let damage { try damage.write(to: indexURL) } else { try FileManager.default.removeItem(at: indexURL) }
             #expect(try library.list().items.map(\.kind) == first.items.map(\.kind))
@@ -385,6 +386,67 @@ struct NativeLibraryTests {
         _ = try library.list()
         let pruned = try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL))
         #expect(pruned.kinds.keys.sorted() == [small.metadata.sourceSha256])
+        #expect(pruned.icons.keys.sorted() == [small.metadata.sourceSha256])
+    }
+
+    @Test("ICN-1: listing gives root entry icons from the index; a schema 1 index is rebuilt once as schema 2")
+    func sourceIndexIcons() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        let library = try NativeLibrary.initialize(at: target.url)
+        defer { library.close() }
+        let book = try library.importSource(blueprintFixture("bp.txt"))
+        let latch = try library.importSource(blueprintFixture())
+        let expected = [
+            book.id: [EntryIcon(index: 1, type: "quality", name: "legendary", quality: nil)],
+            latch.id: [
+                EntryIcon(index: 1, type: "virtual", name: "signal-R", quality: nil),
+                EntryIcon(index: 2, type: "virtual", name: "signal-S", quality: nil),
+            ],
+        ]
+        #expect(book.entryIcons == expected[book.id] && latch.entryIcons == expected[latch.id])
+        let indexURL = target.url.appendingPathComponent("cache/source-index.json")
+        let schemaOne = try JSONSerialization.data(withJSONObject: [
+            "schemaVersion": 1,
+            "kinds": [book.metadata.sourceSha256: "blueprint_book", latch.metadata.sourceSha256: "blueprint"],
+        ])
+        try schemaOne.write(to: indexURL)
+        let listed = try library.list().items
+        #expect(Dictionary(uniqueKeysWithValues: listed.map { ($0.id, $0.entryIcons) }) == expected)
+        let rebuilt = try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL))
+        #expect(rebuilt.schemaVersion == 2 && rebuilt.icons[latch.metadata.sourceSha256] == expected[latch.id])
+        // Icons in an index that disagree with its own rules make the whole index unreadable, so it is rebuilt.
+        var damaged = rebuilt
+        damaged.icons[latch.metadata.sourceSha256] = [EntryIcon(index: 5, type: nil, name: "x", quality: nil)]
+        try JSONEncoder().encode(damaged).write(to: indexURL)
+        #expect(try library.list().items.first { $0.id == latch.id }?.entryIcons == expected[latch.id])
+        #expect(try JSONDecoder().decode(LibrarySourceIndex.self, from: Data(contentsOf: indexURL)) == rebuilt)
+    }
+
+    @Test("ICN-1: entry icons are read in slot order; malformed members and repeated slots are left out")
+    func entryIconParsing() throws {
+        let icons = """
+            [{"index":3,"signal":{"name":"copper-plate","quality":"rare"}},
+             {"index":1,"signal":{"type":"virtual","name":"signal-A"}},
+             {"index":1,"signal":{"name":"iron-plate"}},
+             {"index":5,"signal":{"name":"too-far"}},
+             {"index":2,"signal":{"type":"fluid"}},
+             {"index":4},
+             {"signal":{"name":"no-slot"}}]
+            """
+        let json = Data(#"{"blueprint":{"version":1,"icons":\#(icons)}}"#.utf8)
+        let source = Data(("0" + (try ZlibCodec.compress(json, maximum: 1_000_000)).base64EncodedString()).utf8)
+        let root = try BlueprintCodec.decode(source).root
+        #expect(
+            root.icons == [
+                EntryIcon(index: 1, type: "virtual", name: "signal-A", quality: nil),
+                EntryIcon(index: 3, type: nil, name: "copper-plate", quality: "rare"),
+            ])
+        let none = Data(
+            ("0"
+                + (try ZlibCodec.compress(Data(#"{"blueprint":{"version":1,"icons":7}}"#.utf8), maximum: 1_000_000))
+                .base64EncodedString()).utf8)
+        #expect(try BlueprintCodec.decode(none).root.icons.isEmpty)
     }
 
     @Test("Duplicate item IDs are listed and refused as ambiguous; stale session paths fall back to a rescan")

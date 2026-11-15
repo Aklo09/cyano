@@ -51,6 +51,8 @@ public struct BrowserRow: Identifiable, Equatable, Sendable {
     public let sizeBytes: Int?
     /// For entries inside an open book: their stored indices from the root book (BOOK-2).
     public var entryPath: [Int]? = nil
+    /// The entry's icons in slot order (ICN-1); folders have none.
+    public var icons: [EntryIcon] = []
 
     /// The entry's own stored index, shown in the # column.
     public var storedIndex: Int? { entryPath?.last }
@@ -66,7 +68,7 @@ public struct BrowserRow: Identifiable, Equatable, Sendable {
         BrowserRow(
             id: "item:" + item.id, name: item.name, kind: ItemKind(stored: item.kind), folder: item.folder,
             folderPath: nil, itemId: item.id, updated: LibraryFormat.date(item.metadata.updatedAt),
-            created: LibraryFormat.date(item.metadata.createdAt), sizeBytes: item.sourceBytes)
+            created: LibraryFormat.date(item.metadata.createdAt), sizeBytes: item.sourceBytes, icons: item.entryIcons)
     }
 }
 
@@ -75,7 +77,7 @@ extension BrowserRow {
         BrowserRow(
             id: "entry:" + BlueprintEntryReader.pathText(entry.path), name: BlueprintEntryReader.name(entry),
             kind: BlueprintEntryReader.kind(entry), folder: "", folderPath: nil, itemId: itemId, updated: nil,
-            created: nil, sizeBytes: nil, entryPath: entry.path)
+            created: nil, sizeBytes: nil, entryPath: entry.path, icons: entry.icons)
     }
 }
 
@@ -397,7 +399,7 @@ public final class LibraryBrowserModel {
     private static func renamed(_ detail: EntryDetail, to name: String) -> EntryDetail {
         EntryDetail(
             name: name, kind: detail.kind, version: detail.version, description: detail.description,
-            settings: detail.settings, location: detail.location, entryCount: detail.entryCount)
+            settings: detail.settings, location: detail.location, entryCount: detail.entryCount, icons: detail.icons)
     }
 
     // MARK: Import

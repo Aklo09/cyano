@@ -185,8 +185,15 @@ release, off the main thread, like the prototype map, and drops it when the rele
 - **References:** `IconReference(signalType:name:)` maps entry-icon signals (no type means `item`, `virtual` means
   `virtual-signal`); `IconReference(tagKind:name:)` maps rich-text tags (`planet` means `space-location`);
   `IconReference(imagePath:)` reads `[img=category/name]` and `[img=category.name]`.
+- **Entry icons (R5):** `LibraryItem.entryIcons` (from the source index) and `BlueprintEntry.icons` reach
+  `BrowserRow.icons` and `EntryDetail.icons`. `LibraryWindowView` loads the catalog whenever
+  `AssetSettings.revision` changes and passes it down as the `iconCatalog` environment value. `EntryIconStrip`
+  draws a row's kind symbol, then the icons at text height (16 points at the default size) with quality badges at
+  half size in the bottom-left corner, leaving out icons the release lacks; `EntryIconTile` draws the inspector's
+  48-point tile in the game's layout (`EntryIconLayout.frames`) or the kind symbol. Row VoiceOver labels end with
+  "icons: …" (`EntryIconLayout.spokenNames`).
 - **Tests:** `IconCatalogTests` use a generated release with a PNG atlas; `PrivateIconCatalogTests` decode the real
-  WebP atlases when `.cache/renderer-assets` exists.
+  WebP atlases when `.cache/renderer-assets` exists; `EntryIconTests` cover rows, details, layout, and spoken names.
 
 ## Library selection and windows
 

@@ -69,9 +69,12 @@ Duplicate item UUIDs are reported as `AMBIGUOUS_ID` listing issues; ID-addressed
 and refuse duplicates with `AMBIGUOUS_ID`.
 
 Listing validates each item's metadata and the SHA-256 of its exact TXT bytes, but does not decode the blueprint.
-The entry kind comes from `cache/source-index.json`, a derived map from source hash to kind.
+The root's kind and entry icons come from `cache/source-index.json`, a derived map from source hash to kind and,
+for roots that have any, to their `icons` signals in slot order (schema 2; schema 1 held kinds only).
 Being keyed by content, an entry cannot become stale; a missing source is decoded once and added,
-an unreadable index is rebuilt, and entries for sources no longer in the library are pruned.
+an unreadable index, or one of another schema, is rebuilt, and entries for sources no longer in the library are pruned.
+Listed items report the icons as `entryIcons` (`index`, `type`, `name`, `quality`, as stored); malformed icon
+members and repeated slots are left out, never refused, because the source stays as saved.
 Comment entry paths are validated when an item is opened, and when a source is first indexed.
 
 ID-addressed operations use an index of item paths held by the open library. The first lookup or listing

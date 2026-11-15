@@ -87,7 +87,7 @@ An image published before metadata may be reused only if it matches an existing 
 Refresh can replace known cache members using checked atomic renames.
 Unknown metadata is not silently replaced by a preview, including with `--refresh`.
 
-`source-index.json` is the storage layer's derived kind index (see the storage contract). Scoped cleanup retains it,
+`source-index.json` is the storage layer's derived kind and entry-icon index (see the storage contract). Scoped cleanup retains it,
 `all` removes it, and the next listing rebuilds it; an interrupted index write leaves a root `.tmp-<UUID>` that
 abandoned cleanup selects.
 `cache-cleanup` recognizes both identity-only and complete native cache metadata.

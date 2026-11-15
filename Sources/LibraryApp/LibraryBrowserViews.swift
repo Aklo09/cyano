@@ -220,12 +220,13 @@ struct ItemList: View {
             TableColumn("#") { row in Text(row.storedIndex.map(String.init) ?? "").monospacedDigit() }
                 .width(min: 32, ideal: 44, max: 64)
             TableColumn("Name") { row in
-                Label {
+                HStack(spacing: 6) {
+                    EntryIconStrip(kind: row.kind, icons: row.icons)
                     Text(row.name)
-                } icon: {
-                    Image(systemName: row.kind.symbol).accessibilityHidden(true)
                 }
-                .accessibilityLabel("\(row.name), \(row.kind.label.lowercased()), entry \(row.storedIndex ?? 0)")
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(
+                    Self.withIcons("\(row.name), \(row.kind.label.lowercased()), entry \(row.storedIndex ?? 0)", row))
             }
             .width(min: 160, ideal: 320)
             TableColumn("Kind") { row in Text(row.kind.label) }
@@ -261,11 +262,11 @@ struct ItemList: View {
                 if browser.renamingRow == row.id {
                     RenameField(browser: browser, row: row)
                 } else {
-                    Label {
+                    HStack(spacing: 6) {
+                        EntryIconStrip(kind: row.kind, icons: row.icons)
                         Text(row.name)
-                    } icon: {
-                        Image(systemName: row.kind.symbol).accessibilityHidden(true)
                     }
+                    .accessibilityElement(children: .ignore)
                     .accessibilityLabel(accessibilityLabel(row))
                 }
             }
@@ -357,7 +358,13 @@ struct ItemList: View {
         var parts = [row.name, row.kind.label.lowercased()]
         if let updated = row.updated { parts.append("updated \(updated.formatted(date: .long, time: .omitted))") }
         if let size = row.sizeBytes { parts.append(LibraryFormat.size(size)) }
-        return parts.joined(separator: ", ")
+        return Self.withIcons(parts.joined(separator: ", "), row)
+    }
+
+    /// Entry icons are read after the rest of the row: "…, icons: iron plate, rare; copper cable".
+    private static func withIcons(_ label: String, _ row: BrowserRow) -> String {
+        let names = EntryIconLayout.spokenNames(row.icons)
+        return names.isEmpty ? label : label + ", icons: " + names
     }
 }
 
@@ -488,8 +495,13 @@ private struct InspectorHeader: View {
         let item = browser.showsBook ? (detail?.location == nil ? browser.openBookItem : nil) : browser.selectedItem
         let name = detail?.name ?? item?.name ?? ""
         let kind = detail?.kind ?? item.map { ItemKind(stored: $0.kind) } ?? .blueprint
-        Text(name).font(.title2.weight(.semibold)).textSelection(.enabled)
-        Label(kind.label, systemImage: kind.symbol)
+        HStack(alignment: .top, spacing: 10) {
+            EntryIconTile(kind: kind, icons: detail?.icons ?? item?.entryIcons ?? [], side: 48)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(name).font(.title2.weight(.semibold)).textSelection(.enabled)
+                Label(kind.label, systemImage: kind.symbol)
+            }
+        }
         if let detail { Text(detail.version.map { "Factorio \($0)" } ?? "Version unknown") }
         if let location = detail?.location { Text(location) }
         if let item {

@@ -325,7 +325,8 @@ public final class NativeLibrary: @unchecked Sendable {
     {
         LibraryItem(
             id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
-            kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata)
+            kind: document.root.kind.rawValue, sourceBytes: document.original.bytes.count, metadata: metadata,
+            entryIcons: document.root.icons)
     }
 
     /// Lists an item from its metadata and source hash. Sources decode only when the kind index lacks them.
@@ -338,8 +339,10 @@ public final class NativeLibrary: @unchecked Sendable {
         let source = try parent.fingerprint(basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
         guard source.sha256 == metadata.sourceSha256 else { throw NativeLibraryError.integrity }
         let kind: String
+        let icons: [EntryIcon]
         if let indexed = index.kinds[source.sha256] {
             kind = indexed
+            icons = index.icons[source.sha256] ?? []
         } else {
             let bytes = try parent.read(basename + ".txt", maximum: BlueprintCodecLimits.standard.sourceBytes)
             guard OriginalSource(bytes: bytes).sha256 == metadata.sourceSha256 else {
@@ -350,11 +353,13 @@ public final class NativeLibrary: @unchecked Sendable {
                 do { _ = try document.entry(at: comment.entryPath) } catch { throw NativeLibraryError.invalidMetadata }
             }
             kind = document.root.kind.rawValue
+            icons = document.root.icons
             index.kinds[source.sha256] = kind
+            if !icons.isEmpty { index.icons[source.sha256] = icons }
         }
         let listed = LibraryItem(
             id: metadata.id, folder: folder, basename: basename, name: metadata.displayNameOverride ?? basename,
-            kind: kind, sourceBytes: source.bytes, metadata: metadata)
+            kind: kind, sourceBytes: source.bytes, metadata: metadata, entryIcons: icons)
         return (listed, data.count)
     }
 
@@ -419,9 +424,10 @@ public final class NativeLibrary: @unchecked Sendable {
             }
         }
         try walk(library, folder: "", depth: 0)
-        // Keep only kinds this library still uses; a failed index write merely costs decodes next time.
+        // Keep only sources this library still uses; a failed index write merely costs decodes next time.
         let used = Set(result.items.map(\.metadata.sourceSha256))
         index.kinds = index.kinds.filter { used.contains($0.key) }
+        index.icons = index.icons.filter { used.contains($0.key) }
         if index != storedIndex { try? index.write(cache) }
         itemPaths = Dictionary(grouping: result.items, by: \.id).mapValues {
             $0.map { MutationPath.join($0.folder, $0.basename) }
