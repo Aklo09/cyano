@@ -177,7 +177,8 @@ Layout, left to right:
   headers sort). Folder columns: Name (kind symbol, then the entry icons, then the name; ICN-1, ICN-3), Kind,
   Updated, Size. In the sketch, ▢ ▤ ▦ are kind symbols and ◆ entry icons. Entry icons are drawn 24 points high
   (scaled with the text size) in stored order with 2-point gaps; up to four, so names keep most of the column. Every
-  row is tall enough for them, with icons or without, so rows stay one height (owner, 2026-11-15). Thumbnails are not shown
+  row is tall enough for them, with icons or without, so rows stay one height, and the kind symbol takes the same
+  24-point square (owner, 2026-11-15). Thumbnails are not shown
   (BRW-9, milestone 4 decision S1). Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
   Double-click or ⌘↓ opens a folder or book; ⌘↑ goes to the enclosing folder or book.
 - **Inspector:** described below; toggled with the system inspector command (⌃⌘I) and resizable.

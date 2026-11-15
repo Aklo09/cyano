@@ -67,7 +67,7 @@ private struct SignalIcon: View {
     }
 }
 
-/// A list row's leading symbols: the kind symbol, then the entry icons in stored order at text height; icons the
+/// A list row's leading symbols: the kind symbol, then the entry icons in stored order, all the same size; icons the
 /// release lacks are left out (spec ICN-1, ICN-3, ICN-4). Hidden from VoiceOver; the row's label names the icons.
 struct EntryIconStrip: View {
     let kind: ItemKind
@@ -78,7 +78,10 @@ struct EntryIconStrip: View {
 
     var body: some View {
         HStack(spacing: 2) {
+            // The kind symbol takes the same square as a Factorio icon (owner, 2026-11-15).
             Image(systemName: kind.symbol)
+                .font(.system(size: size * 0.8))
+                .frame(width: size, height: size)
             if let catalog {
                 ForEach(Array(icons.enumerated()), id: \.offset) { _, icon in
                     if let reference = IconReference(signalType: icon.type, name: icon.name),
