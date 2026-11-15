@@ -19,6 +19,8 @@ format:
 test:
     sh tools/swift.sh test --filter 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|LibraryNameTests|LibraryFinderMetadataTests|AssetReleaseTests|PrototypeMapTests|BlueprintStatisticsTests|StatisticsParityTests|LibraryStatisticsTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests|IconCatalogTests|PrivateIconCatalogTests|PrivateStatisticsIconTests|LibrarySessionTests|EntryIconTests|RichTextNameTests|PreviewImageExportTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests|OrganizeActionsTests|AssetSettingsTests|PreviewCenterTests|PreviewViewportTests|StatisticsModelTests|StatisticsParityAppTests|LifecycleTests'
     python3 tools/test-asset-release.py
+    python3 tools/check-artwork.py --self-test
+    python3 tools/check-artwork.py
 
 # Exercise native metadata, process exclusion, CLI workflows, and crash recovery.
 storage-test:

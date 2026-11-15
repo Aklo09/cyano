@@ -7,7 +7,8 @@ rendered all 239 leaves ([validation](../validation/Renderer.md#corpus-run-2026-
 no defects (2026-11-15), so R2 is done with no corrections.
 R4, the icon catalog, is done ([app guide](../development/App.md#icons)). R5, entry icons, is done
 ([validation](../validation/App.md#entry-icons-2026-11-15)). R6, rich-text names, and R7, statistics icons, are done in code and tests; their real-app check is pending. R8, render
-warnings, and R9, copying and saving preview images, are done in code and tests.
+warnings, and R9, copying and saving preview images, are done in code and tests. R10's artwork check is in
+`just test`.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope

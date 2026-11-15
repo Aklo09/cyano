@@ -112,6 +112,12 @@ for comparison; the tools no longer accept them.
 
 These files are ignored by Git and excluded from native package resources.
 Native build and planner-loading checks do not require them.
+`just test` enforces this with `tools/check-artwork.py` (milestone 4, spec GEN-9): it fails when Git-tracked files,
+package resources, or a built app bundle under `.cache/xcode` hold a file named like release data (atlas images,
+render databases, `release.json`, `prototype-map.json`) or with the same bytes as a file in `private-assets/`. The
+staging folders `profile/` and `game-work/` hold an isolated game configuration with project-written mods, not
+artwork, and are not compared. `python3 tools/check-artwork.py --self-test` plants copies in a scratch tree and
+expects both to be found.
 For native image rendering, assemble these inputs into a new private release using the
 [preview harness guide](Preview.md#prepare-a-private-release).
 Run the retained statistics cases when the map is present:
