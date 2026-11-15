@@ -130,8 +130,11 @@ bundle. Milestone 4 verification (owner, 2026-11-15): focused suites per subtask
 `just test` at the end (see the [plan](planning/Milestone-4.md#verification)). R0 is done (2026-11-15): the [app spec](specs/Native-App.md) and [screen specs](specs/Native-App-Screens.md) gained
 ICN-1–ICN-11, WRN-1–WRN-3, IMG-1–IMG-6, and GEN-9. The owner also revised decision 3 (a tagged label goes into
 `displayNameOverride`; file names unchanged) and added decision 9 (text form in titles, file names, sorting) and
-decision 10 (root entry icons in the derived source index, schema 2). Next: R1 (corpus harness) and R3 (planet
-icons), then R4.
+decision 10 (root entry icons in the derived source index, schema 2). R3 is done (2026-11-15): patch
+`0002-planet-icons.patch` exports planet icons as `space-location/<planet>`; `private-assets/2.1.24` was regenerated
+(the previous copy is kept as `private-assets/2.1.24-before-planets`) with the same profile, and renders are
+pixel-identical (see [validation](validation/Renderer.md#planet-icons-2026-11-15)). The owner's everyday release must
+be reassembled to get the icons; their script needs no version change. Next: R1 (corpus harness), then R4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

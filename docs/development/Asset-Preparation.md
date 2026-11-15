@@ -24,6 +24,7 @@ the fpsr root so they also apply to a fresh upstream checkout:
 | Patch | Change |
 |---|---|
 | `0001-inserter-indications.patch` | Alt-mode inserter pickup/drop markers: pipeline exports `pickup_position`/`insert_position` and `utility/indication-line`; `alt-mode.ts` draws them |
+| `0002-planet-icons.patch` | Pipeline exports the `planet` prototypes' icons as `space-location/<planet>`, so planet signals and tags find them (milestone 4, R3) |
 
 `tools/vendor/fpsr-patches/BASE` names the commit of this repository whose `tools/vendor/fpsr` is the pristine
 upstream copy. `just tools-check` runs `tools/check-fpsr-patches.sh`, which extracts that tree, applies the patches
@@ -151,7 +152,10 @@ The game reference imports all 348 statistics cases in game; `evaluate-statistic
 `prototype-map.json` and exits 1 for the one expected failure, the modded `ee-infinity-loader` leaf of `v0.59.0.txt`.
 Then assemble a release ([preview guide](Preview.md#prepare-a-private-release)) and run `just statistics-golden`.
 
-First run (2026-11-15, Factorio 2.1.24): 143 entities, 23 tiles, 1395 icons, 6809 frames per tier. Compared with the
+First run (2026-11-15, Factorio 2.1.24): 143 entities, 23 tiles, 1395 icons, 6809 frames per tier. A second run the
+same day added the planet icons (1400 icons, 6814 frames per tier; see the
+[renderer validation](../validation/Renderer.md#planet-icons-2026-11-15)); it needed only the asset build, because the
+prototype map does not depend on icons. Compared with the
 copied 2.1.23 assets, the render databases gained only `utility/indication-line` and the inserter
 `pickupPosition`/`insertPosition` data; the prototype map and every statistics golden result were identical apart
 from the game version.

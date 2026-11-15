@@ -1,0 +1,29 @@
+diff --git a/tools/pipeline/src/distill/index.ts b/tools/pipeline/src/distill/index.ts
+index 631f399..661191d 100644
+--- a/tools/pipeline/src/distill/index.ts
++++ b/tools/pipeline/src/distill/index.ts
+@@ -538,6 +538,11 @@ export async function distillAndPack(options: DistillAndPackOptions = {}): Promi
+       iconJobs.push({ key: `${category}/${name}`, cat: category, name });
+     }
+   }
++  // Planets are space locations in signals and rich text, but their own prototype type.
++  for (const name of Object.keys(raw.planet ?? {}).sort()) {
++    if (raw["space-location"]?.[name]) continue;
++    iconJobs.push({ key: `space-location/${name}`, cat: "space-location", name, type: "planet" });
++  }
+ 
+   await timed("icons", async () => {
+     const utility = raw["utility-sprites"]?.default as Record<string, RawSprite> | undefined;
+diff --git a/tools/pipeline/src/distill/other.ts b/tools/pipeline/src/distill/other.ts
+index 3e96eb5..9223ab2 100644
+--- a/tools/pipeline/src/distill/other.ts
++++ b/tools/pipeline/src/distill/other.ts
+@@ -145,7 +145,7 @@ export async function distillIcon(
+     }
+     if (!source) source = findItem();
+   } else {
+-    source = tryProto(category, name);
++    source = tryProto(protoTypeHint ?? category, name);
+   }
+ 
+   if (!source) return undefined;

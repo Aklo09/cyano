@@ -538,6 +538,11 @@ export async function distillAndPack(options: DistillAndPackOptions = {}): Promi
       iconJobs.push({ key: `${category}/${name}`, cat: category, name });
     }
   }
+  // Planets are space locations in signals and rich text, but their own prototype type.
+  for (const name of Object.keys(raw.planet ?? {}).sort()) {
+    if (raw["space-location"]?.[name]) continue;
+    iconJobs.push({ key: `space-location/${name}`, cat: "space-location", name, type: "planet" });
+  }
 
   await timed("icons", async () => {
     const utility = raw["utility-sprites"]?.default as Record<string, RawSprite> | undefined;

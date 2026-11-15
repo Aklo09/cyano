@@ -114,6 +114,24 @@ arrows about 0.75 tiles from the inserter. The preview puts each marker at its t
 the inserter, rather than at the raw prototype vectors (1 and 1.2 tiles), where facing drop arrows on a shared belt
 crossed. The long-handed inserter's 1.8 tiles extrapolates the same rule; the screenshot has none.
 
+## Planet icons (2026-11-15)
+
+Milestone 4, R3. Entry icons and rich-text tags name planets as `space-location` signals, but the render database
+had icons only for the three `space-location` prototypes; planets are their own `planet` prototype type. Patch
+`0002-planet-icons.patch` makes the pipeline export each planet's icon as `space-location/<planet>`. The assets were
+regenerated from Factorio 2.1.24 with the same profile (2.1.24, asset schema 2), so earlier 2.1.24 releases still
+verify; they lack only these icons.
+
+| Check | Result |
+|---|---|
+| Render databases, before vs after, both tiers | Icons 1395 → 1400: `space-location/` `aquilo`, `fulgora`, `gleba`, `nauvis`, `vulcanus` (64 × 64 sources). Frames 6809 → 6814 per tier, same atlas counts (105 and 339). `schema`, `gameVersion`, `mods`, `fluidRecipes`, `iconScales` identical. Every other difference (8,816 at 1x, 8,771 at 2x, in `entities`, `tiles`, and the backgrounds) is a frame number shifted by 1 or 5 that points to a frame of identical size and offset; every pre-existing icon keeps its frame geometry |
+| Corpus entry icons | All 379 entry-icon signals in the nine fixtures and the vendored visual tests resolve (signal type `virtual` read as `virtual-signal`), including the 25 planet references |
+| Release | Reassembled into `.cache/renderer-assets`; `assets-verify` passes with a new identity |
+| Renders, previous vs new release | Pixel-identical for `RS.txt`, `space-age.bp.txt` `0`, `bp.txt` `1.1`, `elevated-rails.bp.txt` `0`, and the `v0.59.0.txt` `2.0` upgrade planner; no warnings |
+| `just tools-check`, `just asset-test`, `just renderer-test` | Pass |
+
+The prototype map does not depend on icons, so the statistics reference was not regenerated.
+
 ## Review and remaining work
 
 Manual review covered bounded codec/IR/image input, frame geometry, asset hash binding,

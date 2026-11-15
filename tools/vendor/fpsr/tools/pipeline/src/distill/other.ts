@@ -145,7 +145,7 @@ export async function distillIcon(
     }
     if (!source) source = findItem();
   } else {
-    source = tryProto(category, name);
+    source = tryProto(protoTypeHint ?? category, name);
   }
 
   if (!source) return undefined;

@@ -1,7 +1,8 @@
 # Milestone 4: rendering integration
 
 Date: 2026-11-15. Status: approved by the owner on 2026-11-15, with every decision below settled.
-R0, the spec amendments, is done: the owner approved them on 2026-11-15.
+R0, the spec amendments, is done: the owner approved them on 2026-11-15. R3, planet icons in the release, is done
+([validation](../validation/Renderer.md#planet-icons-2026-11-15)).
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope
@@ -74,7 +75,7 @@ Rich-text tags are rare: 12 of the 277 labels contain them (11 `item`, 2 `fluid`
 root label, in `bp.txt`. Every tagged name has an icon in the release. This survey covers labels only. It does not
 prove coverage for tag forms the corpus lacks, such as `[img=…]`, `[color=…]`, `[gps=…]`, or `[train=…]`.
 
-The render database has 1,395 icons in these categories: recipe, item, virtual-signal, entity, fluid, tile,
+The render database had 1,395 icons in these categories (1,400 after R3 added the planets): recipe, item, virtual-signal, entity, fluid, tile,
 asteroid-chunk, utility, quality, and space-location.
 
 ### Out of scope
