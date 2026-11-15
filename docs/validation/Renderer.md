@@ -147,7 +147,8 @@ on the release build, with the R3 release (identity `006215dd…`). Images and t
 | Scale | 191 leaves at 32 pixels per tile; 48 reduced by the 2048-pixel limit, down to 8.4 pixels per tile |
 | Rails | 11 leaves: `bp.txt` `1.0`, `1.1`, `1.6`, `1.7`, `1.12`; `v0.59.0.txt` `7.2`, `29.2`; `book.bp.txt` `0.4.0`, `0.4.2`, `4.7`; `elevated-rails.bp.txt` `0`. All are at 32 pixels per tile except `bp.txt` `1.12` (26.3), `elevated-rails.bp.txt` `0` (17.5), and `v0.59.0.txt` `29.2` (11.3, 740 rails), where seams are judged at reduced scale |
 
-The owner's visual review of the contact sheet and the rail-seam crops is pending; its findings feed R2.
+The owner reviewed this run's contact sheet (`.cache/qualification/20261115-153748`), including the rail leaves, on
+2026-11-15 and found no defects. Milestone 4's R2 (renderer corrections) therefore needed no changes.
 
 ## Review and remaining work
 
