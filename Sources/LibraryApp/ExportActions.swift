@@ -117,7 +117,7 @@ extension LibraryBrowserModel {
         }
     }
 
-    static func isInside(_ url: URL, _ library: URL) -> Bool {
+    nonisolated static func isInside(_ url: URL, _ library: URL) -> Bool {
         let parent = url.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath().path
         let root = library.standardizedFileURL.resolvingSymlinksInPath().path
         return parent == root || parent.hasPrefix(root.hasSuffix("/") ? root : root + "/")

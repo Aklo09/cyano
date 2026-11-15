@@ -116,7 +116,7 @@ Local fpsr changes are kept as ordered patches in `tools/vendor/fpsr-patches/` a
 `BASE`; `just tools-check` fails if they drift from `tools/vendor/fpsr`. Patch and upgrade steps are in the
 [asset preparation guide](development/Asset-Preparation.md#local-fpsr-patches).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
-Copying or saving preview images is assigned to milestone 4 (R9).
+Copying and saving preview images is done (milestone 4, R9).
 
 
 Milestone 4 is [approved](planning/Milestone-4.md) (2026-11-15) with all decisions settled by the owner: no
@@ -149,7 +149,9 @@ game's icon tile (see the [app guide](development/App.md#icons)). R6 is done in 
 (2026-11-15): Statistics rows show item and quality icons; all 342 map items and every quality have one in the
 release. A real-app check of R6 and R7 is pending (owner: later). R8 is done in code and tests (2026-11-15):
 previews with warnings show a count that opens the grouped list, also from View ▸ Show Render Warnings; the owner
-kept the planner's wording. Next: R9 (copy and save preview images).
+kept the planner's wording. R9 is done in code and tests (2026-11-15):
+Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) hand out the cached PNG unchanged. Next: the
+real-app check of R6 to R9, then R10 (accessibility, smoke run, artwork check) and R11 (acceptance).
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

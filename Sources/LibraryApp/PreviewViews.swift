@@ -43,6 +43,10 @@ public final class PreviewDisplay {
     public var background: PreviewBackground = .checkerboard
     /// Whether the render warnings popover is open (WRN-2, View ▸ Show Render Warnings).
     public var showsWarnings = false
+    /// The name Save Image As suggests, as text: the owner sets it (IMG-2).
+    public var exportName = ""
+    /// A short confirmation after Copy Image or Save Image As, shown over the preview for 2 seconds.
+    public private(set) var confirmation: String?
     @ObservationIgnored private var viewSize: CGSize = .zero
     @ObservationIgnored private var image: PreviewImage?
     @ObservationIgnored weak var center: PreviewCenter?
@@ -86,6 +90,23 @@ public final class PreviewDisplay {
     var canRetry: Bool {
         if case .failed = viewer.state { return true }
         return false
+    }
+
+    /// The ready preview's PNG bytes, which Copy Image and Save Image As hand out; nil in any other state (IMG-6).
+    public var png: Data? {
+        guard case .ready(let image) = viewer.state else { return nil }
+        return image.png
+    }
+
+    func confirm(_ text: String) {
+        confirmation = text
+        NSAccessibility.post(
+            element: NSApp as Any, notification: .announcementRequested,
+            userInfo: [.announcement: text, .priority: NSAccessibilityPriorityLevel.medium.rawValue])
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2))
+            if self?.confirmation == text { self?.confirmation = nil }
+        }
     }
 
     /// The ready preview's warnings; none in any other state (WRN-1, WRN-3).
@@ -146,6 +167,8 @@ struct PreviewArea: View {
     let name: String
     /// Close Window, for a preview window whose item or entry is gone.
     var closeWindow: (() -> Void)?
+    /// The open library, where Save Image As refuses to write (IMG-4).
+    var library: URL?
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
@@ -161,6 +184,22 @@ struct PreviewArea: View {
                     .padding(12)
                     .accessibilityElement(children: .contain)
             }
+        }
+        .overlay(alignment: .bottom) {
+            if let confirmation = display.confirmation {
+                Text(confirmation)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.regularMaterial, in: Capsule())
+                    .padding(.bottom, 10)
+                    .accessibilityHidden(true)
+            }
+        }
+        .contextMenu {
+            Button("Copy Image") { PreviewImageFlow.copy(display) }
+                .disabled(display.png == nil)
+            Button("Save Image As…") { Task { await PreviewImageFlow.save(display, library: library) } }
+                .disabled(display.png == nil)
         }
         .onChange(of: display.viewer.state, initial: true) { _, state in
             display.stateChanged()
@@ -254,10 +293,16 @@ struct InspectorPreview: View {
     @State private var display = PreviewDisplay()
     @Environment(\.openWindow) private var openWindow
 
+    /// Save Image As suggests the entry's name, with " — Entry 5.0" inside a book (IMG-2).
+    static func exportName(_ target: PreviewTarget) -> String {
+        target.subject.entryPath.isEmpty
+            ? target.name : "\(target.name) — Entry \(BlueprintEntryReader.pathText(target.subject.entryPath))"
+    }
+
     var body: some View {
         let target = browser.previewTarget
         VStack(alignment: .leading, spacing: 6) {
-            PreviewArea(display: display, name: target?.name ?? "")
+            PreviewArea(display: display, name: target?.name ?? "", library: browser.session.libraryURL)
                 .frame(height: height)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.separator))
@@ -273,6 +318,7 @@ struct InspectorPreview: View {
             }
         }
         .focusedSceneValue(\.previewDisplay, display)
+        .onChange(of: target.map(Self.exportName), initial: true) { _, name in display.exportName = name ?? "" }
         .onChange(
             of: PreviewRequestKey(target: target?.subject, browser: browser, revision: assetsRevision), initial: true
         ) {
@@ -324,7 +370,12 @@ struct PreviewWindowView: View {
     }
 
     var body: some View {
-        PreviewArea(display: display, name: title, closeWindow: { dismiss() })
+        PreviewArea(display: display, name: title, closeWindow: { dismiss() }, library: model.session.libraryURL)
+            .onChange(of: title, initial: true) { _, title in display.exportName = title }
+            .onCopyCommand {
+                PreviewImageFlow.copy(display)
+                return []
+            }
             .frame(minWidth: 360, minHeight: 280)
             .navigationTitle(title)
             .toolbar { PreviewToolbar(display: display) }

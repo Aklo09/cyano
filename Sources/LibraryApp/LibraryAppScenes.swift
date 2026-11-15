@@ -67,6 +67,8 @@ struct LibraryCommands: Commands {
     let model: LibrarySelectionModel
     @Environment(\.openWindow) private var openWindow
     @FocusedValue(\.libraryWindowActive) private var libraryWindowActive
+    /// The focused preview, the inspector's or a preview window's, for Copy Image and Save Image As (IMG-1, IMG-2).
+    @FocusedValue(\.previewDisplay) private var previewDisplay
 
     /// Commands on the selection run only while the library window is the key window.
     private var inLibrary: Bool { libraryWindowActive == true && model.session.libraryURL != nil }
@@ -113,12 +115,21 @@ struct LibraryCommands: Commands {
             Button("Save As TXT…") { Task { await ExportFlow.saveSelection(model.browser) } }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
                 .disabled(!inLibrary || model.browser.exportTarget == nil)
+            Button("Save Image As…") {
+                guard let previewDisplay else { return }
+                Task { await PreviewImageFlow.save(previewDisplay, library: model.session.libraryURL) }
+            }
+            .keyboardShortcut("e", modifiers: [.command, .shift, .option])
+            .disabled(previewDisplay?.png == nil)
             Divider()
             Button("Close Library") { Task { await model.closeLibrary() } }
                 .keyboardShortcut("w", modifiers: [.command, .shift])
                 .disabled(model.session.libraryURL == nil)
         }
         CommandGroup(after: .pasteboard) {
+            Button("Copy Image") { if let previewDisplay { PreviewImageFlow.copy(previewDisplay) } }
+                .keyboardShortcut("c", modifiers: [.command, .option])
+                .disabled(previewDisplay?.png == nil)
             Divider()
             Button("Rename…") { model.browser.beginRename() }
                 .disabled(!inLibrary || !model.browser.canRenameSelection)

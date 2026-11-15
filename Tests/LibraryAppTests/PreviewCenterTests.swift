@@ -21,7 +21,7 @@ private func tinyImage(warnings: [String] = []) -> PreviewImage {
     let context = CGContext(
         data: nil, width: 4, height: 2, bitsPerComponent: 8, bytesPerRow: 0,
         space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    return PreviewImage(image: context.makeImage()!, warnings: warnings)
+    return PreviewImage(image: context.makeImage()!, warnings: warnings, png: Data("png bytes".utf8))
 }
 
 /// A backend that never starts a worker: renders wait until the test finishes them, and record their order and
@@ -230,6 +230,24 @@ struct PreviewCenterTests {
         fixture.renders.finish(fixture.ids["C"]!)
         await until { isReady(clean.viewer.state) }
         #expect(clean.warnings == nil && !clean.canRetry)
+    }
+
+    @Test("IMG-1, IMG-6: only a ready preview offers its PNG bytes for Copy Image and Save Image As")
+    func imageBytes() async throws {
+        let fixture = try await PreviewFixture()
+        defer { fixture.cleanup() }
+        fixture.renders.cache(fixture.ids["A"]!)
+        let (cached, waiting, empty) = (PreviewDisplay(), PreviewDisplay(), PreviewDisplay())
+        fixture.center.show(fixture.subject("A"), in: cached.viewer)
+        fixture.center.show(fixture.subject("B"), in: waiting.viewer)
+        fixture.center.show(fixture.subject("Empty"), in: empty.viewer)
+        await until { isReady(cached.viewer.state) && fixture.renders.started.count == 1 }
+        await until { empty.viewer.state == .nothingToDraw }
+        #expect(cached.png == Data("png bytes".utf8))
+        #expect(waiting.png == nil && empty.png == nil && PreviewDisplay().png == nil)
+        fixture.renders.finish(fixture.ids["B"]!)
+        await until { isReady(waiting.viewer.state) }
+        #expect(waiting.png == Data("png bytes".utf8))
     }
 
     @Test("WRN-2: warnings group by text with counts, most frequent first, at most 100 lines and then a remainder")

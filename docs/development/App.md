@@ -166,6 +166,12 @@ windows (PRV-1 to PRV-12). Each preview area owns a `PreviewDisplay`, whose `Pre
   follows Open in Window in the inspector and closes the preview window's toolbar; it opens a popover that Esc
   closes, as does View ▸ Show Render Warnings. The "Preview ready" announcement adds the count. The words are the
   planner's own (owner, 2026-11-15).
+- **Copy and save (R9):** `PreviewImage.png` keeps the PNG bytes as rendered or cached, and `PreviewDisplay.png`
+  offers them only in the Ready state (IMG-6). Edit ▸ Copy Image (⌥⌘C; ⌘C in a preview window), File ▸ Save Image
+  As… (⌥⇧⌘E), and the preview's context menu act on the focused preview. `PreviewImageExport.save` refuses a
+  destination inside the library, moves a file it replaces to the Trash first and puts it back if writing fails,
+  and writes atomically; the suggested name is the text form of the entry name (plus " — Entry 5.0" in a book) or
+  the window title, with `.png`. Confirmations appear over the preview for 2 seconds and are announced.
 - **Worker:** the Xcode target embeds the package's `preview-worker` product with a Copy Files phase into
   `Contents/MacOS` (signed on copy); `PreviewBackend.bundledWorker` finds it with
   `Bundle.main.url(forAuxiliaryExecutable:)`. The worker target adds an `@executable_path/../Frameworks` rpath
@@ -359,4 +365,4 @@ static text (System Events reports some SwiftUI button labels as empty).
 
 ## Pending work
 
-- **Copying or saving preview images:** assigned to milestone 4, subtask R9 ([plan](../planning/Milestone-4.md)).
+- **Copying or saving preview images:** done in milestone 4, subtask R9 (see Previews above).

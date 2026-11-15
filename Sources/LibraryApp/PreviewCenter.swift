@@ -25,11 +25,14 @@ public struct PreviewImage: @unchecked Sendable, Equatable {
     public let image: CGImage
     /// The planner's warnings, as rendered or as stored with a cached preview (WRN-1).
     public let warnings: [String]
+    /// The PNG bytes as rendered and cached, which Copy Image and Save Image As hand out unchanged (IMG-1, IMG-2).
+    public let png: Data?
     private let id = UUID()
 
-    public init(image: CGImage, warnings: [String] = []) {
+    public init(image: CGImage, warnings: [String] = [], png: Data? = nil) {
         self.image = image
         self.warnings = warnings
+        self.png = png
     }
 
     public var pointSize: CGSize { CGSize(width: Double(image.width) / 2, height: Double(image.height) / 2) }
@@ -41,7 +44,7 @@ public struct PreviewImage: @unchecked Sendable, Equatable {
         guard let source = CGImageSourceCreateWithData(png as CFData, nil),
             let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else { throw PreviewError.imageEncoding }
-        return PreviewImage(image: image, warnings: warnings)
+        return PreviewImage(image: image, warnings: warnings, png: png)
     }
 }
 
