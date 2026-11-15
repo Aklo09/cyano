@@ -156,7 +156,9 @@ Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) 
 (see [validation](validation/App.md#milestone-4-smoke-runs-2026-11-15)). R11 (2026-11-15): every check passes on
 `fa8d7f8` (see the [milestone 4 acceptance record](validation/Milestone-4.md)); the first Release smoke runs found an
 inspector layout loop (crash on the Comments tab) caused by the larger header, fixed before the passing runs. The user
-guide covers icons, tags, warnings, and image copy/save. Next: the owner's walkthrough and approval of milestone 4.
+guide covers icons, tags, warnings, and image copy/save. Next: the owner's walkthrough, including the
+unscripted paths listed in the [acceptance record](validation/Milestone-4.md#for-the-owners-walkthrough), then recording
+their approval of milestone 4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
