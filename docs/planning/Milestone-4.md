@@ -131,3 +131,24 @@ R1's findings feed R2 in parallel with the app work. Then R4 → R5, R6, R7; R8 
 
 R2 is open-ended: its size depends on what R1 finds. If R1 turns up more than a handful of distinct renderer
 defects, they will be listed and prioritized with the owner before the work continues.
+
+## Verification
+
+Owner decision, 2026-11-15: during milestone 4, each subtask runs only the checks that cover what it changed, plus
+`just lint` and, for app changes, `just app-build`. The full `just test`, the smoke run, and the independence check
+run at the end (R10, R11). `swift test --filter` still builds every target, so a compile break anywhere fails a
+focused run.
+
+| Subtask | Focused checks |
+| --- | --- |
+| R1 | The harness's own run |
+| R2 | `just renderer-test`, `just planner-test`, `just tools-check` |
+| R3 | `just tools-check`, `just asset-test`, `just renderer-test` |
+| R4 | Its new suite, `just asset-test` |
+| R5, R7, R8, R9 | `just app-test`, `just app-build` |
+| R6 | `just storage-test` (it changes LibraryCore filename projection, which the CLI tests also cover), `just app-test`, `just app-build` |
+| R10, R11 | Full `just test`, `just app-smoke` with and without assets, `python3 tools/check-independence.py --deny-path ../fb` |
+
+A new test suite is added to the filter lists of `just test` and its focused recipe in the same subtask; both list
+suites by name, so a missing entry would also escape the final full run. A regression found at the end is traced
+to its subtask commit with `git bisect`.

@@ -267,7 +267,10 @@ Developer ID signing and notarization belong to distribution, which is outside v
 Ordinary UI subtasks are verified with `just lint`, `just test`, and `just app-build`. The independence check runs
 when a change touches dependencies or resources (`Package.swift`, new packages, files read from outside the
 repository), build tooling (`tools/swift.sh`, `tools/xcode.sh`, the Xcode project), what goes into the bundle, or
-network access, and at milestone acceptance (owner decision, 2026-11-14). Launching the app is the smoke run's job
+network access, and at milestone acceptance (owner decision, 2026-11-14).
+During milestone 4, subtasks run only the focused suites for what they changed, with `just lint` and `just app-build`;
+the full `just test` runs at the end (owner decision, 2026-11-15; see the
+[milestone 4 plan](../planning/Milestone-4.md#verification)). Launching the app is the smoke run's job
 (below), run for changes to windows, menus, or previews and at acceptance.
 
 ## Independence
