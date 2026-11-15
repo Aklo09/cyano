@@ -200,13 +200,15 @@ release, off the main thread, like the prototype map, and drops it when the rele
 - **Entry icons (R5):** `LibraryItem.entryIcons` (from the source index) and `BlueprintEntry.icons` reach
   `BrowserRow.icons` and `EntryDetail.icons`. `LibraryWindowView` loads the catalog whenever
   `AssetSettings.revision` changes and passes it down as the `iconCatalog` environment value. `EntryIconStrip`
-  draws a row's kind symbol, then the icons at text height (16 points at the default size) with quality badges at
+  draws a row's kind symbol, then the icons (24 points at the default text size, `ItemList.rowIconSize`; every name
+  cell is that tall plus 6 points, so rows keep one height) with quality badges at
   half size in the bottom-left corner, leaving out icons the release lacks; `EntryIconTile` draws the inspector's
-  48-point tile in the game's layout (`EntryIconLayout.frames`) or the kind symbol. Row VoiceOver labels end with
+  64-point tile in the game's layout (`EntryIconLayout.frames`) or the kind symbol. Row VoiceOver labels end with
   "icons: …" (`EntryIconLayout.spokenNames`).
 - **Names (R6):** `RichTextName` splits a name into text, icon tags (kinds the catalog maps, `planet`, and
-  `img=category/name`), and other tags. `RichNameText` draws icon tags the release has as inline images at the text
-  size (`IconCatalog.badgedImage` adds the quality badge) and leaves every other tag as written; it is used in rows,
+  `img=category/name`), and other tags. `RichNameText` draws icon tags the release has as inline images centred on the
+  text's capital height (24 points in rows, 20 in the sidebar and path bar, 28 in the inspector title;
+  `IconCatalog.badgedImage` adds the quality badge) and leaves every other tag as written; it is used in rows,
   the sidebar, the path bar, and the inspector header. `textForm` (icon tags removed, other tags kept, icon names
   when nothing else is left) gives window titles, Save As names, the entry location line, and the name sort key
   (`BrowserRow.sortName`); `spoken(showing:)` gives VoiceOver labels. Entry names are the labels as stored.

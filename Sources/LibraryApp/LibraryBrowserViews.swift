@@ -118,6 +118,8 @@ struct ItemList: View {
     @Bindable var browser: LibraryBrowserModel
     @Environment(\.openWindow) private var openWindow
     @Environment(\.iconCatalog) private var iconCatalog
+    /// Entry and tag icons in rows; every name cell is at least this tall plus a margin, with icons or without.
+    @ScaledMetric(relativeTo: .body) private var rowIconSize: CGFloat = 24
     @State private var sortOrder = [KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard)]
     @FocusState private var listFocused: Bool
     @State private var refocusList = false
@@ -231,9 +233,10 @@ struct ItemList: View {
                 .width(min: 32, ideal: 44, max: 64)
             TableColumn("Name") { row in
                 HStack(spacing: 6) {
-                    EntryIconStrip(kind: row.kind, icons: row.icons)
-                    RichNameText(name: row.name)
+                    EntryIconStrip(kind: row.kind, icons: row.icons, size: rowIconSize)
+                    RichNameText(name: row.name, pointSize: rowIconSize)
                 }
+                .frame(minHeight: rowIconSize + 6)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(
                     Self.withIcons(
@@ -274,9 +277,10 @@ struct ItemList: View {
                     RenameField(browser: browser, row: row)
                 } else {
                     HStack(spacing: 6) {
-                        EntryIconStrip(kind: row.kind, icons: row.icons)
-                        RichNameText(name: row.name)
+                        EntryIconStrip(kind: row.kind, icons: row.icons, size: rowIconSize)
+                        RichNameText(name: row.name, pointSize: rowIconSize)
                     }
+                    .frame(minHeight: rowIconSize + 6)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(accessibilityLabel(row))
                 }
@@ -408,7 +412,9 @@ struct ItemInspector: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
                 }
-                .frame(maxHeight: min(260, max(80, height * 0.25)))
+                // The header shows all of itself at ordinary window heights and scrolls only in short windows, where the
+                // preview and the tabs need the room.
+                .frame(maxHeight: min(420, max(120, height * 0.45)))
                 .fixedSize(horizontal: false, vertical: true)
                 if browser.previewTarget != nil {
                     InspectorPreview(
@@ -510,9 +516,10 @@ private struct InspectorHeader: View {
         let name = detail?.name ?? item?.name ?? ""
         let kind = detail?.kind ?? item.map { ItemKind(stored: $0.kind) } ?? .blueprint
         HStack(alignment: .top, spacing: 10) {
-            EntryIconTile(kind: kind, icons: detail?.icons ?? item?.entryIcons ?? [], side: 48)
+            EntryIconTile(kind: kind, icons: detail?.icons ?? item?.entryIcons ?? [], side: 64)
             VStack(alignment: .leading, spacing: 4) {
-                RichNameText(name: name, pointSize: 20).font(.title2.weight(.semibold)).textSelection(.enabled)
+                RichNameText(name: name, pointSize: 28, textStyle: .title2).font(.title2.weight(.semibold))
+                    .textSelection(.enabled)
                 Label(kind.label, systemImage: kind.symbol)
             }
         }

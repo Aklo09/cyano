@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import PreviewRenderer
 import SwiftUI
@@ -124,8 +125,9 @@ public struct RichTextName: Equatable, Sendable {
         return words
     }
 
-    /// The name as SwiftUI text, with each icon the release has drawn in place at `pointSize` (ICN-5, ICN-6).
-    func text(catalog: IconCatalog?, pointSize: CGFloat) -> Text {
+    /// The name as SwiftUI text, with each icon the release has drawn in place at `pointSize`, centred on the text's
+    /// capital letters (`capHeight`) (ICN-5, ICN-6).
+    func text(catalog: IconCatalog?, pointSize: CGFloat, capHeight: CGFloat) -> Text {
         tokens.reduce(Text(verbatim: "")) { result, token in
             switch token {
             case .text(let text): return result + Text(verbatim: text)
@@ -134,10 +136,8 @@ public struct RichTextName: Equatable, Sendable {
                 guard let image = catalog?.badgedImage(for: reference, quality: quality) else {
                     return result + Text(verbatim: raw)
                 }
-                // Sized and lowered to stay within the text's ascender and descender, so rows with icons in their
-                // names are as tall as rows without.
                 let icon = Image(decorative: image, scale: CGFloat(image.width) / pointSize)
-                return result + Text(icon).baselineOffset(-pointSize * 0.18)
+                return result + Text(icon).baselineOffset(-(pointSize - capHeight) / 2)
             }
         }
     }
@@ -146,13 +146,18 @@ public struct RichTextName: Equatable, Sendable {
 /// A name with its rich-text icons, read by VoiceOver with icon names in place (ICN-5 to ICN-7).
 struct RichNameText: View {
     let name: String
-    /// The icons' height: 14 points fits body text (13 points) without making its line taller.
-    var pointSize: CGFloat = 14
+    /// The icons' height; list rows reserve room for it (screen specs, "Names").
+    var pointSize: CGFloat = 20
+    /// The text style the name is set in, for centring icons on it.
+    var textStyle: NSFont.TextStyle = .body
     @Environment(\.iconCatalog) private var catalog
 
     var body: some View {
         let rich = RichTextName(name)
-        rich.text(catalog: catalog, pointSize: pointSize)
-            .accessibilityLabel(rich.spoken(showing: catalog))
+        rich.text(
+            catalog: catalog, pointSize: pointSize,
+            capHeight: NSFont.preferredFont(forTextStyle: textStyle).capHeight
+        )
+        .accessibilityLabel(rich.spoken(showing: catalog))
     }
 }

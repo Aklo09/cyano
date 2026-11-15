@@ -27,7 +27,8 @@ and the exact values of the two color tokens.
 - **Sizes:** decimal B/KB/MB (`ByteCountFormatter`, file style); exact bytes are always visible in the inspector,
   never only in a tooltip.
 - **Names:** item, folder, and entry names as stored. Rich-text tags with an icon in the release draw as that icon
-  at text size, in place (ICN-5); every other tag stays as written (ICN-6). Where icons can't be drawn (window
+  in place (ICN-5): 24 points in list rows, 20 in the sidebar and path bar, 28 in the inspector title (owner,
+  2026-11-15); every other tag stays as written (ICN-6). Where icons can't be drawn (window
   titles, suggested file names, sort order) the text form is used (ICN-7). Statistics item names are the prototype
   names as text (for example `fast-inserter`), matching `fb-native statistics`, with the item's icon before them.
 - **Icons:** Factorio icons come only from the configured asset release and are drawn at their own colors on every
@@ -174,8 +175,9 @@ Layout, left to right:
 - **Path bar:** above the item list; every component is a link to that folder or book (BRW-4, BOOK-3).
 - **Item list:** a table showing the current folder's subfolders first, then its items, sorted by name (column
   headers sort). Folder columns: Name (kind symbol, then the entry icons, then the name; ICN-1, ICN-3), Kind,
-  Updated, Size. In the sketch, ▢ ▤ ▦ are kind symbols and ◆ entry icons. Entry icons are drawn at the row's text
-  height in stored order with 2-point gaps; up to four, so names keep most of the column. Thumbnails are not shown
+  Updated, Size. In the sketch, ▢ ▤ ▦ are kind symbols and ◆ entry icons. Entry icons are drawn 24 points high
+  (scaled with the text size) in stored order with 2-point gaps; up to four, so names keep most of the column. Every
+  row is tall enough for them, with icons or without, so rows stay one height (owner, 2026-11-15). Thumbnails are not shown
   (BRW-9, milestone 4 decision S1). Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
   Double-click or ⌘↓ opens a folder or book; ⌘↑ goes to the enclosing folder or book.
 - **Inspector:** described below; toggled with the system inspector command (⌃⌘I) and resizable.
@@ -236,11 +238,13 @@ Primary action: depends on kind: Open in Window for blueprints and planners, Ope
 Secondary actions: Copy String, Save As TXT…, and for root items Rename, Move To…, Replace Source…, Move to Trash
 (BOOK-7: not for entries).
 
-Header: the entry icons tile on the left (ICN-2: 48 × 48 points, one icon filling it or two to four in a 2 × 2 grid;
+Header: the entry icons tile on the left (ICN-2: 64 × 64 points, one icon filling it or two to four in a 2 × 2 grid;
 the kind symbol at the same size when there are no entry icons or no release, ICN-3), then the name (title style,
 with rich-text icons), kind label with symbol, saved Factorio version (BOOK-5a, "Version unknown" when
 invalid). Root items add Updated, Created, and size with exact bytes ("4.2 KB (4,213 bytes)"); entries add
 "Entry 5.0 in Rail Book" instead.
+The header shows all of its lines at ordinary window heights: it may take up to 45% of the inspector's height
+(at most 420 points) and scrolls only when the window is shorter (owner, 2026-11-15).
 
 Preview area (blueprints and planners), a fixed-height region under the header with the states listed under
 Previews. A book shows "Books have no preview" with its entry count and an Open Book button instead.

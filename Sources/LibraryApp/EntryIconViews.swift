@@ -72,8 +72,9 @@ private struct SignalIcon: View {
 struct EntryIconStrip: View {
     let kind: ItemKind
     let icons: [EntryIcon]
+    /// The icons' height; the list makes every row tall enough for it.
+    let size: CGFloat
     @Environment(\.iconCatalog) private var catalog
-    @ScaledMetric(relativeTo: .body) private var size: CGFloat = 16
 
     var body: some View {
         HStack(spacing: 2) {
