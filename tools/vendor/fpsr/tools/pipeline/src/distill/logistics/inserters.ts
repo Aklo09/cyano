@@ -121,7 +121,24 @@ export async function distillInserter(
     });
   }
 
-  return baseEntity("inserter", "inserter", p, [...platformGroups, ...handGroups]);
+  const def = baseEntity("inserter", "inserter", p, [...platformGroups, ...handGroups]);
+  const pickupPosition = rawVector(p.pickup_position);
+  const insertPosition = rawVector(p.insert_position);
+  if (!pickupPosition || !insertPosition) return def;
+  return { ...def, data: { ...def.data, pickupPosition, insertPosition } };
+}
+
+/** Prototype `Vector` as `[x, y]` (the dump writes arrays; `{x, y}` is also valid). */
+function rawVector(value: unknown): [number, number] | undefined {
+  const pair = Array.isArray(value)
+    ? value
+    : value && typeof value === "object"
+      ? [(value as { x?: unknown }).x, (value as { y?: unknown }).y]
+      : undefined;
+  const [x, y] = pair ?? [];
+  if (typeof x !== "number" || typeof y !== "number") return undefined;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
+  return [round4(x), round4(y)];
 }
 /**
  * Skip leaves that Factorio composites additively / as lights. Their source

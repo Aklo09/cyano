@@ -27,8 +27,8 @@ func syntheticPrototypeMap() -> [String: Any] {
     var rail = shape(0, width: 4, height: 4, box: [[-1.5, -2.5], [1.5, 2.5], 0])
     rail["secondaryCollisionBox"] = [[-2, -1], [2, 1], 0.125]
     return [
-        "schema": 1, "gameVersion": "2.1.23",
-        "mods": Dictionary(uniqueKeysWithValues: FactorioProfile.initial.mods.map { ($0, "2.1.23") }),
+        "schema": 1, "gameVersion": "2.1.24",
+        "mods": Dictionary(uniqueKeysWithValues: FactorioProfile.initial.mods.map { ($0, "2.1.24") }),
         "qualities": ["normal": true, "rare": true],
         "footprintDefinition": "Synthetic test map.",
         "entities": [
@@ -62,7 +62,7 @@ struct PrototypeMapTests {
     @Test("A complete map parses with exact geometry, partial direction sets, and resolved references")
     func parsesSyntheticMap() throws {
         let map = try parse(syntheticPrototypeMap())
-        #expect(map.assetIdentity == identity && map.gameVersion == "2.1.23")
+        #expect(map.assetIdentity == identity && map.gameVersion == "2.1.24")
         #expect(map.qualities == ["normal", "rare"])
         #expect(map.entities.count == 4 && map.tiles["concrete"] == [ItemCount(name: "concrete", count: 1)])
         let chest = try #require(map.entities["wooden-chest"])
@@ -160,11 +160,11 @@ struct PrototypeMapTests {
         .deletingLastPathComponent().appendingPathComponent("private-assets/statistics-reference/prototype-map.json")
 
     @Test(
-        "The private 2.1.23 map parses with its documented contents",
+        "The private 2.1.24 map parses with its documented contents",
         .enabled(if: FileManager.default.fileExists(atPath: privateMapURL.path), "Needs the private prototype map"))
     func privateMap() throws {
         let map = try PrototypeMap.parse(Data(contentsOf: Self.privateMapURL), assetIdentity: identity)
-        #expect(map.gameVersion == "2.1.23")
+        #expect(map.gameVersion == "2.1.24")
         #expect(
             map.entities.count == 146 && map.items.count == 342 && map.tiles.count == 23 && map.qualities.count == 6)
         #expect(

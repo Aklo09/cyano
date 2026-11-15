@@ -14,7 +14,7 @@ struct TestAssetRelease {
     let root: URL
     /// `prototypeMap` replaces the minimal map that asset verification alone needs.
     init(
-        frameOutside: Bool = false, density: Int = 2, gameVersion: String = "2.1.23", packedFrame: Bool = false,
+        frameOutside: Bool = false, density: Int = 2, gameVersion: String = "2.1.24", packedFrame: Bool = false,
         prototypeMap: Data? = nil
     ) throws {
         root = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-assets-\(UUID().uuidString)")

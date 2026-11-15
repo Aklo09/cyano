@@ -87,6 +87,12 @@ real-app run checked the menu bar against the spec, quitting during a render, th
 window with a preview window open (see [validation](validation/App.md#menus-and-lifecycle-2026-11-14)). Open: the
 Window menu lists the app name twice with no library open. Next: A16 (accessibility).
 Cached row thumbnails (BRW-9) remain unbuilt.
+Alt-mode previews now mark each inserter's pickup (yellow line) and drop (yellow arrow) (2026-11-15). This needed
+new render-database fields, so the private assets were regenerated from Factorio 2.1.24 and the supported asset
+profile moved from 2.1.23 to 2.1.24 (owner's decision: replace, not both). Releases assembled from 2.1.23 inputs are
+now refused: reassemble any everyday release from `private-assets/2.1.24` and `private-assets/statistics-reference`
+(see the [asset preparation guide](development/Asset-Preparation.md#regenerate) and
+[validation](validation/Renderer.md#inserter-indications-2026-11-15)).
 Asset-release verification still counts a `.DS_Store` as an unexpected member; that is outside A0 and unscheduled.
 Copying or saving preview images is required but deferred to a later milestone.
 

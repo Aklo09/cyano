@@ -230,6 +230,80 @@ function combinatorFlowCommands(
   }));
 }
 
+/**
+ * How far each inserter marker is pulled from the centre of its target tile
+ * back toward the inserter, in tiles. Keeps a pickup line and a facing drop
+ * arrow on a shared belt tile apart (calibrated on a reference rendering).
+ */
+const INSERTER_MARKER_INSET = 0.2;
+
+/**
+ * Inserter pickup and drop markers: Factorio's yellow `indication_line` on the
+ * pickup tile and `indication_arrow`, pointing along the transfer, on the drop
+ * tile. Prototype vectors are authored for direction north and rotate with the
+ * entity; each marker sits at its target tile's centre, inset toward the
+ * inserter.
+ */
+function inserterIndicationCommands(
+  entity: BlueprintEntity,
+  def: EntityRenderDef,
+  db: RenderDb,
+): IconCmd[] {
+  if (def.kind !== "inserter") return [];
+  const pickup = def.data?.pickupPosition;
+  const drop = def.data?.insertPosition;
+  const lineFrame = db.icons["utility/indication-line"];
+  const arrowFrame = db.icons["utility/indication-arrow"];
+  const lineScale = db.iconScales?.["utility/indication-line"];
+  const arrowScale = db.iconScales?.["utility/indication-arrow"];
+  if (!pickup || !drop || lineFrame === undefined || arrowFrame === undefined) return [];
+  if (lineScale === undefined || arrowScale === undefined) return [];
+
+  const angle = cardinalDirection(entity.direction ?? 0) * 22.5;
+  const radians = (angle * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const round4 = (n: number): number => Math.round(n * 1e4) / 1e4;
+  // Clockwise rotation in y-down tile space, rounded so cardinal angles stay exact.
+  const rotate = ([x, y]: [number, number]): [number, number] => [
+    round4(x * cos - y * sin),
+    round4(x * sin + y * cos),
+  ];
+  // Target tile centre (inserters are 1×1, centred on a tile), inset toward the entity.
+  const markerOffset = ([x, y]: [number, number]): [number, number] => {
+    const tile: [number, number] = [Math.round(x), Math.round(y)];
+    const length = Math.hypot(tile[0], tile[1]);
+    if (length === 0) return [x, y];
+    const keep = (length - INSERTER_MARKER_INSET) / length;
+    return [tile[0] * keep, tile[1] * keep];
+  };
+  // Both sprites face north at 0°: the arrow points up, the line lies across it.
+  const heading = ([x, y]: [number, number]): number =>
+    (((Math.round((Math.atan2(x, -y) * 180) / Math.PI) % 360) + 360) % 360);
+
+  const markers = [
+    { vector: rotate(pickup), frame: lineFrame, scale: lineScale, sub: 113 },
+    { vector: rotate(drop), frame: arrowFrame, scale: arrowScale, sub: 114 },
+  ];
+  return markers.map(({ vector, frame, scale, sub }) => {
+    const offset = markerOffset(vector);
+    return {
+      kind: "icon" as const,
+      layer: RENDER_LAYERS["entity-info-icon-above"],
+      sortY: 0,
+      sortX: 0,
+      entity: entity.entity_number,
+      sub,
+      frame,
+      x: round4(entity.position.x + offset[0]),
+      y: round4(entity.position.y + offset[1]),
+      // Same footprint as the combinator flow arrows.
+      size: scale * 1.5,
+      rotation: heading(offset),
+    };
+  });
+}
+
 function skipsFluidIndication(def: EntityRenderDef): boolean {
   return (
     def.kind === "pipe" || def.protoType === "pipe-to-ground" || def.protoType === "storage-tank"
@@ -403,6 +477,7 @@ export function planAltModeCommands(
 
   commands.push(...splitterPriorityCommands(entity, def, db, 100));
   commands.push(...combinatorFlowCommands(entity, def, db));
+  commands.push(...inserterIndicationCommands(entity, def, db));
   commands.push(...fluidPortIndicationCommands(entity, def, db, 120));
   const emptyFilter = emptyInserterFilterCommand(entity, def, db);
   if (emptyFilter) commands.push(emptyFilter);

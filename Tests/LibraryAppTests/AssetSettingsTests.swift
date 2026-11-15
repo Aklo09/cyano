@@ -44,7 +44,7 @@ struct AssetSettingsTests {
             Issue.record("\(settings.state)")
             return
         }
-        #expect(url == release.root && name == "test-release" && version == "2.1.23")
+        #expect(url == release.root && name == "test-release" && version == "2.1.24")
         #expect(settings.choiceFailure == nil && settings.revision == 1 && settings.verifiedURL == release.root)
 
         let relaunched = AssetSettings(defaults: fixture.defaults)

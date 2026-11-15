@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "plannerRevision": "2f7dc70f2681de530402556f757006e904e692d5",
-  "sha256": "cf918c1899573087e72a72d52df82e5089d991534605ae159084af5c72814a75",
+  "sha256": "874eca221e2dbe9a3b233661562096ff0373033dfdec00da4dcfbf040b73ffdc",
   "inputs": [
     {
       "file": "tools/planner-entry.ts",
@@ -17,7 +17,7 @@
     },
     {
       "file": "tools/vendor/fpsr/packages/renderer/src/alt-mode.ts",
-      "sha256": "c59639860c17aaecde9b39f10139ed7915a1f03a6fff2ee328b80ab1d4a61e93"
+      "sha256": "24f011a052949e57048204d0bd1be10bb1bec3fd6d8c575e821db6885e90a324"
     },
     {
       "file": "tools/vendor/fpsr/packages/renderer/src/blueprint-icons.ts",

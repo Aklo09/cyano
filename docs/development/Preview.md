@@ -10,7 +10,7 @@ Build first, then assemble the already prepared private sprites and prototype ma
 
 ```sh
 just build
-python3 tools/assemble-asset-release.py --sprites private-assets/2.1.23 --prototype-map private-assets/statistics-reference/prototype-map.json --destination .cache/renderer-assets --id native-renderer
+python3 tools/assemble-asset-release.py --sprites private-assets/2.1.24 --prototype-map private-assets/statistics-reference/prototype-map.json --destination .cache/renderer-assets --id native-renderer
 just library assets-verify .cache/renderer-assets
 ```
 
@@ -85,6 +85,16 @@ Packed atlas sizes remain separate from canonical sprite geometry, including the
 The report separates source decoding, asset verification/loading, JavaScriptCore startup,
 JavaScript parsing/planning, bridge/result decoding, painting/atlas decoding, PNG encoding,
 process launch, parent validation, and total supervised wall time. Peak RSS comes from the worker.
+
+## Alt-mode overlays
+
+Previews always plan in alt mode. Besides recipe, filter and quality icons, splitter priorities, combinator flow,
+and fluid ports, each inserter shows Factorio's yellow `indication_line` at its pickup position and
+`indication_arrow`, pointing along the transfer, on its drop tile. The tiles come from the prototype's
+`pickup_position` and `insert_position` (stored as `pickupPosition`/`insertPosition` in the render database),
+rotated by the entity's direction. Each marker sits at its tile's centre, pulled 0.2 tiles toward the inserter, so
+a line and a facing arrow on one belt stay apart: 0.8 tiles out for most inserters, 1.8 for the long-handed one.
+A release without these fields or the `utility/indication-line` sprite renders inserters without markers.
 
 ## Qualification status
 

@@ -40,7 +40,7 @@ if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
   throw new Error('Output must be a new directory underneath this project\'s private-assets/ directory.');
 }
 const info = JSON.parse(await readFile(path.join(factorio, 'data/base/info.json'), 'utf8'));
-if (info.version !== '2.1.23') throw new Error('This preparation profile requires Factorio 2.1.23.');
+if (info.version !== '2.1.24') throw new Error('This preparation profile requires Factorio 2.1.24.');
 await mkdir(path.dirname(output), { recursive: true });
 await mkdir(output); // Refuse existing outputs, preserving previous assets and evidence.
 const mods = ['base', 'elevated-rails', 'quality', 'recycler', 'space-age'];

@@ -441,6 +441,13 @@ export interface EntityRenderData {
    * (e.g. foundry uses working visualisations instead).
    */
   pipePictures?: (PipeCoverGraphics | null)[];
+  /**
+   * Inserter `pickup_position` / `insert_position` for direction north, tile
+   * units from the entity center. Alt mode marks them with Factorio's
+   * `indication_line` and `indication_arrow` sprites.
+   */
+  pickupPosition?: [number, number];
+  insertPosition?: [number, number];
   wireAnchors?: WireAnchorMap;
   wireAnchorsOutput?: WireAnchorMap;
   wireConnectorGraphics?: WireConnectorGraphics;

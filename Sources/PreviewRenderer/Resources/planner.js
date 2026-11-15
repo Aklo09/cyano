@@ -831,6 +831,56 @@ var FBPlanner = (() => {
       rotation: angle
     }));
   }
+  var INSERTER_MARKER_INSET = 0.2;
+  function inserterIndicationCommands(entity, def, db) {
+    if (def.kind !== "inserter") return [];
+    const pickup = def.data?.pickupPosition;
+    const drop = def.data?.insertPosition;
+    const lineFrame = db.icons["utility/indication-line"];
+    const arrowFrame = db.icons["utility/indication-arrow"];
+    const lineScale = db.iconScales?.["utility/indication-line"];
+    const arrowScale = db.iconScales?.["utility/indication-arrow"];
+    if (!pickup || !drop || lineFrame === void 0 || arrowFrame === void 0) return [];
+    if (lineScale === void 0 || arrowScale === void 0) return [];
+    const angle = cardinalDirection(entity.direction ?? 0) * 22.5;
+    const radians = angle * Math.PI / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const round42 = (n) => Math.round(n * 1e4) / 1e4;
+    const rotate = ([x, y]) => [
+      round42(x * cos - y * sin),
+      round42(x * sin + y * cos)
+    ];
+    const markerOffset = ([x, y]) => {
+      const tile = [Math.round(x), Math.round(y)];
+      const length = Math.hypot(tile[0], tile[1]);
+      if (length === 0) return [x, y];
+      const keep = (length - INSERTER_MARKER_INSET) / length;
+      return [tile[0] * keep, tile[1] * keep];
+    };
+    const heading = ([x, y]) => (Math.round(Math.atan2(x, -y) * 180 / Math.PI) % 360 + 360) % 360;
+    const markers = [
+      { vector: rotate(pickup), frame: lineFrame, scale: lineScale, sub: 113 },
+      { vector: rotate(drop), frame: arrowFrame, scale: arrowScale, sub: 114 }
+    ];
+    return markers.map(({ vector, frame, scale, sub }) => {
+      const offset = markerOffset(vector);
+      return {
+        kind: "icon",
+        layer: RENDER_LAYERS["entity-info-icon-above"],
+        sortY: 0,
+        sortX: 0,
+        entity: entity.entity_number,
+        sub,
+        frame,
+        x: round42(entity.position.x + offset[0]),
+        y: round42(entity.position.y + offset[1]),
+        // Same footprint as the combinator flow arrows.
+        size: scale * 1.5,
+        rotation: heading(offset)
+      };
+    });
+  }
   function skipsFluidIndication(def) {
     return def.kind === "pipe" || def.protoType === "pipe-to-ground" || def.protoType === "storage-tank";
   }
@@ -956,6 +1006,7 @@ var FBPlanner = (() => {
     }
     commands.push(...splitterPriorityCommands(entity, def, db, 100));
     commands.push(...combinatorFlowCommands(entity, def, db));
+    commands.push(...inserterIndicationCommands(entity, def, db));
     commands.push(...fluidPortIndicationCommands(entity, def, db, 120));
     const emptyFilter = emptyInserterFilterCommand(entity, def, db);
     if (emptyFilter) commands.push(emptyFilter);

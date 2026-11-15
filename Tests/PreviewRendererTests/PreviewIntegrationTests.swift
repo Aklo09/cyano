@@ -42,7 +42,7 @@ struct SyntheticPreviewAssets {
             ],
         ]
         let database = try previewJSON([
-            "schema": 2, "gameVersion": "2.1.23", "mods": mods, "assetDensity": 2,
+            "schema": 2, "gameVersion": "2.1.24", "mods": mods, "assetDensity": 2,
             "atlases": [["file": "atlas.png", "width": 32, "height": 32]], "frames": [frame],
             "entities": ["wooden-chest": entity],
             "tiles": [:], "icons": [:], "fluidRecipes": [:], "iconScales": [:],
@@ -54,12 +54,12 @@ struct SyntheticPreviewAssets {
         atlas["w"] = 32
         atlas["h"] = 32
         let manifest = try previewJSON([
-            "schema": 2, "gameVersion": "2.1.23", "mods": mods,
+            "schema": 2, "gameVersion": "2.1.24", "mods": mods,
             "tiers": ["2x": ["density": 2, "renderDb": descriptor("render-db.json", database), "atlases": [atlas]]],
             "fonts": [],
         ])
         let map = try previewJSON([
-            "schema": 1, "gameVersion": "2.1.23", "mods": Dictionary(uniqueKeysWithValues: mods.map { ($0, "2.1.23") }),
+            "schema": 1, "gameVersion": "2.1.24", "mods": Dictionary(uniqueKeysWithValues: mods.map { ($0, "2.1.24") }),
         ])
         let members = [
             "sprites/manifest.json": manifest, "sprites/render-db.json": database, "sprites/atlas.png": png as Data,
@@ -69,7 +69,7 @@ struct SyntheticPreviewAssets {
             ["path": $0, "bytes": members[$0]!.count, "sha256": OriginalSource(bytes: members[$0]!).sha256]
                 as [String: Any]
         }
-        let profile: [String: Any] = ["gameVersion": "2.1.23", "mods": mods.map { ["name": $0, "version": "2.1.23"] }]
+        let profile: [String: Any] = ["gameVersion": "2.1.24", "mods": mods.map { ["name": $0, "version": "2.1.24"] }]
         let identity: [String: Any] = [
             "schema": 1, "profile": profile, "provenance": ["source": "synthetic-native-test"], "files": files,
         ]

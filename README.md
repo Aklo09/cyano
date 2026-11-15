@@ -15,7 +15,7 @@ The macOS app scaffold builds and launches offline; its interface is being built
 - **Native development:** Xcode 27.2, Swift 6.4.2, macOS 27.2, Apple Silicon are validated.
 - **Command shortcuts:** just 1.54.0 is validated.
 - **Development tooling:** Node 24.22.1 and npm 12.2.1 are validated.
-- **Private artwork:** prepared assets require your licensed Factorio 2.1.23 installation.
+- **Private artwork:** prepared assets require your licensed Factorio 2.1.24 installation.
 
 The package currently targets macOS 27.0 or later using Swift tools 6.4.
 Older systems and Intel Macs have not been qualified.

@@ -92,9 +92,9 @@ manifest = read_json(manifest_path, 4 * 1024**2)
 prototype = read_json(prototype_map, 16 * 1024**2)
 mods = ['base', 'elevated-rails', 'quality', 'recycler', 'space-age']
 require(manifest.get('schema') == 2 and prototype.get('schema') == 1, 'Unsupported asset schemas')
-require(manifest.get('gameVersion') == prototype.get('gameVersion') == '2.1.23', 'Unsupported game version')
+require(manifest.get('gameVersion') == prototype.get('gameVersion') == '2.1.24', 'Unsupported game version')
 require(sorted(manifest['mods']) == mods and sorted(prototype['mods']) == mods, 'Unsupported mod profile')
-require(all(prototype['mods'][mod] == '2.1.23' for mod in mods), 'Unsupported mod version')
+require(all(prototype['mods'][mod] == '2.1.24' for mod in mods), 'Unsupported mod version')
 
 # Exclusive directory creation claims this build target. Failures leave partial evidence for inspection.
 destination.mkdir(mode=0o700)
@@ -119,7 +119,7 @@ for source, relative in sorted(members, key=lambda entry: entry[1]):
     copied_bytes += count
     files.append(dict(path=relative, bytes=count, sha256=digest.hexdigest()))
 
-profile = dict(gameVersion='2.1.23', mods=[dict(name=mod, version=prototype['mods'][mod]) for mod in manifest['mods']])
+profile = dict(gameVersion='2.1.24', mods=[dict(name=mod, version=prototype['mods'][mod]) for mod in manifest['mods']])
 inventory = {file['path']: file for file in files}
 provenance = dict(assembly='fb-asset-release-schema-1', source='existing-private-exports',
     spriteManifestSha256=inventory['sprites/manifest.json']['sha256'],

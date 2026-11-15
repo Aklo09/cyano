@@ -91,6 +91,29 @@ Private images/reports are in ignored `.cache/renderer-review/`.
 The guide runs also produced `.cache/preview-rs.png`, `.cache/preview-large.png`, and `.cache/preview-elevated.png`.
 They are review artifacts, not distributable artwork or committed fixtures.
 
+## Inserter indications (2026-11-15)
+
+Previews lacked the yellow pickup and drop markers that alt mode shows for inserters. The vendored pipeline now
+exports each inserter's `pickup_position`/`insert_position` and the `utility/indication-line` sprite, and the
+planner's alt mode draws them (`inserterIndicationCommands` in `alt-mode.ts`). The assets were regenerated from
+Factorio 2.1.24, the first full regeneration in this port; the asset profile moved from 2.1.23 to 2.1.24.
+
+| Check | Result |
+|---|---|
+| Render databases, 2.1.24 vs copied 2.1.23 | Same 143 entities, 23 tiles, 5 terrain backgrounds, 103 fluid recipes; icons 1394 → 1395 (`utility/indication-line`) |
+| Prototype map, 2.1.24 vs 2.1.23 | Same 146 entities, 342 items, 23 tiles, 6 qualities, 17 equipment items; only versions differ |
+| Game statistics reference | 347 of 348 cases pass; the known modded `ee-infinity-loader` leaf fails as before |
+| Statistics golden | All 348 expected results identical apart from `gameVersion` |
+| `PlannerRuntimeTests` | Markers for the four directions and the long-handed inserter; none without the line sprite |
+| `2i_Assembler.txt` | Lines on pickup tiles, arrows pointing into the drop tiles, as in the owner's reference screenshot |
+| `v0.59.0.txt` leaf `1.1` | East- and west-facing inserters: vertical lines on the belts, arrows pointing into the machines |
+| `RS.txt` | Visually unchanged |
+
+Placement is calibrated on the owner's reference screenshot (84.96 px per tile): pickup lines sit 0.8 tiles and drop
+arrows about 0.75 tiles from the inserter. The preview puts each marker at its target tile's centre, 0.2 tiles toward
+the inserter, rather than at the raw prototype vectors (1 and 1.2 tiles), where facing drop arrows on a shared belt
+crossed. The long-handed inserter's 1.8 tiles extrapolates the same rule; the screenshot has none.
+
 ## Review and remaining work
 
 Manual review covered bounded codec/IR/image input, frame geometry, asset hash binding,

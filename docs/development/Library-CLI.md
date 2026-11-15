@@ -145,7 +145,7 @@ Scans stop after 100,000 entries, 64 directory levels, or five seconds; usage re
 
 `assets-verify <release-directory>` runs independently of library ownership.
 It requires `release.json`, the full `sprites/` inventory, and `statistics/prototype-map.json`.
-It verifies canonical release identity, hashes, sizes, supported 2.1.23 profiles, schemas, tiers, and declared packed frame bounds.
+It verifies canonical release identity, hashes, sizes, supported 2.1.24 profiles, schemas, tiers, and declared packed frame bounds.
 It accepts up to 10,000 files and 2 GiB, with bounded JSON reads.
 It does not decode images or validate rendering; a raw sprite directory alone is not an assembled release.
 

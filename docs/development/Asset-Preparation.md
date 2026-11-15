@@ -42,14 +42,18 @@ It neither launches the game nor regenerates assets.
 
 ## Private inputs
 
-The existing prepared profile and prototype map were copied into:
+The current profile is Factorio 2.1.24, regenerated in this port (see [Regenerate](#regenerate)):
 
 ```text
 private-assets/
-  2.1.23/
-  statistics-reference/
+  2.1.24/                       sprites, moved from the builder's <output>/2.1.24
+  build-2.1.24/                 builder output: data-raw-dump.json, isolated game work directory
+  statistics-reference/         game reference run: reference.json, cases.json, report.json
     prototype-map.json
 ```
+
+The earlier copied 2.1.23 inputs remain as `private-assets/2.1.23/` and `private-assets/statistics-reference-2.1.23/`
+for comparison; the tools no longer accept them.
 
 These files are ignored by Git and excluded from native package resources.
 Native build and planner-loading checks do not require them.
@@ -73,19 +77,27 @@ which records each case's standalone blueprint string, its expected result, the 
 reference calculator and prototype map. Identical inputs produce identical bytes. The file is derived from the
 private map, so it stays in the ignored `.cache/` directory.
 
-## Regeneration status
+## Regenerate
 
-The asset builder now uses the vendored pipeline and project-local Node dependencies.
-Its help describes the required Factorio installation and new private output directory:
+The asset builder uses the vendored pipeline and project-local Node dependencies.
+Both steps need Factorio 2.1.24, stage an isolated game configuration and mods beneath a new private output,
+and never use the normal game profile:
 
 ```sh
-node tools/asset-preparation/build-assets.mjs --help
+factorio="$HOME/Library/Application Support/Steam/steamapps/common/Factorio/factorio.app/Contents"
+node tools/asset-preparation/build-assets.mjs --factorio "$factorio" --output private-assets/build-2.1.24
+mv private-assets/build-2.1.24/2.1.24 private-assets/2.1.24
+node tools/asset-preparation/game-statistics-reference.mjs --factorio "$factorio" --output private-assets/statistics-reference-new
+node tools/asset-preparation/evaluate-statistics.mjs --reference private-assets/statistics-reference-new --report private-assets/statistics-reference-new/report.json
 ```
 
-Asset generation requires Factorio 2.1.23 and refuses an existing output directory.
-It stages isolated game configuration and mods beneath the selected private output.
-The normal game profile is not used.
+Then move the previous `statistics-reference/` aside and rename `statistics-reference-new/` to it, the path the
+assembly and statistics tools read. The builder refuses an existing output directory. It dumps prototype data, then distills and packs both tiers.
+The game reference imports all 348 statistics cases in game; `evaluate-statistics.mjs` writes
+`prototype-map.json` and exits 1 for the one expected failure, the modded `ee-infinity-loader` leaf of `v0.59.0.txt`.
+Then assemble a release ([preview guide](Preview.md#prepare-a-private-release)) and run `just statistics-golden`.
 
-Full asset regeneration and game-reference generation have not been exercised in this port.
-Their copied outputs remain useful inputs, without qualifying a new exporter run.
-The initial foundation does not replace Node-based preparation with native tools.
+First run (2026-11-15, Factorio 2.1.24): 143 entities, 23 tiles, 1395 icons, 6809 frames per tier. Compared with the
+copied 2.1.23 assets, the render databases gained only `utility/indication-line` and the inserter
+`pickupPosition`/`insertPosition` data; the prototype map and every statistics golden result were identical apart
+from the game version.

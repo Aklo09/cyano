@@ -30,7 +30,7 @@ The map is read only after the release verifies, and only if its bytes still mat
 It must have `schema` 1 and a game version. Parsing is strict: every field has a known type, unknown fields are
 refused, and every placement item and equipment item must resolve within the map, so a statistics warning
 always concerns the blueprint, never the map. A direction entry's key is the requested blueprint direction;
-its `direction` field is the engine-resolved direction (a chest resolves all 16 to 0). The initial release profile is Factorio 2.1.23 with
+its `direction` field is the engine-resolved direction (a chest resolves all 16 to 0). The release profile is Factorio 2.1.24 with
 base, space-age, elevated-rails, quality, and recycler: 146 entity prototypes, 342 items, 23 placeable tiles,
 and 6 qualities. The map holds engine-resolved placement choices, item types, equipment items,
 and per-direction collision geometry; renderer sprite bounds are never used.
@@ -66,9 +66,9 @@ repetition are excluded; image pixels and raw collision-box sizes are different 
   then translate it to the saved position. Saved positions are never snapped to game-normalized positions.
 - **Off-grid entities** (vehicles, robots, plants, land mines): use direction 0 geometry and keep fractional extents.
 - **Rotation:** geometry rotates by the entity's `orientation`, defaulting to `direction / 16`, only when the
-  prototype says orientation affects collision. In the 2.1.23 map that is true only for off-grid vehicles:
+  prototype says orientation affects collision. In the 2.1.24 map that is true only for off-grid vehicles:
   cars, tanks, locomotives, and wagons rotate; a spidertron's torso orientation does not rotate its square body.
-- **Secondary collision boxes** also contribute (in the 2.1.23 map, legacy curved rails);
+- **Secondary collision boxes** also contribute (in the 2.1.24 map, legacy curved rails);
   rail snapping sizes alone cannot enclose all rail geometry. A rail ramp measures 16 × 4 or 4 × 16 by direction.
 - **Tiles:** each tile covers `[x, y]` to `[x + 1, y + 1]`, even when its placement item is unknown.
 
@@ -122,7 +122,7 @@ Results are versioned JSON. Items are `{ "name", "quality", "count" }`, sorted b
 then of the quality.
 
 A root blueprint holding one wooden chest at (0.5, 0.5), as the reference calculator computes it
-with the 2.1.23 map, plus the native fields:
+with the 2.1.24 map, plus the native fields:
 
 ```json
 {
@@ -130,7 +130,7 @@ with the 2.1.23 map, plus the native fields:
   "applicable": true,
   "entryPath": [],
   "entryKind": "blueprint",
-  "gameVersion": "2.1.23",
+  "gameVersion": "2.1.24",
   "assetIdentity": "<64 lowercase hex>",
   "basis": "source-blueprint",
   "entities": 1,

@@ -97,7 +97,7 @@ gives previews and statistics the release or the reason there is none, and `prot
 release. `revision` increases whenever the active release changes.
 Choose an assembled release (a folder with `release.json`, `sprites/`, and `statistics/prototype-map.json`), such as
 `.cache/renderer-assets` from the [preview guide](Preview.md#prepare-a-private-release); the raw
-`private-assets/2.1.23` folder is refused. For everyday use, assemble a copy outside the repository's `.cache/`.
+`private-assets/2.1.24` folder is refused. For everyday use, assemble a copy outside the repository's `.cache/`.
 
 Rows show their kind symbol. Cached thumbnails (BRW-9) are not built yet: they need a cache-only lookup per row
 (`LibraryPreviewService.cached` now provides one) and a decision on decoding thumbnails from full-size PNGs; no row ever starts a render.
