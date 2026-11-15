@@ -110,5 +110,29 @@ See [validation and image coverage](../validation/Renderer.md) for measurements 
 
 This harness operates on standalone source files. The separate [library preview command](Library-Previews.md)
 implements saved-item ownership and derived caching.
-Visible-item scheduling, the macOS UI, and full-corpus visual approval remain pending.
+Full-corpus visual approval is milestone 4 work (below).
 Terrain/space backgrounds and coordinate overlays are not part of this painter checkpoint.
+
+## Qualify the corpus
+
+```sh
+just qualify-corpus
+just qualify-corpus --assets <release> --output <parent directory>
+```
+
+`tools/qualify-corpus.py` builds the release executables, imports the full supplied corpus (the nine fixtures in
+`Tests/LibraryCoreTests/Fixtures/Blueprints` and the vendored `tools/vendor/fpsr/fixtures/visual-tests`) into a
+scratch library, and renders every blueprint and planner leaf by stored indices with `fb-native preview`, one at a
+time. The release defaults to `.cache/renderer-assets` and must verify first. Each run gets its own directory,
+`.cache/qualification/<time>/`, holding:
+
+- `report.json`: per leaf, the outcome or error code, dimensions, render time, peak memory, warnings, command kinds,
+  and the number of rail entities, plus a summary;
+- `index.html`: the contact sheet. Open it in a browser; filter by failures, warnings, rails, or planners, or by text;
+  click a card for the viewer, which shows Fit, 100% (one image pixel per screen pixel), and 400% with pixelated
+  scaling for rail seams, and lists the leaf's warnings. Arrow keys step through leaves, Esc closes;
+- `images/` and `library/`: rendered PNGs and the scratch library with its cache.
+
+Everything stays in `.cache/` because the images are derived from private artwork. The script decodes the
+supplied strings only to enumerate leaves; the library imports and renders the exact bytes. It exits with status 1
+when any leaf fails. The plan's review steps are in [milestone 4](../planning/Milestone-4.md), decision 2.

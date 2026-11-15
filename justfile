@@ -65,6 +65,11 @@ renderer-test:
     sh tools/swift.sh test --filter 'PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'
     python3 tools/test-asset-release.py
 
+# Render every leaf of the supplied corpus (release build, private release); report and contact sheet in .cache/qualification/.
+qualify-corpus *args:
+    sh tools/swift.sh build -c release
+    python3 tools/qualify-corpus.py "$@"
+
 # Render a standalone source or selected book leaf using a verified private asset release.
 preview *args:
     sh tools/swift.sh run preview-probe "$@"

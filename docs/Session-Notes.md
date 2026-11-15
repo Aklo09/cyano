@@ -134,7 +134,11 @@ decision 10 (root entry icons in the derived source index, schema 2). R3 is done
 `0002-planet-icons.patch` exports planet icons as `space-location/<planet>`; `private-assets/2.1.24` was regenerated
 (the previous copy is kept as `private-assets/2.1.24-before-planets`) with the same profile, and renders are
 pixel-identical (see [validation](validation/Renderer.md#planet-icons-2026-11-15)). The owner's everyday release must
-be reassembled to get the icons; their script needs no version change. Next: R1 (corpus harness), then R4.
+be reassembled to get the icons; their script needs no version change. R1 is done (2026-11-15): `just qualify-corpus`
+(`tools/qualify-corpus.py`) renders the 239-leaf corpus into `.cache/qualification/<time>/` with `report.json` and an
+`index.html` contact sheet; the first run rendered every leaf with one known warning (see
+[validation](validation/Renderer.md#corpus-run-2026-11-15)). Next: the owner reviews the contact sheet (input to R2),
+then R4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

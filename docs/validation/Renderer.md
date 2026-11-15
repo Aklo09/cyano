@@ -132,6 +132,23 @@ verify; they lack only these icons.
 
 The prototype map does not depend on icons, so the statistics reference was not regenerated.
 
+## Corpus run (2026-11-15)
+
+Milestone 4, R1: the first full run of `just qualify-corpus` ([preview guide](../development/Preview.md#qualify-the-corpus))
+on the release build, with the R3 release (identity `006215dd…`). Images and the contact sheet stay in
+`.cache/qualification/`; this record holds counts only.
+
+| Measure | Result |
+|---|---|
+| Leaves | 239 of 239 rendered, 0 failed, 0 import failures: 226 blueprints, 12 upgrade planners, 1 deconstruction planner, from 13 files (198 from the nine fixtures, 41 from the vendored visual tests; `quality.bp.txt` is an empty book) |
+| Warnings | 1 leaf: `Unsupported entity: ee-infinity-loader (8)` in `v0.59.0.txt`, the known modded entity |
+| Render time (`durationMs`) | Median 1.8 s, minimum 0.6 s, maximum 5.0 s (`v0.59.0.txt` `29.2`); planners about 1.5 s; whole run 7 minutes |
+| Peak resident memory | Median 179 MiB, maximum 362 MiB |
+| Scale | 191 leaves at 32 pixels per tile; 48 reduced by the 2048-pixel limit, down to 8.4 pixels per tile |
+| Rails | 11 leaves: `bp.txt` `1.0`, `1.1`, `1.6`, `1.7`, `1.12`; `v0.59.0.txt` `7.2`, `29.2`; `book.bp.txt` `0.4.0`, `0.4.2`, `4.7`; `elevated-rails.bp.txt` `0`. All are at 32 pixels per tile except `bp.txt` `1.12` (26.3), `elevated-rails.bp.txt` `0` (17.5), and `v0.59.0.txt` `29.2` (11.3, 740 rails), where seams are judged at reduced scale |
+
+The owner's visual review of the contact sheet and the rail-seam crops is pending; its findings feed R2.
+
 ## Review and remaining work
 
 Manual review covered bounded codec/IR/image input, frame geometry, asset hash binding,
