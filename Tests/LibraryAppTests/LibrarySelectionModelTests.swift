@@ -26,7 +26,7 @@ private struct Fixture {
     }
 
     func cleanup() {
-        defaults.removePersistentDomain(forName: suite)
+        removeTestPreferences(suite)
         try? FileManager.default.removeItem(at: parent)
     }
 }
@@ -294,6 +294,6 @@ struct LibrarySelectionModelTests {
         chosen.set("marker", forKey: "probe")
         #expect(fixture.defaults.string(forKey: "probe") == nil)
         #expect(UserDefaults(suiteName: isolated)?.string(forKey: "probe") == "marker")
-        UserDefaults(suiteName: isolated)?.removePersistentDomain(forName: isolated)
+        removeTestPreferences(isolated)
     }
 }

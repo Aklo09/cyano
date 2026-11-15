@@ -330,3 +330,27 @@ the confirmation).
 
 Observed, not fixed: the LIFE-2 failure above, which looks load-related (no change here touches preview rendering);
 for A17 to watch in repeated full runs.
+
+## Tests and smoke runs (2026-11-15)
+
+Milestone 3 subtask A17. The owner allowed the scripted runs on their Mac (hands off; clipboard saved and restored).
+
+| Check | Result |
+| --- | --- |
+| Session tests in `just test` | Every app suite in `just app-test` is in `just test` (session, messages, selection, browsing, books, import, export, comments, organization, settings, previews, statistics, lifecycle). 15 full runs on 2026-11-15 |
+| PRV-11, failed twice in full runs | **Fixed (test race):** the test finished the fake render as soon as the viewer showed "rendering", which happens when the job is scheduled; the fake backend's `finish` only reaches a render that has registered, so under load the signal was lost and the render never ended. It now waits for the render to start, as every other test there does. `until` now reports the calling line (that is how the second failure pointed at the wait after `finish`). Three full runs after the fix passed |
+| LIFE-2, failed once in a full run | Not reproduced in 14 other full runs. Its worker is a real process, so this race does not apply; its failure message now includes the viewer state and whether a render is running |
+| Test preference files | **Fixed:** test cleanups called `removePersistentDomain`, which empties a domain while the preferences daemon writes the empty file back, so 848 `local.fb.library.tests-*.plist` files had built up in `~/Library/Preferences`. `removeTestPreferences` also runs `defaults delete` and removes the file; after `just app-test` and full runs none remain. The leftovers, and 18 from earlier manual runs, were removed with the owner's approval; the app's own `local.fb.library.plist` was kept |
+| `just app-smoke --assets .cache/renderer-assets --deny-path ../fb` (`.cache/smoke/20261115-103807`) | 13 of 13 pass: first launch offline shows selection and quits; relaunch reopens the library; Space opens a preview window; three uncached previews peaked at one worker; renaming retitles the open window; replacing keeps it open with a new image (the old original went to the run's `trash/`); clearing the release shows "No asset release is configured" in the window; closing the library closes the windows and shows selection; after quit no worker, owner idle. 11 captures |
+| `just app-smoke --deny-path ../fb` (no assets, `.cache/smoke/20261115-104046`) | 11 pass, 2 skipped (worker and release checks) |
+| Independence check | The app launch moved to the smoke run; see below |
+
+Deferred real-app checks from A12 now covered by the smoke run: Space in the list, windows closing with the library,
+rename and replace with a window open, a release change, and one worker at most under real renders.
+
+Fixed in the tool during the runs (no app changes): the window-server list includes hidden windows (a closed library
+window stays listed, still showing "Loading library…"), so visible titles come from the accessibility API and
+captures prefer on-screen windows; System Events cannot find the Settings Clear button (it reports the label as
+empty), so buttons are pressed through the native accessibility API.
+
+

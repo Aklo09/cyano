@@ -2,6 +2,22 @@ import FactorioData
 import Foundation
 import LibraryCore
 
+/// Removes a test preferences domain and its file. `removePersistentDomain` only empties the domain, and the
+/// preferences daemon later writes the empty `~/Library/Preferences/<suite>.plist` back, so every test run used to
+/// leave files there; `defaults delete` removes the domain through the daemon.
+func removeTestPreferences(_ suite: String) {
+    UserDefaults().removePersistentDomain(forName: suite)
+    let delete = Process()
+    delete.executableURL = URL(fileURLWithPath: "/usr/bin/defaults")
+    delete.arguments = ["delete", suite]
+    delete.standardOutput = FileHandle.nullDevice
+    delete.standardError = FileHandle.nullDevice
+    if (try? delete.run()) != nil { delete.waitUntilExit() }
+    let file = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Library/Preferences/\(suite).plist")
+    try? FileManager.default.removeItem(at: file)
+}
+
 /// A minimal asset release that passes `AssetRelease.verify` and loads a one-entity prototype map
 /// (adapted from `FactorioDataTests/AssetReleaseTests.swift` and `PrototypeMapTests.swift`; no private assets).
 struct AppTestAssetRelease {

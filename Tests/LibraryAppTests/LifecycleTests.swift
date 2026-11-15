@@ -100,13 +100,15 @@ private final class LifecycleFixture {
         model.previews.show(
             PreviewSubject(libraryPath: url.path, itemId: itemId, entryPath: []), in: viewer)
         for _ in 0..<3000 where worker.pid == nil { try await Task.sleep(for: .milliseconds(10)) }
-        let pid = try #require(worker.pid, "the render never started a worker")
+        let pid = try #require(
+            worker.pid,
+            "the render never started a worker; viewer \(viewer.state), rendering \(model.previews.isRendering)")
         #expect(BlockingWorker.isAlive(pid) && viewer.state == .rendering && model.previews.isRendering)
         return (model, viewer, pid)
     }
 
     func cleanup() {
-        defaults.removePersistentDomain(forName: suite)
+        removeTestPreferences(suite)
         try? FileManager.default.removeItem(at: parent)
     }
 }

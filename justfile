@@ -36,6 +36,10 @@ app-build configuration="Debug":
 app-run: app-build
     open -n ".cache/xcode/Build/Products/Debug/Factorio Blueprint Library.app"
 
+# Scripted smoke run of the Debug app on a scratch library; drives the keyboard (hands off). Captures in .cache/smoke/.
+app-smoke *args: build app-build
+    python3 tools/smoke-app.py "$@"
+
 # Exercise the app's library session layer and user-facing messages.
 app-test:
     sh tools/swift.sh test --filter 'LibrarySessionTests|LibraryMessageTests|LibrarySelectionModelTests|LibraryBrowserModelTests|LibraryBookTests|ImportModelTests|ExportActionsTests|LibraryCommentsTests|OrganizeActionsTests|AssetSettingsTests|PreviewCenterTests|PreviewViewportTests|StatisticsModelTests|StatisticsParityAppTests|LifecycleTests'

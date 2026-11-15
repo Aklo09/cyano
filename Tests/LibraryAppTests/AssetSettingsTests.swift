@@ -19,7 +19,7 @@ private struct SettingsFixture {
     }
 
     func cleanup() {
-        defaults.removePersistentDomain(forName: suite)
+        removeTestPreferences(suite)
         try? FileManager.default.removeItem(at: parent)
     }
 }

@@ -70,9 +70,9 @@ render between the inspector and windows, and cancels a render only when no view
 [app guide](development/App.md#previews)). Verified with `just lint`, `just test`, `just app-build`, the independence
 check, and a smoke run of a relocated app copy with the build's `PackageFrameworks` moved aside (a real uncached
 render in the inspector, nothing to draw, a planner window from ⌘Y with View-menu zoom, and after quit no worker and an
-idle owner; see [validation](validation/App.md#previews-2026-11-14)). Not yet exercised in the real app, for A17: Space
-in the list, windows closing with the library, rename or replace with a window open, a release change, and one worker
-at most under real renders (covered by tests with a fake backend). A13 is done: the Statistics tab shows counts,
+idle owner; see [validation](validation/App.md#previews-2026-11-14)). The real-app checks deferred from A12 (Space in
+the list, windows closing with the library, rename or replace with a window open, a release change, one worker at
+most) are in the A17 smoke run. A13 is done: the Statistics tab shows counts,
 footprint, item groups, and worded warnings from `StatisticsModel`/`StatisticsPresentation`; STA-2 parity with
 `fb-native statistics` for the seven approved blueprints is a test that needs the private release (see the
 [app guide](development/App.md#statistics)). In short windows the inspector now caps its header and preview so the
@@ -92,7 +92,13 @@ focus in the list, the comment field no longer traps Shift-Tab and Escape return
 column headers a keyboard path, unlabeled comments and sheet controls, two `.secondary` texts below 4.5:1, and the
 Window menu listing the app twice (see the [app guide](development/App.md#accessibility) and
 [validation](validation/App.md#accessibility-2026-11-15)). One full `just test` run failed LIFE-2 once (its worker never
-started within 30 s); alone and in a second full run it passed: A17 should watch it. Next: A17 (tests and smoke runs).
+started within 30 s); alone and in a second full run it passed. A17 is done (2026-11-15): `just app-smoke` runs a
+scripted smoke run of a scratch app copy offline on a scratch library (launch, reopen, preview windows, at most one
+worker, rename and replace with a window open, release change, close and quit), with captures and a report in
+`.cache/smoke/`; the independence check no longer launches the app (see the [app guide](development/App.md#smoke-run)
+and [validation](validation/App.md#tests-and-smoke-runs-2026-11-15)). PRV-11's intermittent failure was a test race (it
+finished a fake render before it had started) and is fixed; LIFE-2 failed once in 15 full runs and now reports the
+viewer state. Test cleanups no longer leave `local.fb.library.tests-*.plist` files in `~/Library/Preferences`. Next: A18 (docs and acceptance).
 Cached row thumbnails (BRW-9) remain unbuilt.
 Alt-mode previews now mark each inserter's pickup (yellow line) and drop (yellow arrow) (2026-11-15). This needed
 new render-database fields, so the private assets were regenerated from Factorio 2.1.24 and the supported asset

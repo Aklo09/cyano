@@ -93,7 +93,7 @@ private final class StatisticsFixture {
     }
 
     func cleanup() {
-        UserDefaults().removePersistentDomain(forName: suite)
+        removeTestPreferences(suite)
         try? FileManager.default.removeItem(at: parent)
     }
 }
@@ -295,7 +295,7 @@ struct StatisticsParityAppTests {
         let expected = try outputs.map(cliResult)
 
         let suite = "local.fb.library.tests-\(UUID().uuidString)"
-        defer { UserDefaults().removePersistentDomain(forName: suite) }
+        defer { removeTestPreferences(suite) }
         let assets = AssetSettings(defaults: try #require(UserDefaults(suiteName: suite)))
         await assets.choose(privateRelease, library: url)
         let session = LibrarySession()

@@ -27,6 +27,7 @@ just library <args>        # run the fb-native CLI (just library --help)
 just preview <args>        # run preview-probe; real images need verified private assets
 just app-build [Release]   # build the macOS app via tools/xcode.sh (derived data in .cache/xcode)
 just app-run               # build the Debug app and open it
+just app-smoke [--assets .cache/renderer-assets]   # scripted smoke run on a scratch library; takes the keyboard (hands off)
 just app-test              # app model suites: session, messages, selection, browsing, books, import, export, comments, organization, settings, previews, statistics, lifecycle (also in just test)
 ```
 

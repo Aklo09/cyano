@@ -120,17 +120,20 @@ private final class PreviewFixture {
     }
 
     func cleanup() {
-        UserDefaults().removePersistentDomain(forName: suite)
+        removeTestPreferences(suite)
         try? FileManager.default.removeItem(at: parent)
     }
 }
 
 /// Waits up to 30 s for asynchronous scheduling to reach `condition`; library writes force data to disk and can take
 /// seconds while other test targets run alongside.
+/// A failure is reported at the caller's line, so it says which wait timed out.
 @MainActor
-private func until(_ condition: @MainActor () -> Bool) async {
+private func until(
+    _ condition: @MainActor () -> Bool, sourceLocation: SourceLocation = #_sourceLocation
+) async {
     for _ in 0..<3000 where !condition() { try? await Task.sleep(for: .milliseconds(10)) }
-    #expect(condition())
+    #expect(condition(), "still not reached after 30 s", sourceLocation: sourceLocation)
 }
 
 private func isReady(_ state: PreviewState) -> Bool {
@@ -221,7 +224,8 @@ struct PreviewCenterTests {
         fixture.center.show(fixture.subject("Book", [7]), in: viewer)
         await until { viewer.state == .deleted(entry: true) }
         fixture.center.show(fixture.subject("Book", [3]), in: viewer)
-        await until { viewer.state == .rendering }
+        // The viewer shows "rendering" when the job is scheduled; `finish` only reaches a render that has started.
+        await until { viewer.state == .rendering && fixture.renders.started == [fixture.ids["Book"]!] }
         fixture.renders.finish(fixture.ids["Book"]!)
         await until { isReady(viewer.state) }
 

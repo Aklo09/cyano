@@ -267,16 +267,41 @@ Developer ID signing and notarization belong to distribution, which is outside v
 Ordinary UI subtasks are verified with `just lint`, `just test`, and `just app-build`. The independence check runs
 when a change touches dependencies or resources (`Package.swift`, new packages, files read from outside the
 repository), build tooling (`tools/swift.sh`, `tools/xcode.sh`, the Xcode project), what goes into the bundle, or
-network access, and at milestone acceptance (owner decision, 2026-11-14). The app launch it performs moves to the
-scripted smoke runs of A17.
+network access, and at milestone acceptance (owner decision, 2026-11-14). Launching the app is the smoke run's job
+(below), run for changes to windows, menus, or previews and at acceptance.
 
 ## Independence
 
-`python3 tools/check-independence.py --deny-path ../fb` copies `App/` and both wrappers into a relocated tree,
-builds the Debug app there with the original checkout and the given paths unreadable and networking denied, then
-launches it with a scratch preferences domain and requires a window within 10 seconds. It counts windows on any
-Space: a directly launched app is not activated, so its window may open on another Space. The launch denies IP networking only: a blanket
-`deny network*` also blocks the local connections a GUI app needs, and the app then shows no window.
+`python3 tools/check-independence.py --deny-path ../fb` copies `App/` and both wrappers into a relocated tree and
+builds the Debug app there with the original checkout and the given paths unreadable and networking denied. It no
+longer launches the app (A17 moved that to the smoke run).
+
+## Smoke run
+
+```sh
+just app-smoke --assets .cache/renderer-assets --deny-path ../fb
+```
+
+`tools/smoke-app.py` (after `just build` and `just app-build`, which the recipe runs) copies the Debug app into a new
+`.cache/smoke/<time>/`, makes a scratch library there from committed fixtures with the CLI, and launches the copy under
+`sandbox-exec` with IP networking denied (a blanket `deny network*` also blocks the local connections a GUI app needs),
+the given paths unreadable, a fresh `-FBNativeDefaultsSuite`, and `FB_NATIVE_TRASH_DIRECTORY` pointing into the run,
+so replaced originals never reach the owner's Trash. It drives the app with System Events keystrokes and menu clicks,
+saves window captures (`NN-<screen>.png`), `report.md`, and `results.json` there, and exits 1 if a check fails.
+Without `--assets` the worker and release-change checks are skipped.
+
+Checks: the first launch shows library selection (the window check the independence check used to make, counting
+windows on any Space because a directly launched app is not activated) and quits cleanly; the relaunch reopens the
+library; Space opens a preview window; three uncached previews run with at most one worker (`pgrep`, sampled every
+50 ms); renaming and replacing the item reach its open window (title, new image); clearing the release in Settings
+reaches the window; closing the library closes its windows and shows selection; after quit no worker remains and
+`fb-native owner` reports the library idle.
+
+It takes the keyboard and brings the app forward for a few minutes: the owner keeps hands off, and the terminal
+needs Accessibility and Screen Recording access. The clipboard text is saved and restored. A small native helper,
+compiled into the run directory, reads windows: the window-server list for the launch and captures (it also lists
+hidden windows, so captures prefer on-screen ones), and the accessibility API for visible titles, button presses, and
+static text (System Events reports some SwiftUI button labels as empty).
 
 ## Pending work
 
