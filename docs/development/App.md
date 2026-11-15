@@ -201,7 +201,7 @@ release, off the main thread, like the prototype map, and drops it when the rele
   `BrowserRow.icons` and `EntryDetail.icons`. `LibraryWindowView` loads the catalog whenever
   `AssetSettings.revision` changes and passes it down as the `iconCatalog` environment value. `EntryIconStrip`
   draws a row's kind symbol in the same square as an icon, then the icons (24 points at the default text size, `ItemList.rowIconSize`; every name
-  cell is that tall plus 6 points, so rows keep one height) with quality badges at
+  cell is that tall plus 12 points, the height of a name line holding an icon, so rows keep one height) with quality badges at
   half size in the bottom-left corner, leaving out icons the release lacks; `EntryIconTile` draws the inspector's
   64-point tile in the game's layout (`EntryIconLayout.frames`) or the kind symbol. Row VoiceOver labels end with
   "icons: …" (`EntryIconLayout.spokenNames`).

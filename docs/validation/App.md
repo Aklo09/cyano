@@ -397,3 +397,11 @@ the inspector title, lowered to stay within the line; the acceptance runs (R11) 
 inspector header's 48-point icon tile makes the header a little taller, so with the default window height its last
 line (Folder) scrolls under the preview, as the header's height cap (milestone 3) intends.
 
+Follow-up (owner, 2026-11-15): icons in rows were too small, the kind symbol then looked too small beside them, and
+the inspector header hid its last lines. Row icons are now 24 points with the kind symbol in the same square, tag
+icons 20 points in the sidebar and path bar, the inspector tile 64 points with 28-point title icons, and the header may
+use up to 45% of the inspector's height. A real-app check (accessibility actions and window captures only) showed one
+row height, the kind symbols matching the icons, and the whole header (Updated, Created, Size, Folder) for the RS latch
+and `bp.txt` entry 6. Rows with tag icons in their names were still 3 to 4 points taller; the minimum row height is now
+the icon size plus 12 points, to be confirmed in the acceptance runs.
+

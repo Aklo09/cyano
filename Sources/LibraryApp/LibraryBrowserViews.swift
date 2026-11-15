@@ -118,7 +118,8 @@ struct ItemList: View {
     @Bindable var browser: LibraryBrowserModel
     @Environment(\.openWindow) private var openWindow
     @Environment(\.iconCatalog) private var iconCatalog
-    /// Entry and tag icons in rows; every name cell is at least this tall plus a margin, with icons or without.
+    /// Entry and tag icons in rows. Every name cell is at least this tall plus 12 points, the height of a name line
+    /// holding a centred icon, so rows keep one height with icons or without.
     @ScaledMetric(relativeTo: .body) private var rowIconSize: CGFloat = 24
     @State private var sortOrder = [KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard)]
     @FocusState private var listFocused: Bool
@@ -236,7 +237,7 @@ struct ItemList: View {
                     EntryIconStrip(kind: row.kind, icons: row.icons, size: rowIconSize)
                     RichNameText(name: row.name, pointSize: rowIconSize)
                 }
-                .frame(minHeight: rowIconSize + 6)
+                .frame(minHeight: rowIconSize + 12)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(
                     Self.withIcons(
@@ -280,7 +281,7 @@ struct ItemList: View {
                         EntryIconStrip(kind: row.kind, icons: row.icons, size: rowIconSize)
                         RichNameText(name: row.name, pointSize: rowIconSize)
                     }
-                    .frame(minHeight: rowIconSize + 6)
+                    .frame(minHeight: rowIconSize + 12)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(accessibilityLabel(row))
                 }
