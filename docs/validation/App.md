@@ -385,7 +385,7 @@ change). The four new checks:
 | Check | With assets | Without assets |
 |---|---|---|
 | Rows name their entry icons (ICN-1) | Pass: "icons: signal R; signal S" | Pass |
-| A tagged root label stays the item name (ICN-5, ICN-6, ICN-8) | Pass: read as "legendary (2026-06)" | Pass: read as "[quality=legendary](2026-06)" |
+| A tagged root label stays the item name (ICN-5, ICN-6, ICN-8) | Pass: read as `legendary (2026-06)` | Pass: read as `[quality=legendary](2026-06)` |
 | Warnings count and list (WRN-1, WRN-2) | Pass: "1 warning"; popover lists "1 × Unsupported entity: ee-infinity-loader (8)" | Skipped |
 | Copy Image gives the cached PNG (IMG-1) | Pass: 2,290,116 bytes, equal to the cache file | Skipped |
 
