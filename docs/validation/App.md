@@ -245,3 +245,88 @@ allow 30 s and return as soon as the condition holds.
 
 Observed, not fixed: with no library open, the Window menu lists "Factorio Blueprint Library" twice (the selection
 window and a second, untitled-looking entry); for A16/A17.
+
+## Accessibility (2026-11-15)
+
+Milestone 3 subtask A16. The owner allowed scripted keystrokes and clicks on a scratch copy of the Debug app (scratch
+library with folders, a book, an unpacked planner book, and a comment; separate preferences; the private 2.1.24
+release), and switching Increase Contrast for the run. Full Keyboard Access was already on and stayed on. The
+clipboard text was saved and restored. VoiceOver itself was not run (owner's choice): rows marked "AX tree" were read
+through the native accessibility API (`AXUIElementCopyAttributeValue`), which is what VoiceOver reads, and
+announcements through an `AXObserver` on `AXAnnouncementRequested`. Contrast was measured on window captures
+(`screencapture -l`) from glyph-core pixels (98th percentile of per-pixel contrast) against each region's dominant
+background; dark mode is the system setting, light mode a scratch-copy `NSRequiresAquaSystemAppearance`.
+
+### Keyboard walkthrough (screen specs, "Accessibility")
+
+| Step | How verified | Result |
+| --- | --- | --- |
+| Open a library (first launch, no recents) | Keystrokes + AX focus | Selection window labelled; focus starts on a button; Window menu lists it once |
+| Find an item with ⌘F | Keystrokes + AX focus | Focus in the search field; typing filters; Tab moves into the results |
+| Open a folder or book with ⌘↓ | Keystrokes + AX focus + capture | **Fixed:** focus fell to the window when the book's table replaced the item list, and a folder opened in place lost its selection. Now the list keeps focus with its first row selected; ⌘↑ returns to the item list |
+| Copy an entry with ⌘C | Keystrokes + clipboard | 7,813-byte entry string copied; "Copied blueprint string" announced (twice while a view also posted it; that duplicate was removed and not re-observed). Rechecked after the Window-menu change: 919-byte item string copied |
+| Add a comment with ⌥⌘K and ⌘↩ | Keystrokes + AX + capture | Focus in "New comment"; ⌘↩ adds it. **Fixed:** Shift-Tab never left the field and Escape left focus nowhere; Tab and Shift-Tab now move focus and Escape returns to the list |
+| Preview window with Space; zoom with ⌘+ and ⌘9 | Keystrokes + AX | Window opens with the image focused; ⌘+ 88→110→137%, ⌘− 110%, ⌘0 100%, ⌘9 fit 88%; ⌘W returns focus to the entries list |
+| Import from the clipboard with ⇧⌘V and ⌘↩ | Keystrokes + AX focus + capture | Sheet opens with focus in "Blueprint string"; ⌘↩ imports, selects the new item, focus in the item list |
+| Tab order, main window | Keystrokes + AX focus + captures | Sidebar → Hide Sidebar → Import → search → item list, every stop with a visible focus ring or selection. **Fixed (A7 finding):** focus did reach the list but showed nothing; entering it with no shown row selected now selects the first row. A selection hidden by the search counts as none. Repeated: 30 of 30 ⌘F-search-Tab cycles across three launches and 3 of 3 first Tabs after launch selected the shown row (an earlier guard on `.keyDown` missed about one in ten, see the app guide) |
+| Sheets return focus | Keystrokes + AX focus | Move To (⌃⌘M), Import (⇧⌘I), and Replace Source: Escape returns focus to where it was |
+| Delete a comment | Keystrokes + AX | Delete in the comments list opens the confirmation with Cancel as default; Tab, Space confirms. Deleting the last comment removes the list and focus falls back to the window (observed, not changed) |
+| Stale focus restore | Keystrokes + AX focus | After ⌘↓ into a folder, a search that empties and refills the list keeps focus in the search field |
+| Mouse-only gestures (GEN-5) | Menus + code | Drag move → Move To… (⌃⌘M); drop import → Import… (⇧⌘I); pan → arrow keys in the preview; comment delete → Delete in the comments list; **added:** View ▸ Sort By for the column headers, with the header indicator following it |
+
+### VoiceOver labels and announcements
+
+| Check | How verified | Result |
+| --- | --- | --- |
+| Item rows | AX tree | "(2026-06), book, updated 15 November 2026, 260 KB"; book entries add "entry 0"; kind symbols hidden |
+| Preview image and states | AX tree + observer | "Preview of (2026-06) — Entry 4"; "Preview ready" announced |
+| Toolbars | AX tree | Hide Sidebar, Import, Zoom Out/In, Zoom to Fit, Actual Size, Background labelled with help text; zoom level "Zoom 88 percent" |
+| Inspector, Settings, selection window | AX tree | Every button labelled (System Events reports these titles empty; the native API has them) |
+| Comments | AX tree | **Fixed:** the list was unlabeled and each comment read only its date; now "Comments", and "Latch for the oil cracking setup, 15 Nov 2026 at 9:09" |
+| Import, Move To, Replace Source sheets | AX tree | **Fixed:** the name field, "Save in" pop-up, "Books" choice, and the Move To folder list ("Folders") were unlabeled; Replace Source was already labelled |
+| Banners and confirmations | Observer + code | Confirmations were already announced by the model. Banners now announce their text when shown and keep their action a separate button (`contain`, not `combine`); no banner state occurred in the run |
+| System-drawn elements | AX tree | Window buttons, scroll-bar parts, outline disclosure triangles, and the Statistics list's leading section row carry no label of their own (system standard) |
+
+### Contrast (text the app draws, 4.5:1)
+
+| Area | Dark | Light | Increase Contrast (dark / light) |
+| --- | --- | --- | --- |
+| Item rows | 12.4 | 14.0 | 14.6 / 17.6 |
+| Selected row, key window | 6.2 | 5.4 | 4.6 / 7.6 |
+| Selected row, background window | — | 11.6 | — |
+| Sidebar item, selected item | 18.4, 12.6 | 19.6, 15.9 | 16.7, 6.4 / 19.6, 8.5 |
+| Column headers | 15.6 | 14.9 | 18.7 / 21.0 |
+| Path bar | 13.5 | 14.9 | — |
+| Inspector text | 18.7 | 21.0 | 18.7 / 21.0 |
+| Material panel over the checkerboard | 11.5 | 7.7 | — |
+| "Books have no preview" entry count | **3.1 → 17.0** | — | — |
+| Statistics quality name ("rare") | 13.5 after the change | — | — |
+
+**Fixed:** the entry count (3.1:1 in dark mode) and the Statistics quality name used `.secondary`; both are primary
+text now, the quality name set smaller. The quality name was only measured after the change. System-drawn text keeps system styling as the spec allows: the selected
+inspector segment (3.8 dark, 4.3 light) and a background window's sidebar (about 3:1) and title (2:1).
+Increase Contrast is followed through system colors. Reduce Motion: zoom from buttons and shortcuts uses no animation
+(code: `PreviewViews.swift` checks `accessibilityDisplayShouldReduceMotion`); not toggled in the run. Text uses system
+styles; the one fixed size is the decorative symbol in the selection window.
+
+### Window menu
+
+**Fixed (A15 finding):** each `Window` scene added its own Window-menu item, both named after the app. The library
+scene now drops its item and AppKit lists its window by title. Checked in one session: library open "Library"; with
+a preview "Library, Simple RS Latch"; preview closed "Library"; ⇧⌘W shows the selection window listed once; reopening
+from the recents list shows "Library" again. Removing the selection scene's item as well also removed Edit's Cut,
+Copy, Paste, Delete, and Select All; that variant was dropped, and File, Edit, and Library now match the A15 menu dump
+item for item.
+
+Not checked: Full Keyboard Access off (it stayed on for the run). Also unchecked: after a keyboard-confirmed item
+deletion, focus returning to the list may select its first row, so a second ⌘⌫ would target that row (still behind
+the confirmation).
+
+| Check | Result |
+| --- | --- |
+| `LibraryBrowserModelTests` (2 new) | Keyboard focus selects the first row only when no shown row is selected (also in search results, with a hidden selection, and with no matches); the location key follows folders and books, not the filter; Sort By titles |
+| `just lint`, `just app-build` | Pass |
+| `just test` | First run: one failure, LIFE-2 (`LifecycleTests.swift:103`, "the render never started a worker" after its 30 s wait); every other test passed. The suite alone passed three times in a row (about 1.5 s each), and the second and final full `just test` runs passed |
+
+Observed, not fixed: the LIFE-2 failure above, which looks load-related (no change here touches preview rendering);
+for A17 to watch in repeated full runs.

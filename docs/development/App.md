@@ -224,6 +224,30 @@ Xcode counterparts of `tools/swift.sh --disable-sandbox`: neither Xcode's manife
 for macro plugins (`@State`, `@Observable`) can run inside the `sandbox-exec` profile used by the independence check. If `xcodebuild` reports that a required plug-in failed to load, run
 `sudo xcodebuild -runFirstLaunch` once to install Xcode's system components.
 
+## Accessibility
+
+Rules the views follow (screen specs, "Accessibility"; checks in the
+[validation](../validation/App.md#accessibility-2026-11-15)):
+
+- **Keyboard focus in the item list.** A SwiftUI `Table` draws no focus ring, so when focus arrives by anything but
+  a mouse event, `ItemList` calls `itemListFocusedByKeyboard()` on the next turn (after the table has pushed its own
+  selection back), which selects the first row when no shown row is selected. Do not test for `.keyDown`: by the time
+  focus changes, the current event can already be the Tab's key-up (scripted input misses it about one time in ten).
+  Opening a folder keeps the table and its focus; opening or leaving a book replaces the table after a loading
+  state, so a `locationKey` change marks focus to restore, and the next table to appear takes it back only if focus
+  went nowhere meanwhile. `requestListFocus()` moves focus to the list from elsewhere (Escape in the comment field).
+- **Labels.** Form captions are not linked to their controls on macOS, so pickers and fields in forms and sheets get
+  an explicit `accessibilityLabel`. Combining children drops selectable text (`.textSelection`), so rows with such
+  text use `.ignore` and a label. Containers with an action (`Banner`) use `.contain` so the button stays one.
+- **Announcements.** Transient text (confirmations, preview states, banners) is posted with an announcement.
+- **Text.** No `.secondary` or lighter styles on text the app draws; hierarchy comes from weight and size.
+- **Window menu.** Each `Window` scene adds a Window-menu item named after the app. The library scene uses
+  `.commandsRemoved()` and `ListedInWindowMenu` lists its window through AppKit as "Library" (the library's name).
+  Don't apply `.commandsRemoved()` to the selection scene: it also removes the standard Edit commands (Cut, Copy,
+  Paste, Delete, Select All), and with them ⌘C in the list.
+- **Checking.** System Events reports some SwiftUI button titles as empty; read labels with the native accessibility
+  API (`AXUIElementCopyAttributeValue`) instead.
+
 ## Bundle identity and signing
 
 | Setting | Value |

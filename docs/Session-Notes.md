@@ -57,7 +57,7 @@ independence check runs only for dependency, tooling, bundle, or network changes
 moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibility access, so real-window captures
 (`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
 `-FBNativeDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
-Open finding for A16: Tab never visibly reaches the item list. A8 is done: Import (paste, TXT files, drag and drop; one book or
+A8 is done: Import (paste, TXT files, drag and drop; one book or
 unpacked) keeps exact bytes and selects the result. A9 is done: Copy String and Save As TXT
 for items and book entries, refusing destinations inside the library. Capture only app windows
 (`screencapture -l<window>`), never the whole screen. A10 is done: the inspector has Statistics (placeholder until A13),
@@ -84,8 +84,15 @@ finishes, renders are cancelled and workers reaped, the reopen path is kept), cl
 the Edit menu holds Rename… and Move to Trash/Delete Folder, Library adds Recover, and selection commands work only
 while the library window is key (see the [app guide](development/App.md#library-selection-and-windows)). A
 real-app run checked the menu bar against the spec, quitting during a render, the relaunch, and closing the main
-window with a preview window open (see [validation](validation/App.md#menus-and-lifecycle-2026-11-14)). Open: the
-Window menu lists the app name twice with no library open. Next: A16 (accessibility).
+window with a preview window open (see [validation](validation/App.md#menus-and-lifecycle-2026-11-14)). A16 is done
+(2026-11-15): a scripted keyboard walkthrough of the screen specs' flow, an accessibility-tree audit (labels and
+announcements; VoiceOver itself not run, by the owner's choice), and contrast measured in dark, light, and Increase
+Contrast. Fixed: Tab into the item list now shows a selected row (it reached the list invisibly), opening a book keeps
+focus in the list, the comment field no longer traps Shift-Tab and Escape returns to the list, View ▸ Sort By gives the
+column headers a keyboard path, unlabeled comments and sheet controls, two `.secondary` texts below 4.5:1, and the
+Window menu listing the app twice (see the [app guide](development/App.md#accessibility) and
+[validation](validation/App.md#accessibility-2026-11-15)). One full `just test` run failed LIFE-2 once (its worker never
+started within 30 s); alone and in a second full run it passed: A17 should watch it. Next: A17 (tests and smoke runs).
 Cached row thumbnails (BRW-9) remain unbuilt.
 Alt-mode previews now mark each inserter's pickup (yellow line) and drop (yellow arrow) (2026-11-15). This needed
 new render-database fields, so the private assets were regenerated from Factorio 2.1.24 and the supported asset

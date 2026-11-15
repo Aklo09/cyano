@@ -68,7 +68,8 @@ Hierarchy comes from font weight and size, not from lighter text. The rule cover
 system controls (table headers, disabled items, search field placeholder) keeps its system styling.
 This check is partial: it covers window, control, and text backgrounds in light and dark mode. Sidebar materials,
 selected rows, the material panel over previews, and Increase Contrast (the probe returned unchanged values, so it
-measured nothing) must be checked on the running app in A16. Color is never the only signal: every state
+measured nothing) must be checked on the running app in A16 (done 2026-11-15: see the
+[validation](../validation/App.md#accessibility-2026-11-15)). Color is never the only signal: every state
 has text, and every status symbol has a text label. The app follows Increase Contrast and Reduce Transparency
 through system colors and materials.
 
@@ -470,6 +471,7 @@ Every command is in the menu bar (LIFE-4); unavailable commands are disabled rat
 | View | Show/Hide Sidebar (system command) | ⌃⌘S |
 | View | Show/Hide Inspector (system command) | ⌃⌘I |
 | View | Statistics, Details, Comments | ⌘1, ⌘2, ⌘3 |
+| View | Sort By ▸ Name, Kind, Updated, Size; Ascending, Descending (folders and search results; added in A16 as the keyboard path for the column headers) | |
 | View | Zoom In, Zoom Out | ⌘+, ⌘− |
 | View | Actual Size, Zoom to Fit | ⌘0, ⌘9 |
 | View | Background ▸ Checkerboard, Transparent, Solid Color… | |
@@ -488,7 +490,9 @@ Every command is in the menu bar (LIFE-4); unavailable commands are disabled rat
   comment with ⌥⌘K and ⌘↩, open a preview window with Space, zoom with ⌘+ and ⌘9, import from the clipboard with
   ⇧⌘V and ⌘↩.
 - **Focus:** the system focus ring is never hidden; after a sheet closes, focus returns to the control that opened
-  it, or to the newly selected item.
+  it, or to the newly selected item. A table draws no focus ring, so keyboard focus entering the item list with
+  nothing selected selects the first row (as in Finder); opening or leaving a book keeps focus in the list. In the
+  comment field, Tab and Shift-Tab move focus like a text field's and Escape returns it to the list. (A16)
 - **Motion:** with Reduce Motion, zoom changes from buttons and shortcuts apply without animation.
 - **Text size:** system text styles only; layouts allow names to wrap or truncate with the full name in VoiceOver
   and in the inspector header.

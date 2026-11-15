@@ -27,17 +27,21 @@ struct ImportSheet: View {
 
             Form {
                 if model.acceptsName {
+                    // Form shows the captions as separate text without linking them to the controls.
                     TextField("Name (optional)", text: $model.name)
+                        .accessibilityLabel("Name (optional)")
                 }
                 Picker("Save in", selection: $model.destination) {
                     Text("Library").tag("")
                     ForEach(folders, id: \.self) { folder in Text(folder).tag(folder) }
                 }
+                .accessibilityLabel("Save in")
                 Picker("Books", selection: $model.mode) {
                     Text("Save as one book").tag(ImportModel.Mode.oneBook)
                     Text("Unpack book into folders").tag(ImportModel.Mode.unpack)
                 }
                 .pickerStyle(.radioGroup)
+                .accessibilityLabel("Books")
                 if model.mode == .unpack {
                     Text(
                         "Each blueprint is saved as a new string; the book's original string isn't kept unless you "

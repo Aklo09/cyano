@@ -106,6 +106,52 @@ struct LibraryBrowserModelTests {
         #expect(sizes.count == 3 && sizes == sizes.sorted(by: >))
     }
 
+    @Test("GEN-5: keyboard focus entering the list selects its first row only when nothing is selected")
+    func keyboardFocusSelection() async throws {
+        let fixture = try BrowsingFixture()
+        defer { fixture.cleanup() }
+        let (session, browser) = await openBrowser(fixture.url)
+        defer { Task { await session.close() } }
+        browser.itemListFocusedByKeyboard()
+        #expect(browser.selection == ["folder:smelting"])
+        browser.selection = ["folder:Trains"]
+        browser.itemListFocusedByKeyboard()
+        #expect(browser.selection == ["folder:Trains"])
+        browser.selection = []
+        browser.filterText = "zzz"
+        browser.itemListFocusedByKeyboard()
+        #expect(browser.selection.isEmpty)
+        browser.filterText = "loop"
+        browser.itemListFocusedByKeyboard()
+        #expect(browser.selectedRows.map(\.name) == ["Loop"])
+        // A selection no shown row matches (left from another folder) counts as none.
+        browser.selection = ["item:not-shown"]
+        browser.itemListFocusedByKeyboard()
+        #expect(browser.selectedRows.map(\.name) == ["Loop"])
+        browser.requestListFocus()
+        #expect(browser.listFocusRequested)
+    }
+
+    @Test("The location key changes with the folder or book shown, not with the filter")
+    func locationKey() async throws {
+        let fixture = try BrowsingFixture()
+        defer { fixture.cleanup() }
+        let (session, browser) = await openBrowser(fixture.url)
+        defer { Task { await session.close() } }
+        #expect(browser.locationKey == "folder:")
+        browser.filterText = "loop"
+        #expect(browser.locationKey == "folder:")
+        browser.filterText = ""
+        browser.show(folder: "Trains")
+        #expect(browser.locationKey == "folder:Trains")
+        browser.show(folder: "")
+        let book = try #require(rows(browser).first { $0.kind == .book })
+        browser.selection = [book.id]
+        await browser.openSelection()
+        #expect(browser.locationKey == "book:" + (book.itemId ?? "") + ":")
+        #expect(LibraryBrowserModel.SortKey.allCases.map(\.title) == ["Name", "Kind", "Updated", "Size"])
+    }
+
     @Test("BRW-4: folders open and close through the path bar, double-click, and Enclosing Folder")
     func navigation() async throws {
         let fixture = try BrowsingFixture()

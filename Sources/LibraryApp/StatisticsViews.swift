@@ -104,7 +104,8 @@ private struct StatisticsList: View {
                         HStack(alignment: .firstTextBaseline) {
                             Text(row.name)
                             if let quality = row.quality {
-                                Text(quality).foregroundStyle(.secondary)
+                                // Hierarchy by size, not lighter text (screen specs, "Color and contrast").
+                                Text(quality).font(.callout)
                             }
                             Spacer()
                             Text(row.count, format: .number).monospacedDigit()

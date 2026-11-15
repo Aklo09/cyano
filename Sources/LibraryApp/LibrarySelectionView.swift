@@ -25,6 +25,7 @@ struct LibrarySelectionView: View {
         .frame(width: 520)
         .fixedSize(horizontal: false, vertical: true)
         .disabled(isOpening)
+        .background(ListedInWindowMenu())
         .onChange(of: model.windowGoal, initial: true) { _, goal in
             guard goal == .library else { return }
             openWindow(id: LibraryAppIdentity.libraryWindow)

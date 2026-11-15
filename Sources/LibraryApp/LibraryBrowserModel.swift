@@ -102,7 +102,19 @@ public struct FolderNode: Identifiable, Equatable, Sendable {
 /// Browsing state for the library window, derived from the session's listing (BRW-1 to BRW-10).
 @MainActor @Observable
 public final class LibraryBrowserModel {
-    public enum SortKey: String, Sendable, CaseIterable { case name, kind, updated, size }
+    public enum SortKey: String, Sendable, CaseIterable {
+        case name, kind, updated, size
+
+        /// The column and View ▸ Sort By title.
+        public var title: String {
+            switch self {
+            case .name: "Name"
+            case .kind: "Kind"
+            case .updated: "Updated"
+            case .size: "Size"
+            }
+        }
+    }
 
     /// What the item list area shows.
     public enum Content: Equatable {
@@ -129,6 +141,8 @@ public final class LibraryBrowserModel {
     public var showingIssues = false
     /// Set by the Find command; the window moves focus to the search field and clears it.
     public var searchFocusRequested = false
+    /// Set to move keyboard focus to the item list (Escape in the comment field).
+    public var listFocusRequested = false
     /// The book shown in the item list instead of a folder's contents, if any.
     public private(set) var book: OpenBook?
     /// Details of the selected saved item, decoded on demand (version, description, settings).
@@ -191,6 +205,12 @@ public final class LibraryBrowserModel {
         return Self.content(
             listing: listing, failure: session.listingFailure, folder: folder, filter: filterQuery, key: sortKey,
             ascending: ascending)
+    }
+
+    /// Identifies the folder or book entry the item list shows, ignoring the filter.
+    public var locationKey: String {
+        if let book { return "book:" + book.itemId + ":" + book.path.map(String.init).joined(separator: ".") }
+        return "folder:" + folder
     }
 
     /// Whether the item list shows a book's entries (columns #, Name, Kind; stored order).
@@ -418,6 +438,18 @@ public final class LibraryBrowserModel {
 
     public func requestSearchFocus() {
         searchFocusRequested = true
+    }
+
+    public func requestListFocus() {
+        listFocusRequested = true
+    }
+
+    /// Keyboard focus moved into the item list. A table draws no focus ring, so with no shown row selected the first
+    /// row is selected, as in Finder; the focused list then shows it highlighted. A selection left from another folder
+    /// (hidden by a search) counts as none.
+    public func itemListFocusedByKeyboard() {
+        guard selectedRows.isEmpty, case .rows(let rows) = content, let first = rows.first else { return }
+        selection = [first.id]
     }
 
     /// Keeps the location and selection valid after the listing changes, and starts at the root for a new library.

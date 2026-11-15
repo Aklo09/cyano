@@ -109,8 +109,54 @@ struct ItemList: View {
     @Bindable var browser: LibraryBrowserModel
     @Environment(\.openWindow) private var openWindow
     @State private var sortOrder = [KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard)]
+    @FocusState private var listFocused: Bool
+    @State private var refocusList = false
 
     var body: some View {
+        listArea
+            .onChange(of: browser.listFocusRequested) { _, requested in
+                guard requested else { return }
+                browser.listFocusRequested = false
+                listFocused = true
+                selectFirstRowForKeyboard()
+            }
+            .onChange(of: browser.locationKey) {
+                guard listFocused else { return }
+                // Opening or leaving a book replaces the table (after a loading state) and would leave focus nowhere;
+                // the next table to appear takes it back.
+                refocusList = true
+                // A folder opens in the same table, which keeps focus but loses its selection.
+                selectFirstRowForKeyboard()
+            }
+    }
+
+    /// Selects the first row for a list focused from the keyboard (`itemListFocusedByKeyboard`), on the next turn,
+    /// after the table has pushed its own selection back.
+    private func selectFirstRowForKeyboard() {
+        Task { @MainActor in browser.itemListFocusedByKeyboard() }
+    }
+
+    private static func isMouse(_ event: NSEvent?) -> Bool {
+        guard let event else { return false }
+        let mouse: [NSEvent.EventType] = [
+            .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp,
+        ]
+        return mouse.contains(event.type)
+    }
+
+    /// Gives keyboard focus back to a table that replaced a focused one, with a visible selected row.
+    private func restoreListFocus() {
+        guard refocusList else { return }
+        refocusList = false
+        Task { @MainActor in
+            // Only when focus went nowhere: never take it from a field the user has moved to since.
+            guard let window = NSApp.keyWindow, window.firstResponder === window else { return }
+            listFocused = true
+            selectFirstRowForKeyboard()
+        }
+    }
+
+    @ViewBuilder private var listArea: some View {
         switch browser.content {
         case .loading:
             ProgressView("Loading library…").frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -198,6 +244,14 @@ struct ItemList: View {
             return []
         }
         .onKeyPress(.space) { openPreviewWindow() }
+        .focused($listFocused)
+        .onChange(of: listFocused) { _, focused in
+            // Not a click, which selects (or clears) rows itself. Anything else counts as the keyboard: by the time
+            // focus changes, the current event can already be the Tab's key-up.
+            guard focused, !Self.isMouse(NSApp.currentEvent) else { return }
+            selectFirstRowForKeyboard()
+        }
+        .onAppear(perform: restoreListFocus)
         .accessibilityLabel("Book entries")
     }
 
@@ -253,6 +307,18 @@ struct ItemList: View {
             return []
         }
         .onKeyPress(.space) { openPreviewWindow() }
+        .onChange(of: [browser.sortKey.rawValue, String(browser.ascending)]) {
+            // View ▸ Sort By changed the order; move the header's sort indicator to match.
+            let order: SortOrder = browser.ascending ? .forward : .reverse
+            let wanted =
+                switch browser.sortKey {
+                case .name: KeyPathComparator(\BrowserRow.name, comparator: .localizedStandard, order: order)
+                case .kind: KeyPathComparator(\BrowserRow.kind.label, order: order)
+                case .updated: KeyPathComparator(\BrowserRow.sortableUpdated, order: order)
+                case .size: KeyPathComparator(\BrowserRow.sortableSize, order: order)
+                }
+            if sortOrder.first != wanted { sortOrder = [wanted] }
+        }
         .onChange(of: sortOrder, initial: true) { _, order in
             guard let first = order.first else { return }
             browser.ascending = first.order == .forward
@@ -269,6 +335,14 @@ struct ItemList: View {
             browser.beginImport(files: urls)
             return !urls.isEmpty
         }
+        .focused($listFocused)
+        .onChange(of: listFocused) { _, focused in
+            // Not a click, which selects (or clears) rows itself. Anything else counts as the keyboard: by the time
+            // focus changes, the current event can already be the Tab's key-up.
+            guard focused, !Self.isMouse(NSApp.currentEvent) else { return }
+            selectFirstRowForKeyboard()
+        }
+        .onAppear(perform: restoreListFocus)
         .accessibilityLabel("Items")
     }
 
@@ -393,7 +467,8 @@ private struct BookPreviewNote: View {
         VStack(spacing: 8) {
             Text("Books have no preview").font(.headline)
             if browser.selectedDetail != nil {
-                Text(entryCount == 1 ? "1 entry" : "\(entryCount) entries").foregroundStyle(.secondary)
+                // Primary text: secondary fails 4.5:1 on this panel (A16 contrast check).
+                Text(entryCount == 1 ? "1 entry" : "\(entryCount) entries")
             }
             if browser.canOpenSelection {
                 Button("Open Book") { Task { await browser.openSelection() } }
@@ -498,8 +573,9 @@ private struct CommentsTab: View {
                     .padding(16)
             } else {
                 List(browser.comments, id: \.id, selection: $selected) { comment in
+                    let date = LibraryFormat.date(comment.createdAt).map(LibraryFormat.display) ?? comment.createdAt
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(LibraryFormat.date(comment.createdAt).map(LibraryFormat.display) ?? comment.createdAt)
+                        Text(date)
                             .font(.caption.weight(.medium))
                         Text(comment.text)
                             .textSelection(.enabled)
@@ -509,9 +585,12 @@ private struct CommentsTab: View {
                     .contextMenu {
                         Button("Delete Comment") { browser.commentPendingDeletion = comment }
                     }
-                    .accessibilityElement(children: .combine)
+                    // Combining children keeps only the date: selectable text is not merged.
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("\(comment.text), \(date)")
                 }
                 .scrollContentBackground(.hidden)
+                .accessibilityLabel("Comments")
                 .onDeleteCommand {
                     browser.commentPendingDeletion = browser.comments.first { $0.id == selected }
                 }
@@ -523,8 +602,19 @@ private struct CommentsTab: View {
                     .focused($fieldFocused)
                     .accessibilityLabel("New comment")
                     .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color(nsColor: .separatorColor)))
+                    // A comment rarely needs a tab character; Tab and Shift-Tab move focus like a text field's,
+                    // and Escape returns it to the item list.
+                    .onKeyPress(keys: [.tab, KeyEquivalent("\u{19}")], phases: .down) { press in
+                        // Shift-Tab arrives as the back-tab character.
+                        if press.modifiers.contains(.shift) || press.key == KeyEquivalent("\u{19}") {
+                            NSApp.keyWindow?.selectPreviousKeyView(nil)
+                        } else {
+                            NSApp.keyWindow?.selectNextKeyView(nil)
+                        }
+                        return .handled
+                    }
                     .onKeyPress(.escape) {
-                        fieldFocused = false
+                        browser.requestListFocus()
                         return .handled
                     }
                 if browser.commentTooLong {
@@ -718,6 +808,7 @@ struct MoveToSheet: View {
                 }
             }
             .frame(minHeight: 260)
+            .accessibilityLabel("Folders")
             HStack {
                 Spacer()
                 Button("Cancel", role: .cancel) { browser.moveSheetRows = nil }

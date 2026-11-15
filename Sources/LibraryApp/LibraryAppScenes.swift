@@ -35,6 +35,7 @@ public struct LibraryAppScenes: Scene {
         .defaultSize(width: 1200, height: 720)
         .defaultLaunchBehavior(model.windowGoal == .library ? .presented : .suppressed)
         .restorationBehavior(.disabled)
+        .commandsRemoved()
 
         // Opening a subject that already has a window brings that window forward (PRV-4); none are restored (PRV-13).
         WindowGroup("Preview", id: LibraryAppIdentity.previewWindow, for: PreviewSubject.self) { $subject in
@@ -176,6 +177,24 @@ struct LibraryCommands: Commands {
                     .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")))
                     .disabled(model.browser.commentScope == nil)
             }
+        }
+        CommandGroup(after: .sidebar) {
+            // The keyboard path for the column headers (GEN-5); a book's entries keep their stored order.
+            Menu("Sort By") {
+                Picker("Sort By", selection: Bindable(model.browser).sortKey) {
+                    ForEach(LibraryBrowserModel.SortKey.allCases, id: \.self) { key in Text(key.title).tag(key) }
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+                Divider()
+                Picker("Order", selection: Bindable(model.browser).ascending) {
+                    Text("Ascending").tag(true)
+                    Text("Descending").tag(false)
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+            }
+            .disabled(!inLibrary || model.browser.showsBook)
         }
         SidebarCommands()
         InspectorCommands()

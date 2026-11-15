@@ -126,6 +126,7 @@ struct LibraryWindowView: View {
             }
         }
         .frame(minWidth: 900, minHeight: 500)
+        .background(ListedInWindowMenu())
         .navigationTitle(model.session.libraryURL?.lastPathComponent ?? LibraryAppIdentity.name)
         .focusedSceneValue(\.libraryWindowActive, true)
         .task {
@@ -198,6 +199,25 @@ private struct Banner: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(.thinMaterial)
-        .accessibilityElement(children: .combine)
+        // Contain, not combine: the action stays a button of its own.
+        .accessibilityElement(children: .contain)
+        .onChange(of: text, initial: true) { _, text in AccessibilityNotification.Announcement(text).post() }
+    }
+}
+
+/// Lists the hosting window in the Window menu under its own title. `Window` scenes leave their windows out of
+/// AppKit's list and add a scene item instead; the scenes drop those items (they shared the app's name), so AppKit
+/// lists the open windows itself.
+struct ListedInWindowMenu: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView { Listing() }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private final class Listing: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard let window, window.isExcludedFromWindowsMenu else { return }
+            window.isExcludedFromWindowsMenu = false
+            NSApp.addWindowsItem(window, title: window.title, filename: false)
+        }
     }
 }
