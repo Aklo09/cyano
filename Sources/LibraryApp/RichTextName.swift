@@ -129,16 +129,20 @@ public struct RichTextName: Equatable, Sendable {
     /// capital letters (`capHeight`) (ICN-5, ICN-6).
     func text(catalog: IconCatalog?, pointSize: CGFloat, capHeight: CGFloat) -> Text {
         tokens.reduce(Text(verbatim: "")) { result, token in
+            let piece: Text
             switch token {
-            case .text(let text): return result + Text(verbatim: text)
-            case .tag(let raw): return result + Text(verbatim: raw)
+            case .text(let text): piece = Text(verbatim: text)
+            case .tag(let raw): piece = Text(verbatim: raw)
             case .icon(let reference, let quality, let raw):
-                guard let image = catalog?.badgedImage(for: reference, quality: quality) else {
-                    return result + Text(verbatim: raw)
+                if let image = catalog?.badgedImage(for: reference, quality: quality) {
+                    let icon = Image(decorative: image, scale: CGFloat(image.width) / pointSize)
+                    piece = Text(icon).baselineOffset(-(pointSize - capHeight) / 2)
+                } else {
+                    piece = Text(verbatim: raw)
                 }
-                let icon = Image(decorative: image, scale: CGFloat(image.width) / pointSize)
-                return result + Text(icon).baselineOffset(-(pointSize - capHeight) / 2)
             }
+            // Interpolating Text keeps each piece's own attributes; the key has no words to localize.
+            return Text("\(result)\(piece)")
         }
     }
 }
