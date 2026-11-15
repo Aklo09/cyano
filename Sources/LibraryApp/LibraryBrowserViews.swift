@@ -1,5 +1,6 @@
 import AppKit
 import LibraryCore
+import PreviewRenderer
 import SwiftUI
 
 /// The folder sidebar with its listing-issues footer (BRW-1, BRW-8).
