@@ -136,8 +136,9 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **BRW-8** Given the library contains invalid items (malformed metadata, hash mismatch, duplicate IDs), when it is
   listed, then the valid items are usable, and a visible notice gives the number of issues with each issue's path and
   a message; invalid items cannot be selected for actions.
-- **BRW-9** Given an item with a cached preview for the current assets, when its row is shown, then the row shows that
-  thumbnail; given no cached preview, the row shows its kind instead; no row ever starts a render (decision 4).
+- **BRW-9** Dropped by the owner (2026-11-15, A18): rows always show the item's kind symbol, never a thumbnail, and no
+  row ever starts a render (decision 4). It read: given an item with a cached preview for the current assets, the row
+  shows that thumbnail.
 - **BRW-10** Given the library exceeds a listing bound, when it is listed, then the app says the library is too large
   to list rather than showing a partial list as complete.
 
@@ -339,8 +340,8 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 ## Out of scope
 
 - **Several libraries open at once:** decision 3 chose one library per app.
-- **Thumbnail grids, cards, and thumbnails for uncached rows:** milestone 4 (decision 4); list rows show a thumbnail
-  only when one is already cached.
+- **Thumbnail grids, cards, and row thumbnails:** milestone 4 (decision 4); list rows show the kind symbol (BRW-9 was
+  dropped).
 - **Icons:** blueprint and book name icons and item icons in statistics need the private sprite atlases; milestone 4.
   Until then, Factorio rich-text tags (for example `[item=iron-plate]`) are removed from displayed names; milestone 4
   turns them into icons (owner decision, 2026-11-14).

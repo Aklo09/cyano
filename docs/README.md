@@ -4,6 +4,7 @@ Use the approved plan for scope and validation records for completed work.
 
 | Need | Document |
 | --- | --- |
+| Use the macOS app | [User guide](User-Guide.md) |
 | Build the foundation | [Project README](../README.md) |
 | Follow the delivery roadmap | [Native plan](planning/macOS-Plan.md) |
 | Understand the original investigation | [Initial assessment](planning/macOS-Assessment.md) |
@@ -32,6 +33,7 @@ Use the approved plan for scope and validation records for completed work.
 | Inspect owned-render/cache validation | [Library preview validation](validation/Library-Previews.md) |
 | Inspect milestone 1 acceptance | [Milestone 1 acceptance](validation/Milestone-1.md) |
 | Inspect milestone 2 acceptance | [Milestone 2 acceptance](validation/Milestone-2.md) |
+| Inspect milestone 3 acceptance | [Milestone 3 acceptance](validation/Milestone-3.md) |
 | Resume implementation | [Session notes](Session-Notes.md) |
 
 The assessment preserves historical analysis and references to the original web repository.

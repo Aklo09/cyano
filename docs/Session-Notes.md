@@ -4,6 +4,7 @@ The owner approved the [native plan](planning/macOS-Plan.md) on 2026-11-13.
 Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative
 images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
 Milestone 2 is [accepted](validation/Milestone-2.md), including native construction statistics approved by the owner.
+Milestone 3, the native macOS app, is [accepted](validation/Milestone-3.md) after the owner's walkthrough (2026-11-15).
 
 ## Current state
 
@@ -29,7 +30,7 @@ Milestone 2 is [accepted](validation/Milestone-2.md), including native construct
 
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
 Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
-The macOS app scaffold builds and launches offline; application scheduling and the UI remain pending.
+The macOS app covers milestone 3's workflows offline, with and without assets (see the [user guide](User-Guide.md)).
 
 ## Next implementation
 
@@ -98,8 +99,12 @@ worker, rename and replace with a window open, release change, close and quit), 
 `.cache/smoke/`; the independence check no longer launches the app (see the [app guide](development/App.md#smoke-run)
 and [validation](validation/App.md#tests-and-smoke-runs-2026-11-15)). PRV-11's intermittent failure was a test race (it
 finished a fake render before it had started) and is fixed; LIFE-2 failed once in 15 full runs and now reports the
-viewer state. Test cleanups no longer leave `local.fb.library.tests-*.plist` files in `~/Library/Preferences`. Next: A18 (docs and acceptance).
-Cached row thumbnails (BRW-9) remain unbuilt.
+viewer state. Test cleanups no longer leave `local.fb.library.tests-*.plist` files in `~/Library/Preferences`. A18 (2026-11-15): the [user guide](User-Guide.md), the
+[milestone 3 acceptance record](validation/Milestone-3.md) with every check and the offline Release smoke runs (27 of
+27 with assets; 25 and 3 skipped without), REC-1a's test, the smoke run's everyday-workflow checks, and BRW-9 dropped
+by the owner. The owner did the walkthrough and accepted milestone 3
+on 2026-11-15. Next: milestone 4 (see the [native plan](planning/macOS-Plan.md#delivery-roadmap)).
+Cached row thumbnails (BRW-9) were dropped by the owner (2026-11-15).
 Alt-mode previews now mark each inserter's pickup (yellow line) and drop (yellow arrow) (2026-11-15). This needed
 new render-database fields, so the private assets were regenerated from Factorio 2.1.24 and the supported asset
 profile moved from 2.1.23 to 2.1.24 (owner's decision: replace, not both). Releases assembled from 2.1.23 inputs are

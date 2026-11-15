@@ -31,7 +31,8 @@ PLANNER_BOOK = ROOT / 'tools/vendor/fpsr/fixtures/decode/06-book-with-planner.tx
 #   windows <pid>               document-sized windows (layer 0, >= 100 pt) on any Space, with on-screen state
 #   titles <pid>                titles of the app's accessibility windows (visible ones), as JSON
 #   press <pid> <window> <label>  presses the first button titled or described <label> in that window
-#   texts <pid> <window>        the window's static texts, one per line
+#   texts <pid> <window>        the window's static texts and labels, one per line
+#   select <pid> <window> <text>  clicks the first row (in the window or its sheets) showing <text>
 HELPER_SOURCE = r'''
 import AppKit
 import ApplicationServices
@@ -78,12 +79,46 @@ case "press":
         AXUIElementPerformAction(button, kAXPressAction as CFString) == .success
     else { print("not pressed"); exit(1) }
     print("pressed")
+case "select":
+    func row(_ element: AXUIElement, depth: Int) -> AXUIElement? {
+        if depth > 16 { return nil }
+        if string(element, kAXRoleAttribute) == "AXRow" {
+            func shows(_ element: AXUIElement, _ depth: Int) -> Bool {
+                if (attribute(element, kAXValueAttribute) as? String) == arguments[4] { return true }
+                return depth < 4 && children(element).contains { shows($0, depth + 1) }
+            }
+            if shows(element, 0) { return element }
+        }
+        for child in children(element) { if let found = row(child, depth: depth + 1) { return found } }
+        return nil
+    }
+    // A real click: setting the row's selected attribute is not seen by SwiftUI's selection.
+    // An open sheet first: the same text can also be in the window behind it (a sidebar folder).
+    let sheets = window(arguments[3]).map { children($0).filter { string($0, kAXRoleAttribute) == "AXSheet" } } ?? []
+    guard let target = window(arguments[3]),
+        let found = sheets.lazy.compactMap({ row($0, depth: 0) }).first ?? row(target, depth: 0),
+        let position = attribute(found, kAXPositionAttribute), let size = attribute(found, kAXSizeAttribute)
+    else { print("not found"); exit(1) }
+    var origin = CGPoint.zero
+    var extent = CGSize.zero
+    AXValueGetValue(position as! AXValue, .cgPoint, &origin)
+    AXValueGetValue(size as! AXValue, .cgSize, &extent)
+    let point = CGPoint(x: origin.x + min(60, extent.width / 2), y: origin.y + extent.height / 2)
+    for type in [CGEventType.leftMouseDown, .leftMouseUp] {
+        CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left)?
+            .post(tap: .cghidEventTap)
+        usleep(60_000)
+    }
+    print("clicked")
 case "texts":
     func collect(_ element: AXUIElement, depth: Int) {
         if depth > 16 { return }
         if string(element, kAXRoleAttribute) == "AXStaticText", let value = attribute(element, kAXValueAttribute) as? String {
             print(value)
         }
+        // Rows such as comments carry their text as a label.
+        let label = string(element, kAXDescriptionAttribute)
+        if !label.isEmpty { print(label) }
         for child in children(element) { collect(child, depth: depth + 1) }
     }
     if let target = window(arguments[3]) { collect(target, depth: 0) }
@@ -92,8 +127,8 @@ default:
 }
 '''
 
-KEY = {'tab': 48, 'return': 36, 'escape': 53, 'space': 49, 'down': 125, 'up': 126, 'f': 3, 'a': 0, 'w': 13, 'q': 12,
-       'v': 9, 'y': 16, '1': 18, '9': 25, 'plus': 24, 'comma': 43}
+KEY = {'tab': 48, 'return': 36, 'escape': 53, 'space': 49, 'down': 125, 'up': 126, 'delete': 51, 'f': 3, 'a': 0,
+       'c': 8, 'k': 40, 'm': 46, 'n': 45, 'w': 13, 'q': 12, 'v': 9, 'y': 16, '1': 18, '9': 25, 'plus': 24, 'comma': 43}
 
 
 def sandbox_literal(value):
@@ -182,11 +217,16 @@ class Smoke:
         self.front()
 
     def find(self, text):
-        """Selects the first item whose name matches `text`, through Find and Tab, with the main window key."""
+        """Selects the first item whose name matches `text` (or the current folder's first row for ""), through Find
+        and Tab, with the main window key."""
         self.raise_window('Library')
+        self.key('escape', delay=0.4)  # cancels a sheet a failed step left open, so failures don't cascade
         self.key('f', 'command', delay=0.5)
         self.key('a', 'command', delay=0.3)
-        self.type(text, delay=1.0)
+        if text:
+            self.type(text, delay=1.0)
+        else:
+            self.key('delete', delay=1.0)  # an empty search shows the current folder
         self.key('tab', delay=1.5)
 
     def static_texts(self, title):
@@ -281,62 +321,144 @@ class Smoke:
         self.record('Quits cleanly from selection', self.quit())
         return True
 
-    def library_session(self):
-        self.defaults(reopenLibraryPath=self.library.resolve())
-        if self.args.assets:
-            self.defaults(assetReleasePath=self.args.assets.resolve())
+    def select_row(self, window, text, delay=0.8):
+        selected = self.run([str(self.helper), 'select', str(self.process.pid), window, text]).returncode == 0
+        time.sleep(delay)
+        return selected
+
+    def library_texts(self):
+        return self.static_texts('Library')
+
+    def relaunch_library(self, label):
         self.launch()
         reopened = self.wait(lambda: 'Library' in self.titles(), timeout=10)
-        self.record('Relaunch reopens the last library', bool(reopened), f'{self.titles()}')
-        if not reopened:
-            return
-        self.front()
-        self.capture('library', 'Library')
+        self.record(label, bool(reopened), f'{self.titles()}')
+        if reopened:
+            self.front()
+        return reopened
 
+    def everyday_workflows(self, assets):
+        """Library workflows that need no assets (exit condition: they work offline, with or without a release)."""
         self.find('latch')
-        assets = self.args.assets is not None
         if assets:
             time.sleep(3)
         self.capture('inspector', 'Library')
-        self.key('1', 'command', delay=2 if assets else 0.6)
+        self.key('1', 'command', delay=2 if assets else 0.8)
         self.capture('statistics', 'Library')
+        if not assets:
+            texts = self.library_texts()
+            self.record('Without assets, the preview and statistics say what they need (PRV-9, STA-4)',
+                        'No asset release is configured' in texts and 'Statistics need the game data' in texts)
 
-        # Space in the list opens a preview window (deferred from A12).
+        # Copy String gives the exact imported bytes (EXP).
+        self.find('assembler 2i')
+        self.run(['/usr/bin/pbcopy'], input='')
+        self.key('c', 'command', delay=1.0)
+        # Bytes, not text: text mode would turn the fixture's CRLF into LF.
+        copied = subprocess.run(['/usr/bin/pbpaste'], capture_output=True).stdout
+        self.record('Copy String copies the exact original string', copied == (FIXTURES / '2i_Assembler.txt').read_bytes(),
+                    f'{len(copied)} bytes')
+
+        # Import from the clipboard (IMP).
+        self.run(['/usr/bin/pbcopy'], input=(FIXTURES / 'Hazard_Patterns.txt').read_text())
+        self.raise_window('Library')
+        self.key('v', 'command', 'shift', delay=1.5)
+        self.key('return', 'command', delay=3)
+        self.record('Import from Clipboard adds and selects the item', 'concrete patterns' in self.library_texts())
+
+        # Add a comment (COM).
+        self.find('latch')
+        self.key('k', 'command', 'option', delay=1.0)
+        self.type('Added by the smoke run', delay=0.5)
+        self.key('return', 'command', delay=2)
+        texts = self.library_texts()
+        self.record('Add Comment adds a comment', 'Added by the smoke run' in texts and 'Smoke-run comment' in texts)
+        self.key('escape', delay=0.5)
+
+        # New folder, move into it, move to Trash (ORG).
+        self.find('')
+        self.key('n', 'command', 'shift', delay=1.5)
+        self.key('a', 'command', delay=0.3)
+        self.type('Smoke folder', delay=0.5)
+        self.key('return', delay=2)
+        self.record('New Folder creates and names a folder', 'Smoke folder' in self.library_texts())
+        self.find('assembler 6i')
+        self.key('m', 'command', 'control', delay=1.5)
+        chosen = self.select_row('Library', 'Smoke folder')
+        self.key('return', delay=2.5)
+        sheet_closed = 'Cancel' not in self.library_texts()
+        self.record('Move To moves the item into the chosen folder', chosen and sheet_closed,
+                    f'folder clicked {chosen}; sheet closed {sheet_closed} (the disk check after quit confirms)')
+        self.find('assembler 4i')
+        self.key('delete', 'command', delay=1.5)
+        pressed = self.press('Library', 'Move to Trash', delay=2)
+        self.record('Move to Trash removes the item after confirmation', pressed)
+        self.capture('organized', 'Library')
+
+        # Books open like folders by stored index (BOOK).
+        self.find('tileable')
+        self.key('down', 'command', delay=3)
+        texts = self.library_texts()
+        self.record('Open (⌘↓) shows a book\'s entries', 'Tileable factories' in texts and ', entry ' in texts)
+        self.capture('book', 'Library')
+        self.key('up', 'command', delay=1.5)
+
+    def worker_check(self, assets):
+        """One worker at most under real renders (deferred from A12): three previews opened in a row before anything
+        is cached (selecting an item renders it for the inspector, so this runs first)."""
+        if not assets:
+            self.record('At most one preview worker while three windows render', None, 'needs --assets')
+            return
+        peak, seen = 0, 0
+        self.find('assembler')
+        for step in range(3):
+            if step:
+                self.raise_window('Library')
+                self.key('down', delay=0.3)
+            self.key('space', delay=0.2)
+            count = len(self.workers())
+            peak, seen = max(peak, count), seen + count
+        deadline = time.monotonic() + 60
+        idle_since = None
+        while time.monotonic() < deadline:
+            count = len(self.workers())
+            peak, seen = max(peak, count), seen + count
+            idle_since = (idle_since or time.monotonic()) if count == 0 else None
+            if idle_since and time.monotonic() - idle_since > 3:
+                break
+            time.sleep(0.05)
+        self.record('At most one preview worker while three windows render', peak <= 1 and seen > 0,
+                    f'peak {peak}; windows {self.titles()}')
+        for title in ['Assembler 2i', 'Assembler 4i', 'Assembler 6i']:
+            self.capture('preview-' + title.split()[-1], title)
+
+    def preview_windows(self, assets):
+        # Space in the list opens a preview window (PRV-3; deferred from A12); opening it again reuses it (PRV-4).
         self.find('latch')
         self.key('space', delay=0.5)
         opened = self.wait(lambda: 'Simple RS Latch' in self.titles(), timeout=10)
         self.record('Space in the list opens a preview window', bool(opened), f'{self.titles()}')
+        self.find('latch')
+        self.key('space', delay=1.5)
+        count = self.titles().count('Simple RS Latch')
+        self.record('Opening the same item again brings its window forward (PRV-4)', count == 1, f'{count} windows')
         if assets:
             time.sleep(3)
         before = self.capture('preview-window', 'Simple RS Latch')
 
-        # One worker at most under real renders (deferred from A12): three uncached previews opened in a row.
         if assets:
-            peak, seen = 0, 0
-            self.find('assembler')
-            for step in range(3):
-                if step:
-                    self.raise_window('Library')
-                    self.key('down', delay=0.3)
-                self.key('space', delay=0.2)
-                count = len(self.workers())
-                peak, seen = max(peak, count), seen + count
-            deadline = time.monotonic() + 60
-            idle_since = None
-            while time.monotonic() < deadline:
-                count = len(self.workers())
-                peak, seen = max(peak, count), seen + count
-                idle_since = (idle_since or time.monotonic()) if count == 0 else None
-                if idle_since and time.monotonic() - idle_since > 3:
-                    break
-                time.sleep(0.05)
-            titles = self.titles()
-            self.record('At most one preview worker while three windows render', peak <= 1 and seen > 0,
-                        f'peak {peak}; windows {titles}')
-            for title in ['Assembler 2i', 'Assembler 4i', 'Assembler 6i']:
-                self.capture('preview-' + title.split()[-1], title)
+            # Changing the background keeps the zoom and starts no render (PRV-8a).
+            self.raise_window('Simple RS Latch')
+            zoom = [t for t in self.static_texts('Simple RS Latch').split('\n') if t.startswith('Zoom ')]
+            self.system_events('click menu item "Transparent" of menu 1 of menu item "Background" of menu 1 of '
+                               'menu bar item "View" of menu bar 1', delay=1.0)
+            after_zoom = [t for t in self.static_texts('Simple RS Latch').split('\n') if t.startswith('Zoom ')]
+            self.record('Changing the background keeps the zoom and starts no render (PRV-8a)',
+                        zoom == after_zoom and not self.workers(), f'{zoom} → {after_zoom}')
+            self.capture('preview-transparent', 'Simple RS Latch')
         else:
-            self.record('At most one preview worker while three windows render', None, 'needs --assets')
+            self.record('Changing the background keeps the zoom and starts no render (PRV-8a)', None,
+                        'needs --assets')
 
         # Rename with a preview window open: the window follows (deferred from A12).
         self.find('latch')
@@ -351,10 +473,9 @@ class Smoke:
         self.find('latch renamed')
         self.system_events('click menu item "Replace Source…" of menu 1 of menu bar item "Library" of menu bar 1',
                            delay=1.5)
-        source = (FIXTURES / 'Hazard_Patterns.txt').read_bytes()
-        self.run(['/usr/bin/pbcopy'], input=source.decode())
+        self.run(['/usr/bin/pbcopy'], input=(FIXTURES / '4x_Rocket_Silo.txt').read_text())
         self.key('v', 'command', delay=1.0)
-        self.key('return', 'command', delay=3)
+        self.key('return', 'command', delay=3 if assets else 1.5)
         replaced = 'Latch renamed' in self.titles()
         after = self.capture('preview-replaced', 'Latch renamed')
         if assets and before and after:
@@ -379,7 +500,29 @@ class Smoke:
         else:
             self.record('Clearing the asset release updates open preview windows', None, 'needs --assets')
 
+    def library_session(self):
+        self.defaults(reopenLibraryPath=self.library.resolve())
+        if self.args.assets:
+            self.defaults(assetReleasePath=self.args.assets.resolve())
+        assets = self.args.assets is not None
+        if not self.relaunch_library('Relaunch reopens the last library'):
+            return
+        self.capture('library', 'Library')
+        self.worker_check(assets)
+        self.everyday_workflows(assets)
+        self.preview_windows(assets)
+
+        # Quitting with preview windows open; they are not restored (PRV-13).
+        open_before = self.titles()
+        self.record('Quits cleanly with preview windows open', self.quit(), f'{open_before}')
+        if not self.relaunch_library('Relaunch reopens the library'):
+            return
+        self.record('Preview windows are not restored after a relaunch (PRV-13)', self.titles() == ['Library'],
+                    f'{self.titles()}')
+
         # Closing the library closes its preview windows (deferred from A12).
+        self.find('latch renamed')
+        self.key('space', delay=2)
         self.raise_window('Library')
         self.key('w', 'command', 'shift', delay=2)
         closed = self.wait(lambda: self.titles() == [APP_NAME], timeout=8)
@@ -390,6 +533,16 @@ class Smoke:
         self.record('No preview worker remains after quit', not self.workers(), f'{len(self.workers())} left')
         state = self.cli('owner', str(self.library))['result']['state']
         self.record('The library is idle after quit', state == 'idle', state)
+
+        # The library on disk agrees with what the app showed.
+        items = {i['name']: i['folder'] for i in self.cli('list', str(self.library))['result']['items']}
+        expected = {'concrete patterns': '', 'Assembler 6i': 'Smoke folder', 'Latch renamed': ''}
+        wrong = {name: items.get(name) for name, folder in expected.items() if items.get(name) != folder}
+        self.record('fb-native list matches: imported, moved, renamed, and deleted items',
+                    not wrong and 'Assembler 4i' not in items, f'unexpected {wrong}' if wrong else '')
+        trashed = sorted(p.name for p in (self.out / 'trash').iterdir())
+        self.record('Deleted and replaced originals went to the run\'s trash, not the owner\'s', len(trashed) >= 2,
+                    f'{trashed}')
 
     def cleanup(self):
         if self.process and self.process.poll() is None:

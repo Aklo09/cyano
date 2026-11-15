@@ -156,6 +156,28 @@ struct LibrarySessionTests {
         await session.close()
     }
 
+    @Test("REC-1a: staging left by a change that never committed opens without a notice and changes nothing")
+    func uncommittedStaging() async throws {
+        let scratch = try Scratch()
+        defer { scratch.cleanup() }
+        try NativeLibrary.initialize(at: scratch.url()).close()
+        let interrupting = Interrupting(at: .metadataStaged)
+        let session = LibrarySession(opener: interrupting.opener)
+        await session.open(scratch.url())
+        interrupting.armed = true
+        _ = await session.perform(.importing) { try $0.importSource(source("Never committed")) }
+        interrupting.armed = false
+        await session.close()
+        let operations = scratch.url().appendingPathComponent("operations")
+        let staged = try FileManager.default.contentsOfDirectory(atPath: operations.path).filter { $0 != ".DS_Store" }
+        #expect(!staged.isEmpty, "the interruption left no staging to open with")
+
+        await session.open(scratch.url())
+        #expect(session.completedNotice == nil && !session.requiresRecovery)
+        #expect(session.listing?.items.isEmpty == true)
+        await session.close()
+    }
+
     @Test("Opening reports a completed interrupted change once; a failed change blocks the session until Recover")
     func completedAndBlocked() async throws {
         let scratch = try Scratch()

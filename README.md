@@ -8,7 +8,8 @@ deletion, book unpacking, maintenance, and offline asset verification.
 The standalone renderer paints real previews through supervised native workers.
 Saved-item previews reuse validated derived caches.
 Construction statistics report a blueprint's building requirements and footprint from a verified asset release.
-The macOS app scaffold builds and launches offline; its interface is being built in milestone 3.
+The macOS app browses, imports, exports, comments on, and organizes a library, with preview windows and statistics;
+see the [user guide](docs/User-Guide.md). Milestone 3 is accepted.
 
 ## Requirements
 

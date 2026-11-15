@@ -1,10 +1,12 @@
 # Milestone 3: native application
 
-Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below.
+Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below;
+[accepted](../validation/Milestone-3.md) on 2026-11-15.
 A1, the [app spec](../specs/Native-App.md), is approved and A0 is done (2026-11-14). A2, the
 [screen specs](../specs/Native-App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
-(2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, A7, books and planners, A8, import, A9, export, A10, comments, and A11, organization, A14, settings, A12, previews, A13, statistics, A15, menus and lifecycle, A16, accessibility, and A17, tests and smoke runs, are done. Next: A18 (docs and
-acceptance).
+(2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, A7, books and planners, A8, import, A9, export, A10, comments, and A11, organization, A14, settings, A12, previews, A13, statistics, A15, menus and lifecycle, A16, accessibility, and A17, tests and smoke runs, are done. A18, docs and acceptance, is
+done: the owner did the walkthrough and accepted milestone 3 on 2026-11-15 (see the
+[acceptance record](../validation/Milestone-3.md)).
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 3.
 
 ## Scope
@@ -36,7 +38,7 @@ The owner settled these on 2026-11-14.
 | 1 | App structure (A3) | UI and logic in a package target, testable under `just test`; a thin Xcode app target only for the `.app` bundle, Info.plist, signing, and SwiftUI previews, as the plan anticipated | SwiftPM only, with a script assembling the `.app` |
 | 2 | App Sandbox | None: a directly distributed, signed app for personal use, as the assessment recommends | Sandbox with security-scoped bookmarks and a re-qualified preview worker |
 | 3 | Window model | One library per app, in one main window; opening another library closes the current one and releases its lease. Any root item or book entry (by stored index) can open in its own preview window, so several can be compared side by side | One window per library with several libraries open; root items only in preview windows |
-| 4 | Previews | On demand only: the inspector's selected item and each open preview window. Renders run one at a time through the single shared preview service, in request order; waiting windows say so, cache hits appear at once, and closing a window or changing the selection cancels its render. List rows show a thumbnail only when one is already cached | Parallel workers per window; grid thumbnail scheduling now |
+| 4 | Previews | On demand only: the inspector's selected item and each open preview window. Renders run one at a time through the single shared preview service, in request order; waiting windows say so, cache hits appear at once, and closing a window or changing the selection cancels its render. List rows show a thumbnail only when one is already cached (dropped by the owner in A18, 2026-11-15: rows show the kind symbol) | Parallel workers per window; grid thumbnail scheduling now |
 | 5 | Statistics | Include the statistics panel (A13), with item names as text; icons need the private sprite atlases and come with milestone 4 | Statistics out of the app until milestone 4 |
 | 6 | Maintenance | Cache cleanup, staging cleanup, quarantine, and usage stay CLI-only; the app shows "recovery required" with a Recover action | Maintenance screens in the app |
 | 7 | UI testing | Session-layer unit tests in `just test`, scripted screenshot runs, and an owner walkthrough; no XCUITest | Automated UI tests with XCUITest |

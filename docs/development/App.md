@@ -99,8 +99,8 @@ Choose an assembled release (a folder with `release.json`, `sprites/`, and `stat
 `.cache/renderer-assets` from the [preview guide](Preview.md#prepare-a-private-release); the raw
 `private-assets/2.1.24` folder is refused. For everyday use, assemble a copy outside the repository's `.cache/`.
 
-Rows show their kind symbol. Cached thumbnails (BRW-9) are not built yet: they need a cache-only lookup per row
-(`LibraryPreviewService.cached` now provides one) and a decision on decoding thumbnails from full-size PNGs; no row ever starts a render.
+Rows show their kind symbol; no row ever starts a render. Cached row thumbnails (BRW-9) were dropped by the owner in
+A18.
 
 ## Statistics
 
@@ -290,12 +290,21 @@ so replaced originals never reach the owner's Trash. It drives the app with Syst
 saves window captures (`NN-<screen>.png`), `report.md`, and `results.json` there, and exits 1 if a check fails.
 Without `--assets` the worker and release-change checks are skipped.
 
-Checks: the first launch shows library selection (the window check the independence check used to make, counting
-windows on any Space because a directly launched app is not activated) and quits cleanly; the relaunch reopens the
-library; Space opens a preview window; three uncached previews run with at most one worker (`pgrep`, sampled every
-50 ms); renaming and replacing the item reach its open window (title, new image); clearing the release in Settings
-reaches the window; closing the library closes its windows and shows selection; after quit no worker remains and
-`fb-native owner` reports the library idle.
+Checks, in order: the first launch shows library selection (the window check the independence check used to make,
+counting windows on any Space because a directly launched app is not activated) and quits cleanly; the relaunch
+reopens the library; three previews opened before anything is cached run with at most one worker (`pgrep`, sampled
+every 50 ms; selecting an item renders it for the inspector, so this runs first); without assets, the preview and
+Statistics say what they need; Copy String gives the fixture's exact bytes; Import from Clipboard, Add Comment, New
+Folder, Move To, Move to Trash, and opening a book work; Space opens a preview window and opening it again reuses it;
+a background change keeps the zoom and starts no worker; renaming and replacing reach the open window (title, new
+image); clearing the release in Settings reaches the window; quitting with windows open does not restore them;
+closing the library closes its windows; after quit no worker remains, `fb-native owner` reports idle, and
+`fb-native list` shows the imported, moved, renamed, and deleted items as expected, with removed originals in the
+run's `trash/`.
+
+The tool presses Escape before each step's search, so a sheet a failed step left open does not take the following
+keystrokes. Rows in sheets are selected with a real click (SwiftUI ignores setting a row's selected attribute), and
+the helper looks in an open sheet before the window behind it.
 
 It takes the keyboard and brings the app forward for a few minutes: the owner keeps hands off, and the terminal
 needs Accessibility and Screen Recording access. The clipboard text is saved and restored. A small native helper,
@@ -305,5 +314,4 @@ static text (System Events reports some SwiftUI button labels as empty).
 
 ## Pending work
 
-- **Cached row thumbnails (BRW-9):** not built; see Browsing.
 - **Copying or saving preview images:** deferred to a later milestone (spec, out of scope).

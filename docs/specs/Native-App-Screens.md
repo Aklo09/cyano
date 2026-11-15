@@ -167,8 +167,8 @@ Layout, left to right:
   issues and opens the Listing issues sheet (BRW-8). Collapsible with the system sidebar command (⌃⌘S).
 - **Path bar:** above the item list; every component is a link to that folder or book (BRW-4, BOOK-3).
 - **Item list:** a table showing the current folder's subfolders first, then its items, sorted by name (column
-  headers sort). Folder columns: Name (with a 20-point cached thumbnail when one exists, otherwise the kind symbol,
-  BRW-9), Kind, Updated, Size. Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
+  headers sort). Folder columns: Name (with the kind symbol; cached thumbnails, BRW-9, were dropped
+  in A18), Kind, Updated, Size. Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
   Double-click or ⌘↓ opens a folder or book; ⌘↑ goes to the enclosing folder or book.
 - **Inspector:** described below; toggled with the system inspector command (⌃⌘I) and resizable.
 - **Banners:** one line across the top of the item list for window-wide conditions (below).
@@ -481,7 +481,7 @@ Every command is in the menu bar (LIFE-4); unavailable commands are disabled rat
 ## Accessibility
 
 - **VoiceOver:** list rows read name, kind, updated date, and size ("Loop, blueprint, updated 3 October 2026,
-  4.2 kilobytes"); book rows add "entry 3". Thumbnails and kind symbols are hidden from VoiceOver because the row
+  4.2 kilobytes"); book rows add "entry 3". Kind symbols are hidden from VoiceOver because the row
   states the kind. The preview image is labeled "Preview of <name>"; state changes (waiting, rendering, ready,
   failed) are announced. Banners and confirmations are announced when they appear. Icon-only toolbar buttons have
   labels and help text (zoom, Fit, Actual Size).

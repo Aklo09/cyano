@@ -1,6 +1,6 @@
 # Native macOS port: roadmap and first milestone
 
-Date: 2026-11-13. Status: approved by the owner; milestones 1 and 2 are accepted.
+Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, and 3 are accepted.
 Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
@@ -22,7 +22,7 @@ See [foundation validation](../validation/Foundation.md) for evidence and limita
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Milestone 2 is [accepted](../validation/Milestone-2.md). Application rendering scheduling remains milestone 4 work.
+Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Application rendering scheduling remains milestone 4 work.
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
 The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.
