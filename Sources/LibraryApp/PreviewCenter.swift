@@ -19,24 +19,59 @@ public struct PreviewSubject: Codable, Hashable, Sendable {
     }
 }
 
-/// A decoded preview. The renderer paints the 2x tier, so two pixels make one point at Actual Size.
+/// A decoded preview with its render report's warnings. The renderer paints the 2x tier, so two pixels make one
+/// point at Actual Size.
 public struct PreviewImage: @unchecked Sendable, Equatable {
     public let image: CGImage
+    /// The planner's warnings, as rendered or as stored with a cached preview (WRN-1).
+    public let warnings: [String]
     private let id = UUID()
 
-    public init(image: CGImage) { self.image = image }
+    public init(image: CGImage, warnings: [String] = []) {
+        self.image = image
+        self.warnings = warnings
+    }
 
     public var pointSize: CGSize { CGSize(width: Double(image.width) / 2, height: Double(image.height) / 2) }
 
     public static func == (a: PreviewImage, b: PreviewImage) -> Bool { a.id == b.id }
 
     /// Decodes PNG bytes the renderer or the cache produced.
-    public static func decode(_ png: Data) throws -> PreviewImage {
+    public static func decode(_ png: Data, warnings: [String] = []) throws -> PreviewImage {
         guard let source = CGImageSourceCreateWithData(png as CFData, nil),
             let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else { throw PreviewError.imageEncoding }
-        return PreviewImage(image: image)
+        return PreviewImage(image: image, warnings: warnings)
     }
+}
+
+/// A render report's warnings for display: one line per distinct text with its count, most frequent first, at most
+/// `limit` lines (WRN-1, WRN-2). Reports may hold up to 100,000 warnings.
+public struct RenderWarnings: Equatable, Sendable {
+    public struct Line: Equatable, Sendable {
+        public let text: String
+        public let count: Int
+    }
+
+    /// Every warning in the report.
+    public let total: Int
+    public let lines: [Line]
+    /// Distinct texts beyond `lines`.
+    public let more: Int
+
+    public init(_ warnings: [String], limit: Int = 100) {
+        var counts: [String: Int] = [:]
+        for warning in warnings { counts[warning, default: 0] += 1 }
+        let sorted = counts.map { Line(text: $0.key, count: $0.value) }.sorted {
+            $0.count != $1.count ? $0.count > $1.count : $0.text < $1.text
+        }
+        total = warnings.count
+        lines = Array(sorted.prefix(limit))
+        more = max(0, sorted.count - limit)
+    }
+
+    /// "1 warning", "3 warnings".
+    public var summary: String { total == 1 ? "1 warning" : "\(total.formatted()) warnings" }
 }
 
 /// What a preview area or window shows (screen specs, "Previews").
@@ -112,7 +147,7 @@ public struct PreviewBackend: Sendable {
                     {
                         return .nothingToDraw
                     }
-                    return .cached(try PreviewImage.decode(hit.preview.png))
+                    return .cached(try PreviewImage.decode(hit.preview.png, warnings: hit.preview.report.warnings))
                 }
                 let entry = try library.entry(id: job.itemId, entryPath: job.entryPath)
                 return isEmptyBlueprint(entry) ? .nothingToDraw : .needsRender
@@ -124,7 +159,7 @@ public struct PreviewBackend: Sendable {
                 let result = try service.render(
                     library: library, id: job.itemId, entryPath: job.entryPath, assetsURL: job.assetsURL,
                     cancellation: token)
-                return try PreviewImage.decode(result.preview.png)
+                return try PreviewImage.decode(result.preview.png, warnings: result.preview.report.warnings)
             })
     }
 

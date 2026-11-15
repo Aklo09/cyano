@@ -147,7 +147,9 @@ game's icon tile (see the [app guide](development/App.md#icons)). R6 is done in 
 (2026-11-15): names keep their tags and show icons in place; imports and unpacked leaves save tagged labels as
 `displayNameOverride` (see the [storage contract](contracts/Storage.md#portable-names-and-confined-access)). R7 is done in code and tests
 (2026-11-15): Statistics rows show item and quality icons; all 342 map items and every quality have one in the
-release. A real-app check of R6 and R7 is pending (owner: later). Next: R8 (render warnings).
+release. A real-app check of R6 and R7 is pending (owner: later). R8 is done in code and tests (2026-11-15):
+previews with warnings show a count that opens the grouped list, also from View ▸ Show Render Warnings; the owner
+kept the planner's wording. Next: R9 (copy and save preview images).
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

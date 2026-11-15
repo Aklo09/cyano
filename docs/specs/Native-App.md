@@ -388,7 +388,7 @@ Icons come only from the configured asset release (GEN-9). Everything in this gr
   when it is shown, then a control states the number of warnings; with no warnings, no control appears.
 - **WRN-2** Given WRN-1, when the owner opens the control, then the warnings are listed once per distinct text with
   their count, most frequent first, at most 100 lines followed by "and N more". The wording is the planner's text
-  until R1 shows which warnings occur; this criterion is then amended with the owner.
+  (owner, 2026-11-15, after R1: the corpus produced one warning, "Unsupported entity: ee-infinity-loader (8)").
 - **WRN-2a** Given WRN-1, when the owner uses only the keyboard, then the control is in the focus order right after
   the preview (inspector and preview window), View ▸ Show Render Warnings opens it, and Esc closes it.
 - **WRN-3** Given a preview with warnings, when it is shown, then it stays in the Ready state, can be zoomed, copied,
@@ -447,7 +447,7 @@ None. The owner accepted the proposed defaults on 2026-11-14; they are now crite
 IMP-3, EXP-4, PRV-4, PRV-8a, PRV-12, PRV-13, COM-6, and ORG-12.
 Remarks from the owner's review added REC-1/REC-1a, GEN-6/GEN-7, and GEN-8, and deferred copying or saving
 preview images.
-Milestone 4 (R0): WRN-2's wording waits for R1's corpus report; the owner settles it then.
+Milestone 4 (R0): WRN-2's wording waited for R1's corpus report; the owner kept the planner's text (2026-11-15).
 Milestone 4 (R0): root items' entry icons (ICN-1) come from the derived `cache/source-index.json`, which already
 decodes each source once for its kind; it moves to schema 2 and is rebuilt once (owner, 2026-11-15).
 Milestone 4 (R0): the owner chose the text form for text-only places (decision 9) and tagged names in item metadata

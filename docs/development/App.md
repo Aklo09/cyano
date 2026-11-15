@@ -160,6 +160,12 @@ windows (PRV-1 to PRV-12). Each preview area owns a `PreviewDisplay`, whose `Pre
   itself when its library closes or another one opens (LIFE-1). Open with Open in Window (inspector), ⌘Y, or Space in the list. The View
   menu acts on the focused preview: Zoom In/Out (⌘+/⌘−), Actual Size (⌘0), Zoom to Fit (⌘9), Background, Retry
   Preview (⌘R).
+- **Warnings (R8):** `PreviewImage.warnings` carries the render report's warnings, from a fresh render or a cached
+  report. `PreviewDisplay.warnings` groups a ready preview's warnings into `RenderWarnings` (one line per text with
+  its count, most frequent first, at most 100 lines, then "and N more"). `RenderWarningsButton` ("3 warnings")
+  follows Open in Window in the inspector and closes the preview window's toolbar; it opens a popover that Esc
+  closes, as does View ▸ Show Render Warnings. The "Preview ready" announcement adds the count. The words are the
+  planner's own (owner, 2026-11-15).
 - **Worker:** the Xcode target embeds the package's `preview-worker` product with a Copy Files phase into
   `Contents/MacOS` (signed on copy); `PreviewBackend.bundledWorker` finds it with
   `Bundle.main.url(forAuxiliaryExecutable:)`. The worker target adds an `@executable_path/../Frameworks` rpath

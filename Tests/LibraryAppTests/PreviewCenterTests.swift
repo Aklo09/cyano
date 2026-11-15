@@ -17,11 +17,11 @@ private func blueprint(_ label: String, empty: Bool = false) -> String {
     return #"{"blueprint":{"item":"blueprint","label":"\#(label)""# + entities + #","version":1}}"#
 }
 
-private func tinyImage() -> PreviewImage {
+private func tinyImage(warnings: [String] = []) -> PreviewImage {
     let context = CGContext(
         data: nil, width: 4, height: 2, bitsPerComponent: 8, bytesPerRow: 0,
         space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    return PreviewImage(image: context.makeImage()!)
+    return PreviewImage(image: context.makeImage()!, warnings: warnings)
 }
 
 /// A backend that never starts a worker: renders wait until the test finishes them, and record their order and
@@ -31,6 +31,7 @@ private final class FakeRenders: @unchecked Sendable {
     private var gates: [String: DispatchSemaphore] = [:]
     private var failures: [String: Error] = [:]
     private var cachedIds: Set<String> = []
+    private var warningsById: [String: [String]] = [:]
     private var startedIds: [String] = []
     private var cancelledIds: [String] = []
     private var running = 0
@@ -41,6 +42,7 @@ private final class FakeRenders: @unchecked Sendable {
     var peak: Int { locked { peakRunning } }
 
     func cache(_ id: String) { locked { _ = cachedIds.insert(id) } }
+    func warn(_ id: String, _ warnings: [String]) { locked { warningsById[id] = warnings } }
     func fail(_ id: String, with error: Error) { locked { failures[id] = error } }
 
     /// Lets the oldest unfinished render of `id` return.
@@ -57,7 +59,9 @@ private final class FakeRenders: @unchecked Sendable {
             lookup: { library, job in
                 let entry = try library.entry(id: job.itemId, entryPath: job.entryPath)
                 if PreviewBackend.isEmptyBlueprint(entry) { return .nothingToDraw }
-                return self.locked { self.cachedIds.contains(job.itemId) } ? .cached(tinyImage()) : .needsRender
+                let warnings = self.locked { self.warningsById[job.itemId] } ?? []
+                return self.locked { self.cachedIds.contains(job.itemId) }
+                    ? .cached(tinyImage(warnings: warnings)) : .needsRender
             },
             render: { _, job, token in
                 let gate = DispatchSemaphore(value: 0)
@@ -75,7 +79,7 @@ private final class FakeRenders: @unchecked Sendable {
                     }
                 }
                 if let failure = self.locked({ self.failures.removeValue(forKey: job.itemId) }) { throw failure }
-                return tinyImage()
+                return tinyImage(warnings: self.locked { self.warningsById[job.itemId] } ?? [])
             })
     }
 }
@@ -202,6 +206,41 @@ struct PreviewCenterTests {
         fixture.center.show(fixture.subject("Empty"), in: empty)
         await until { isReady(cached.state) && empty.state == .nothingToDraw }
         #expect(fixture.center.renderCount == 0 && fixture.renders.started.isEmpty)
+    }
+
+    @Test("WRN-1, WRN-3: cached and rendered previews carry their warnings; Ready stays Ready; none means no control")
+    func warnings() async throws {
+        let fixture = try await PreviewFixture()
+        defer { fixture.cleanup() }
+        let unsupported = "Unsupported entity: ee-infinity-loader (8)"
+        fixture.renders.cache(fixture.ids["A"]!)
+        fixture.renders.warn(fixture.ids["A"]!, [unsupported])
+        fixture.renders.warn(fixture.ids["B"]!, ["x", "y", "x"])
+        let (cached, rendered, clean) = (PreviewDisplay(), PreviewDisplay(), PreviewDisplay())
+        fixture.center.show(fixture.subject("A"), in: cached.viewer)
+        fixture.center.show(fixture.subject("B"), in: rendered.viewer)
+        await until { isReady(cached.viewer.state) && fixture.renders.started.count == 1 }
+        #expect(cached.warnings?.lines == [RenderWarnings.Line(text: unsupported, count: 1)])
+        #expect(cached.warnings?.summary == "1 warning" && rendered.warnings == nil)
+        fixture.renders.finish(fixture.ids["B"]!)
+        await until { isReady(rendered.viewer.state) }
+        #expect(rendered.warnings?.summary == "3 warnings" && rendered.warnings?.lines.map(\.text) == ["x", "y"])
+        fixture.center.show(fixture.subject("C"), in: clean.viewer)
+        await until { fixture.renders.started.count == 2 }
+        fixture.renders.finish(fixture.ids["C"]!)
+        await until { isReady(clean.viewer.state) }
+        #expect(clean.warnings == nil && !clean.canRetry)
+    }
+
+    @Test("WRN-2: warnings group by text with counts, most frequent first, at most 100 lines and then a remainder")
+    func warningLines() {
+        let grouped = RenderWarnings(["b", "a", "b", "c", "b", "a"])
+        #expect(grouped.total == 6 && grouped.more == 0)
+        #expect(grouped.lines.map(\.text) == ["b", "a", "c"] && grouped.lines.map(\.count) == [3, 2, 1])
+        let many = RenderWarnings((0..<150).map { "warning \($0)" } + ["warning 7"])
+        #expect(many.lines.count == 100 && many.more == 50 && many.total == 151)
+        #expect(many.lines.first == RenderWarnings.Line(text: "warning 7", count: 2))
+        #expect(RenderWarnings([]).summary == "0 warnings")
     }
 
     @Test("PRV-9: without an asset release, previews say so and never render")

@@ -41,6 +41,8 @@ public final class PreviewDisplay {
     public let viewer = PreviewViewer()
     public private(set) var viewport: PreviewViewport?
     public var background: PreviewBackground = .checkerboard
+    /// Whether the render warnings popover is open (WRN-2, View ▸ Show Render Warnings).
+    public var showsWarnings = false
     @ObservationIgnored private var viewSize: CGSize = .zero
     @ObservationIgnored private var image: PreviewImage?
     @ObservationIgnored weak var center: PreviewCenter?
@@ -64,6 +66,7 @@ public final class PreviewDisplay {
     func subjectChanged() {
         image = nil
         viewport = nil
+        showsWarnings = false
     }
 
     func resize(to size: CGSize) {
@@ -83,6 +86,12 @@ public final class PreviewDisplay {
     var canRetry: Bool {
         if case .failed = viewer.state { return true }
         return false
+    }
+
+    /// The ready preview's warnings; none in any other state (WRN-1, WRN-3).
+    public var warnings: RenderWarnings? {
+        guard case .ready(let image) = viewer.state, !image.warnings.isEmpty else { return nil }
+        return RenderWarnings(image.warnings)
     }
 
     func change(_ body: (inout PreviewViewport) -> Void) {
@@ -224,7 +233,10 @@ struct PreviewArea: View {
         switch state {
         case .waiting: "Waiting to render"
         case .rendering: "Rendering preview"
-        case .ready: "Preview ready"
+        case .ready(let image):
+            image.warnings.isEmpty
+                ? "Preview ready"
+                : "Preview ready, \(RenderWarnings(image.warnings).summary.replacingOccurrences(of: "warning", with: "render warning"))"
         case .failed: "The preview couldn't be rendered"
         case .nothingToDraw: "This blueprint has no entities or tiles"
         default: nil
@@ -250,11 +262,14 @@ struct InspectorPreview: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.separator))
             if let target {
-                Button("Open in Window") {
-                    openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
+                HStack(spacing: 8) {
+                    Button("Open in Window") {
+                        openWindow(id: LibraryAppIdentity.previewWindow, value: target.subject)
+                    }
+                    .help("Open this preview in its own window (⌘Y)")
+                    RenderWarningsButton(display: display)
                 }
                 .controlSize(.small)
-                .help("Open this preview in its own window (⌘Y)")
             }
         }
         .focusedSceneValue(\.previewDisplay, display)
@@ -355,7 +370,55 @@ struct PreviewToolbar: ToolbarContent {
                 .help("Actual Size (⌘0)")
                 .disabled(!display.canZoom)
             BackgroundMenu(display: display)
+            RenderWarningsButton(display: display)
         }
+    }
+}
+
+/// "3 warnings" with a warning symbol, shown only for a ready preview with warnings; opens the list (WRN-1, WRN-2).
+struct RenderWarningsButton: View {
+    @Bindable var display: PreviewDisplay
+
+    var body: some View {
+        if let warnings = display.warnings {
+            Button {
+                display.showsWarnings = true
+            } label: {
+                Label(warnings.summary, systemImage: "exclamationmark.triangle")
+            }
+            .help("Show Render Warnings")
+            .accessibilityLabel(warnings.summary.replacingOccurrences(of: "warning", with: "render warning"))
+            .popover(isPresented: $display.showsWarnings, arrowEdge: .bottom) {
+                RenderWarningsList(warnings: warnings)
+            }
+        }
+    }
+}
+
+/// The popover: one line per distinct warning with its count, most frequent first (WRN-2). Esc closes it.
+private struct RenderWarningsList: View {
+    let warnings: RenderWarnings
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Render warnings").font(.headline)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(Array(warnings.lines.enumerated()), id: \.offset) { _, line in
+                        Text("\(line.count.formatted()) × \(line.text)")
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+                    }
+                    if warnings.more > 0 {
+                        Text("and \(warnings.more.formatted()) more")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxHeight: 300)
+        }
+        .padding(14)
+        .frame(width: 360)
     }
 }
 
@@ -405,6 +468,8 @@ struct PreviewCommands: Commands {
             }
             .disabled(display == nil)
             Divider()
+            Button("Show Render Warnings") { display?.showsWarnings = true }
+                .disabled(display?.warnings == nil)
             Button("Retry Preview") { display?.retry() }
                 .keyboardShortcut("r")
                 .disabled(display?.canRetry != true)
