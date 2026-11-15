@@ -1,7 +1,9 @@
 # Manage a blueprint library in a native macOS app
 
-Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A1).
-Plan: [milestone 3](../planning/Milestone-3.md). Screen layout, focus order, and shortcuts belong to the A2 screen specs.
+Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A1). Amended for milestone 4
+(subtask R0, 2026-11-15): GEN-9, BRW-1, BRW-5, IMP-5, STA-1, and the Icons, Render warnings, and Preview images
+groups; approved by the owner on 2026-11-15.
+Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Milestone-4.md). Screen layout, focus order, and shortcuts belong to the A2 screen specs.
 
 ## Problem
 
@@ -28,6 +30,16 @@ and the private renderer assets may be missing, for example on a fresh machine.
   (for example `5.0`); indices can be sparse.
 - **Assets:** a verified private asset release; previews and statistics need it, nothing else does.
 - **Preview window:** a separate window showing one entry's image, so several can be compared.
+- **Entry icons:** the one to four signals stored in an entry's `icons` field, which the game shows as the entry's
+  symbol.
+- **Rich-text tag:** Factorio markup in a name, such as `[item=iron-plate]` or `[item=iron-plate,quality=rare]`.
+- **Icon tag:** a well-formed tag whose kind names an icon category: `item`, `fluid`, `virtual-signal`, `entity`,
+  `recipe`, `tile`, `quality`, `asteroid-chunk`, `space-location`, `planet` (as `space-location`), and
+  `img=<category>/<name>` or `img=<category>.<name>` for any of these categories. Other tags (`color`, `font`, `gps`,
+  `train`, `special-item`, and anything unknown) are not icon tags.
+- **Text form of a name:** the name with every icon tag removed and every other tag kept as written, whether or not
+  a release is configured; when nothing but spaces is left, the icons' names are used instead (`[item=fusion-reactor]`
+  becomes "fusion reactor"). It does not change with the release.
 
 ## Acceptance criteria
 
@@ -66,6 +78,10 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
   recovered, or changed, then they never cause a refusal, listing issue, recovery requirement, or integrity conflict,
   and they are never treated as library content; a folder containing only `.DS_Store` (and a folder description)
   counts as empty (ORG-10). (LibraryCore behavior since milestone 3 subtask A0.)
+- **GEN-9** Given the built app bundle, the package resources, and the git-tracked files, when the artwork check in
+  `just test` runs, then none of them contains a file from an asset release, detected by name (atlas images, render
+  databases, `release.json`, `prototype-map.json`) or, where `private-assets/` exists, by SHA-256; a planted copy
+  makes the check fail. Every icon and sprite is read at runtime from the configured release only.
 - **GEN-5** Given the main window, when the owner uses only the keyboard, then every workflow in this spec can be
   completed. (Detailed checks: A16.)
 
@@ -121,7 +137,8 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 
 - **BRW-1** Given an open library, when it is shown, then the folder hierarchy, including empty folders, is browsable,
   and the selected folder lists its items with name, kind (blueprint, book, upgrade planner, deconstruction planner),
-  updated date, and size in decimal B/KB/MB with the exact byte count available.
+  updated date, and size in decimal B/KB/MB with the exact byte count available. Names show their entry icons and
+  rich-text icons as the Icons group specifies.
 - **BRW-2** Given a folder with no items or subfolders, when it is selected, then an empty state says so and offers
   import.
 - **BRW-3** Given a library with no items at all, when it opens, then the empty state offers import.
@@ -129,7 +146,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
   ancestor can be selected from that path.
 - **BRW-5** Given text in the name filter, when it is applied, then items in every folder whose names contain the text
   (case- and diacritic-insensitive) are listed, each with its folder; clearing the filter returns to the selected
-  folder.
+  folder. The filter matches the stored name, tag text included, so `iron-plate` finds `[item=iron-plate] Smelter`.
 - **BRW-6** Given the filter matches nothing, when it is applied, then an empty state says no items match.
 - **BRW-7** Given a folder with a stored description (from an unpacked book), when it is selected, then the description
   is shown as plain text with its line breaks.
@@ -175,7 +192,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **IMP-4** Given no target is chosen, when the owner imports, then the target is the selected folder (the library
   root when none is selected); dropping onto a folder targets that folder.
 - **IMP-5** Given an optional name, when the item is saved, then it uses that name; without one, it uses the string's
-  label, or a kind-specific untitled name when there is none.
+  label with its rich-text tags kept (ICN-8), or a kind-specific untitled name when there is none.
 - **IMP-6** Given an item whose name collides under GEN-6 already exists in the target folder, when the import is saved,
   then the new item gets the next ` (2)`, ` (3)` suffix and the existing item is unchanged.
 - **IMP-7** Given an invalid string (not a blueprint string, corrupt data, over a codec limit), when the owner saves,
@@ -291,7 +308,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 
 - **STA-1** Given assets are configured and a blueprint entry is selected, when statistics are shown, then the five
   requirement groups, their total, and the footprint in tiles appear with item names as text and quality where not
-  normal.
+  normal, each with its icon (ICN-9).
 - **STA-2** Given the seven blueprints approved in [milestone 2](../validation/Milestone-2.md) (`RS.txt`,
   `4x_Rocket_Silo.txt`, `Hazard_Patterns.txt`, `bp.txt` `0.0` and `1.1`, and `v0.59.0.txt` `1.1` from
   `Tests/LibraryCoreTests/Fixtures/Blueprints/`, plus
@@ -326,6 +343,72 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **SET-6** Given Settings, when the owner clears the asset release, then previews and statistics show their
   "no assets configured" state.
 
+### Icons (R3–R7)
+
+Icons come only from the configured asset release (GEN-9). Everything in this group falls back to text without one.
+
+- **ICN-1** Given a release is configured and a root item or book entry whose `icons` field holds signals, when it is
+  listed (root items' icons are known at listing time, with no decoding beyond the derived index), then its row shows the kind symbol, then each signal's icon in stored order, then the name; a signal with a
+  quality other than normal shows that quality's badge on its icon.
+- **ICN-2** Given ICN-1's item or entry is shown in the inspector, then the header shows its entry icons as the game
+  arranges them: one icon fills the tile; two to four share a 2 × 2 grid in the game's positions, with quality badges.
+- **ICN-3** Given an entry without entry icons, or no release configured, when it is listed or shown in the
+  inspector, then the row shows the kind symbol and the name, and the inspector header shows the kind symbol.
+- **ICN-4** Given an entry icon that the release has no image for (an unknown name or type, or a planet in a release
+  without planet icons), when it is shown, then rows leave it out and the inspector leaves its slot empty; nothing
+  else changes and no error is shown.
+- **ICN-5** Given a name containing an icon tag whose name the release has an icon for, when the name is shown in a
+  list row, the sidebar, the path bar, or the inspector header, then the tag appears as that icon at the size of the
+  surrounding text, with a quality badge for `quality=` other than normal, in its place in the name. A name made only
+  of icon tags shows only icons.
+- **ICN-6** Given a tag that does not become an icon (not an icon tag, a name the release has no icon for, malformed
+  markup, or no release configured), when the name is shown, then the tag stays in the name exactly as written
+  (owner decision S5).
+- **ICN-7** Given a name with tags, when it appears where icons cannot be drawn (window titles, the default file name
+  of Save As TXT and Save Image As, sort order), then its text form is used, so these never change with the release;
+  VoiceOver reads each icon as its name with hyphens as spaces, followed by its quality when not normal (for example
+  "iron plate, rare").
+- **ICN-8** Given a string whose label contains rich-text tags, when it is imported without an explicit name (IMP-5)
+  or unpacked (IMP-9, for each leaf item), then the item's name is the label with its tags as written, including a
+  label made only of tags, and it gets the same ` (2)` suffix as its file when IMP-6 adds one; the item's file name is
+  derived as before, with tags removed. Folders made by unpacking keep their names as before. Items imported before
+  this change keep their names. Renaming accepts any name, tags included, and shows the tags as icons. A label over
+  the name limit (1,024 characters) keeps the name derived from the file name.
+- **ICN-9** Given statistics are shown (STA-1), when an item or quality has an icon in the release, then the icon
+  appears before the item's name and with its quality; an item without one shows its name alone.
+- **ICN-10** Given the owner selects a different release or clears it (SET-5a, SET-6), when names, rows, and
+  statistics are shown again, then every icon comes from the new release or falls back as in ICN-3, ICN-4, and ICN-6.
+- **ICN-11** Given a release prepared with planet icons, when Nauvis, Vulcanus, Gleba, Fulgora, or Aquilo appears as
+  an entry icon or a `planet` or `space-location` tag, then its icon is shown; a 2.1.24 release prepared without
+  them still verifies and falls back as in ICN-4 and ICN-6.
+
+### Render warnings (R8)
+
+- **WRN-1** Given a preview in the Ready state whose render report has warnings, rendered now or read from the cache,
+  when it is shown, then a control states the number of warnings; with no warnings, no control appears.
+- **WRN-2** Given WRN-1, when the owner opens the control, then the warnings are listed once per distinct text with
+  their count, most frequent first, at most 100 lines followed by "and N more". The wording is the planner's text
+  until R1 shows which warnings occur; this criterion is then amended with the owner.
+- **WRN-2a** Given WRN-1, when the owner uses only the keyboard, then the control is in the focus order right after
+  the preview (inspector and preview window), View ▸ Show Render Warnings opens it, and Esc closes it.
+- **WRN-3** Given a preview with warnings, when it is shown, then it stays in the Ready state, can be zoomed, copied,
+  and saved, and offers no Retry for the warnings.
+
+### Preview images (R9)
+
+- **IMG-1** Given a preview in the Ready state in the inspector or a preview window, when the owner copies the image,
+  then the clipboard holds a PNG whose bytes equal the cached preview (2x, transparent, as rendered; the view's
+  background and zoom are not included), and a confirmation says it was copied.
+- **IMG-2** Given IMG-1's preview, when the owner saves the image to a new file, then the file's bytes equal the
+  cached preview; the suggested name is the text form of the name (ICN-7), with " — Entry 5.0" for a book entry,
+  and `.png`.
+- **IMG-3** Given the chosen file already exists, when the owner confirms replacing it, then it behaves as EXP-4.
+- **IMG-4** Given a destination inside the open library's folder, when the owner saves there, then the app refuses as
+  EXP-5 and writes nothing.
+- **IMG-5** Given a write failure, when the owner saves, then it behaves as EXP-6.
+- **IMG-6** Given a preview that is not Ready (no assets, waiting, rendering, failed, nothing to draw, deleted) or a
+  selected book, when the owner looks for Copy Image or Save Image As, then both are disabled.
+
 ### Menus and lifecycle (A15)
 
 - **LIFE-1** Given an open library, when the owner closes the main window, then its preview windows close, renders are
@@ -340,16 +423,16 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 ## Out of scope
 
 - **Several libraries open at once:** decision 3 chose one library per app.
-- **Thumbnail grids, cards, and row thumbnails:** milestone 4 (decision 4); list rows show the kind symbol (BRW-9 was
-  dropped).
-- **Icons:** blueprint and book name icons and item icons in statistics need the private sprite atlases; milestone 4.
-  Until then, Factorio rich-text tags (for example `[item=iron-plate]`) are removed from displayed names; milestone 4
-  turns them into icons (owner decision, 2026-11-14).
+- **Thumbnail grids, cards, and row thumbnails:** dropped by the owner (BRW-9 in A18, then milestone 4 decision S1,
+  2026-11-15); the inspector's preview of the selected entry is enough.
+- **Entry icons in the sidebar and preview window titles:** folders have no entry icons, and window titles are text
+  (ICN-7).
+- **Colored text from `[color]` tags and fonts from `[font]` tags:** they stay as written (ICN-6).
 - **Saved Factorio versions in list rows:** listing hashes sources without decoding them, so it has no version.
 - **Maintenance screens:** cache and staging cleanup, quarantine, operations listing, and disk usage stay in the CLI
   (decision 6); so does the web app's information page.
-- **Copying or saving a preview image:** required by the owner but deferred to a later milestone (not yet
-  assigned); cached images and the viewer must not prevent it.
+- **Copying or saving a preview at another size or with the view's background:** IMG-1 and IMG-2 use the cached
+  image as rendered.
 - **Reveal in Finder:** dropped by the owner; Finder edits to an owned library are unsafe.
 - **Editing entries inside a book:** only whole-item replacement, as in the web application.
 - **Undo:** deleted and replaced originals go to the Trash; restoring one means closing the library and moving the
@@ -364,6 +447,11 @@ None. The owner accepted the proposed defaults on 2026-11-14; they are now crite
 IMP-3, EXP-4, PRV-4, PRV-8a, PRV-12, PRV-13, COM-6, and ORG-12.
 Remarks from the owner's review added REC-1/REC-1a, GEN-6/GEN-7, and GEN-8, and deferred copying or saving
 preview images.
+Milestone 4 (R0): WRN-2's wording waits for R1's corpus report; the owner settles it then.
+Milestone 4 (R0): root items' entry icons (ICN-1) come from the derived `cache/source-index.json`, which already
+decodes each source once for its kind; it moves to schema 2 and is rebuilt once (owner, 2026-11-15).
+Milestone 4 (R0): the owner chose the text form for text-only places (decision 9) and tagged names in item metadata
+instead of file names (decision 3, revised), 2026-11-15.
 
 ## References
 

@@ -127,7 +127,11 @@ icons added to the private release by regenerating `private-assets/2.1.24` (prof
 at runtime from the release and never embedded, render warnings shown, image copy/save, the 239-leaf corpus reviewed
 from contact sheets, and a `just test` check that no Factorio artwork reaches git, package resources, or the app
 bundle. Milestone 4 verification (owner, 2026-11-15): focused suites per subtask plus `just lint` and `just app-build`, full
-`just test` at the end (see the [plan](planning/Milestone-4.md#verification)). Next: R0, the spec amendments, for owner approval; R1 (corpus harness) and R3 (planet icons) can start at once.
+`just test` at the end (see the [plan](planning/Milestone-4.md#verification)). R0 is done (2026-11-15): the [app spec](specs/Native-App.md) and [screen specs](specs/Native-App-Screens.md) gained
+ICN-1–ICN-11, WRN-1–WRN-3, IMG-1–IMG-6, and GEN-9. The owner also revised decision 3 (a tagged label goes into
+`displayNameOverride`; file names unchanged) and added decision 9 (text form in titles, file names, sorting) and
+decision 10 (root entry icons in the derived source index, schema 2). Next: R1 (corpus harness) and R3 (planet
+icons), then R4.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

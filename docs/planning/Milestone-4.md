@@ -1,6 +1,7 @@
 # Milestone 4: rendering integration
 
 Date: 2026-11-15. Status: approved by the owner on 2026-11-15, with every decision below settled.
+R0, the spec amendments, is done: the owner approved them on 2026-11-15.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope
@@ -38,8 +39,8 @@ Milestones 1 and 3 delivered part of the roadmap row. This milestone extends tha
 - **Entry icons:** each blueprint, book, and planner stores an `icons` array of up to four signals. The game shows
   them as the entry's symbol. The app shows only the kind symbol today.
 - **Rich-text icons:** names drop every bracketed tag today (`LibraryBookBrowsing.name`). Root item names come from the
-  stored basename or rename, and import already strips tags from them ([storage contract](../contracts/Storage.md)).
-  See decision 3.
+  stored basename or rename, and import strips tags from the basename ([storage contract](../contracts/Storage.md)).
+  Decision 3 keeps the tagged label in the item's metadata instead.
 - **Planet icons:** the release's render database has no planet icons (see the survey).
 - **Statistics icons:** statistics show item names as text (milestone 3, decision 5).
 - **Render warnings:** the planner reports warnings, and the cache keeps them, but the app does not show them.
@@ -100,12 +101,14 @@ Settled by the owner on 2026-11-15.
 | S5 | A tag whose icon is not available stays in the name as written; it is no longer removed |
 | 1 | The full supplied corpus is the nine fixtures (198 leaves) plus the four non-empty vendored visual tests (41 leaves), 239 leaves in all. Only the vendored files have curved, diagonal, legacy, and elevated-curve rails |
 | 2 | A `just` recipe imports the corpus into a scratch library and calls the existing `fb-native preview … --entry` for every leaf. It writes a report (dimensions, timings, warnings, failures) and contact sheets under `.cache/`. The owner reviews the sheets and opens flagged entries at full size. For rail seams the owner judges crops at 100% and 400%, compared with in-game screenshots where the owner supplies them. No reference renderer and no new dependency |
-| 3 | Imports stop removing tags when they name a new item. Filename projection keeps them (`[` and `]` are valid on APFS), so the stored name, renames, and folders made by unpacking all keep their tags and show icons. Finder and the CLI show the tags as text. Items imported earlier keep their stripped names. This changes the filename rule in the [storage contract](../contracts/Storage.md), not the metadata schema |
+| 3 | Revised by the owner on 2026-11-15, replacing the first version (tags kept in file names). When a label contains rich-text tags, import and unpacking save the label with its tags as the item's name in the existing `displayNameOverride` metadata field; file names keep today's projection with tags removed, so Finder, file paths, and the CLI's basenames are unchanged. Folders made by unpacking have no sidecar and keep today's names. Items imported earlier keep their names. The metadata schema stays at version 1; only the wording in the [storage contract](../contracts/Storage.md) changes |
 | 4 | Entry icons have two layouts. The inspector header shows the game's arrangement, using fpsr's layout (`packages/renderer/src/blueprint-icons.ts`): one icon fills the tile, and two to four share a 2 × 2 grid, with quality badges; a signal without an icon leaves its slot empty. List rows keep the kind symbol and show the entry's icons (one to four, in stored order, with quality badges) in a line before the name; a signal without an icon is left out. Without icons or without a release, rows show the kind symbol and name only, and the inspector shows the kind symbol |
 | 5 | The app process reads icons at runtime from the verified release only: Image I/O crops the WebP atlas frames that the render database names, kept in a bounded in-memory cache, never written to disk. The 1,395 icons use 944 frames on 37 atlases at 2x (at most 320 × 320, 13.3 MiB decoded in all) or 9 atlases at 1x (3.3 MiB) |
 | 6 | Planet icons are added to the render database as `space-location/<planet>`, so that signals and `[planet=…]` tags find them. The profile stays at 2.1.24 schema 2, so a release without them still verifies and shows planet tags as text (S5). Getting the icons means regenerating `private-assets/2.1.24` and reassembling the release, which changes the release identity, so cached previews render again once |
 | 7 | Render warnings: a count beside the preview, with a disclosure listing them grouped by text and capped (reports allow up to 100,000), worded from the planner's text after R1 shows which ones occur. Nothing new is persisted |
 | 8 | Copy Image and Save Image As… (PNG, the cached bytes exactly) from the inspector and preview windows are part of milestone 4 |
+| 9 | Where icons can't be drawn (window titles, suggested file names, sort order), names use their text form: icon tags removed whether or not the release has the icon, other tags kept, and the icons' names when nothing else is left. These places never change with the release |
+| 10 | Root items' entry icons are stored in the derived `cache/source-index.json` beside each source's kind, from the same single decode. The index moves to schema 2; a schema 1 index is treated as unreadable and rebuilt once on the next listing, and an older build rebuilding schema 1 costs only a decode. The [storage contract](../contracts/Storage.md) and [preview cache contract](../contracts/Preview-Cache.md) describe it |
 
 ## Subtasks
 
@@ -118,15 +121,15 @@ Numbering uses R for rendering.
 | R2 | Renderer corrections | Fixes for defects that R1 and the owner's review find, including connected-rail seams. Each fpsr change is a patch in `tools/vendor/fpsr-patches/`; a render-database change regenerates the private assets | Every corpus leaf renders without failure or unexplained warning; the owner accepts the seam crops | R1 |
 | R3 | Planet icons in the release | An fpsr pipeline patch that exports the planet icons; `private-assets/2.1.24` regenerated; asset-preparation guide and renderer validation updated; the owner reminded to reassemble the everyday release | The five corpus planets resolve in the new release; `just asset-test` and `just tools-check` pass | Decision 6 |
 | R4 | Icon catalog | Loads the icon table and atlas frames from a verified release, with bounded crops through Image I/O, a memory cache keyed by release identity, and signal-type mapping (`virtual` → `virtual-signal`). Tests use a tiny synthetic release | Unit tests cover known, unknown, quality-badged, and malformed entries, plus a release change | Decision 5 |
-| R5 | Entry icons | Icons in a line before the name in list rows, after the kind symbol, and the 2 × 2 composite in the inspector header, for root items and book entries (decision 4) | All 258 corpus entries with icons show them in both places; entries without icons, and the no-assets state, show the kind symbol only | R0, R4 |
-| R6 | Rich-text names | One tag parser replaces the regex in `LibraryBookBrowsing.name`. Tags with an icon draw as icons in rows, the path bar, and the inspector header; tags without one stay as written (S5). Window titles, filter, sort, and Save As filenames use the text form; VoiceOver reads icon names. Storage change only if decision 3 is accepted | Corpus labels and synthetic tag forms display as specified; filter and sort behave as the spec says | R0, R4, decision 3 |
+| R5 | Entry icons | Source index schema 2 with each root's entry icons (decision 10), its contract wording, and storage tests for the rebuild from schema 1; icons in a line before the name in list rows, after the kind symbol, and the 2 × 2 composite in the inspector header, for root items and book entries (decision 4) | All 258 corpus entries with icons show them in both places; entries without icons, and the no-assets state, show the kind symbol only; listing decodes nothing once the index is built; `just storage-test` and `just app-test` pass | R0, R4 |
+| R6 | Rich-text names | One tag parser replaces the regex in `LibraryBookBrowsing.name`. Icon tags draw as icons in rows, the sidebar, the path bar, and the inspector header; other tags stay as written (S5). Text-only places use the text form (decision 9, ICN-7). Import and unpacking save a tagged label in `displayNameOverride` (decision 3, ICN-8), and `docs/contracts/Storage.md` describes it; filename projection is unchanged. Expectations that assert tag removal change with the owner's approval of R0: `LibraryBookTests` (tag-only entries named "Untitled Blueprint", tags removed from labels); storage tests gain import and unpack cases for tagged labels | Corpus labels and synthetic tag forms display as specified; `just storage-test` and `just app-test` pass with the updated expectations | R0, R4 |
 | R7 | Statistics icons | Item and quality icons in Statistics rows. Missing icons fall back to text | STA-2 parity holds; every map item has an icon or a fallback | R0, R4 |
 | R8 | Render warnings in the UI | Warning count and disclosure in the inspector and preview windows | Synthetic warnings display as specified, with VoiceOver announcements | R0 |
 | R9 | Copy and save preview image | Copy Image and Save Image As… (PNG, cached bytes); refuses destinations inside the library, as Save As TXT does | Saved bytes equal the cache file; the clipboard holds a PNG | R0 |
 | R10 | Accessibility, smoke run, and artwork check | Keyboard and VoiceOver labels for icons and the new controls; `just app-smoke` extended to entry and name icons, a warning, and image copy. A check in `just test` that fails if Factorio artwork or release data is in git-tracked files, package resources, or the built app bundle: by name (`atlas.*.webp`, `render-db.*.json`, `release.json`, `prototype-map.json`) and, where `private-assets/` exists, by matching SHA-256 against every file in it | Smoke run passes with and without assets; the check passes, and fails on a planted copy of an atlas in a scratch bundle | R5–R9 |
 | R11 | Docs and acceptance | Guides (`docs/development/App.md`, `Preview.md`, `Asset-Preparation.md`), the user guide, and `docs/validation/Milestone-4.md` with per-leaf counts, verdicts, timings, and the owner's visual review (images stay in ignored directories) | Exit condition shown; owner approves | All |
 
-Suggested order: R0 first. R1 and R3 can start at once, because they need no app changes;
+Suggested order: R0 is done. R1 and R3 can start at once, because they need no app changes;
 R1's findings feed R2 in parallel with the app work. Then R4 → R5, R6, R7; R8 and R9 in any order; then R10 and R11.
 
 R2 is open-ended: its size depends on what R1 finds. If R1 turns up more than a handful of distinct renderer
@@ -145,7 +148,8 @@ focused run.
 | R2 | `just renderer-test`, `just planner-test`, `just tools-check` |
 | R3 | `just tools-check`, `just asset-test`, `just renderer-test` |
 | R4 | Its new suite, `just asset-test` |
-| R5, R7, R8, R9 | `just app-test`, `just app-build` |
+| R5 | `just storage-test` (source index), `just app-test`, `just app-build` |
+| R7, R8, R9 | `just app-test`, `just app-build` |
 | R6 | `just storage-test` (it changes LibraryCore filename projection, which the CLI tests also cover), `just app-test`, `just app-build` |
 | R10, R11 | Full `just test`, `just app-smoke` with and without assets, `python3 tools/check-independence.py --deny-path ../fb` |
 

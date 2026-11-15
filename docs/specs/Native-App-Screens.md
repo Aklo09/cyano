@@ -1,8 +1,10 @@
 # Native app screens
 
-Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A2).
+Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A2). Amended for milestone 4
+(subtask R0, 2026-11-15): names and icons, the item list, inspector header, Statistics tab, previews (warnings, image
+copy and save), menus, and accessibility; approved by the owner on 2026-11-15.
 Behavior and acceptance criteria: [native app spec](Native-App.md) (criterion IDs below refer to it).
-Plan: [milestone 3](../planning/Milestone-3.md).
+Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Milestone-4.md).
 
 Owner decisions for this document (2026-11-14): books are browsed like folders in the item list, and the
 inspector keeps the preview on top with tabs below it. Dark mode uses a darker content background and a stronger
@@ -24,9 +26,13 @@ and the exact values of the two color tokens.
 - **Dates:** the Mac's time zone and format, medium date with short time (for example "14 Nov 2026 at 14:03").
 - **Sizes:** decimal B/KB/MB (`ByteCountFormatter`, file style); exact bytes are always visible in the inspector,
   never only in a tooltip.
-- **Names:** item and entry names as stored, except that entry names drop Factorio rich-text tags (for example
-  `[item=iron-plate]`) as item names already do; milestone 4 turns the tags into icons (owner decision); statistics item names are the prototype names as text
-  (for example `fast-inserter`), matching `fb-native statistics`.
+- **Names:** item, folder, and entry names as stored. Rich-text tags with an icon in the release draw as that icon
+  at text size, in place (ICN-5); every other tag stays as written (ICN-6). Where icons can't be drawn (window
+  titles, suggested file names, sort order) the text form is used (ICN-7). Statistics item names are the prototype
+  names as text (for example `fast-inserter`), matching `fb-native statistics`, with the item's icon before them.
+- **Icons:** Factorio icons come only from the configured asset release and are drawn at their own colors on every
+  background; they are never the only carrier of meaning, because the kind label, name text, or VoiceOver name says
+  the same. Quality badges sit in the bottom-left corner of the icon, as in the game.
 - **Feedback:** every action changes something visible at once. Library operations taking longer than 0.5 s show
   an indeterminate spinner in the toolbar and disable actions that would queue behind them; renders show their own
   state (Previews below). Successful copy and export show a short confirmation at the bottom of the window for
@@ -155,9 +161,9 @@ Layout, left to right:
 ```text
 ┌ Sidebar ─────┬ Path bar: Library › Trains › Rail Book ───────┬ Inspector ─────────────┐
 │ ▾ Library    │ #  Name                 Kind       Updated  Size│ Header                │
-│   ▸ Smelting │    Stations             Folder                   │ Preview               │
-│   ▾ Trains   │    Rail Book            Book      12 Nov  41 KB  │ [Statistics|Details|  │
-│              │    Loop                 Blueprint  3 Oct   4 KB  │  Comments]            │
+│   ▸ Smelting │    ▢ Stations           Folder                   │ Preview               │
+│   ▾ Trains   │    ▤ ◆◆ Rail Book       Book      12 Nov  41 KB  │ [Statistics|Details|  │
+│              │    ▦ ◆ Loop             Blueprint  3 Oct   4 KB  │  Comments]            │
 │ ⚠ 2 issues   │                                                  │ Tab content           │
 └──────────────┴──────────────────────────────────────────────────┴───────────────────────┘
 ```
@@ -167,8 +173,10 @@ Layout, left to right:
   issues and opens the Listing issues sheet (BRW-8). Collapsible with the system sidebar command (⌃⌘S).
 - **Path bar:** above the item list; every component is a link to that folder or book (BRW-4, BOOK-3).
 - **Item list:** a table showing the current folder's subfolders first, then its items, sorted by name (column
-  headers sort). Folder columns: Name (with the kind symbol; cached thumbnails, BRW-9, were dropped
-  in A18), Kind, Updated, Size. Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
+  headers sort). Folder columns: Name (kind symbol, then the entry icons, then the name; ICN-1, ICN-3), Kind,
+  Updated, Size. In the sketch, ▢ ▤ ▦ are kind symbols and ◆ entry icons. Entry icons are drawn at the row's text
+  height in stored order with 2-point gaps; up to four, so names keep most of the column. Thumbnails are not shown
+  (BRW-9, milestone 4 decision S1). Inside a book, columns are # (stored index), Name, Kind (BOOK-1, BOOK-2).
   Double-click or ⌘↓ opens a folder or book; ⌘↑ goes to the enclosing folder or book.
 - **Inspector:** described below; toggled with the system inspector command (⌃⌘I) and resizable.
 - **Banners:** one line across the top of the item list for window-wide conditions (below).
@@ -228,7 +236,9 @@ Primary action: depends on kind: Open in Window for blueprints and planners, Ope
 Secondary actions: Copy String, Save As TXT…, and for root items Rename, Move To…, Replace Source…, Move to Trash
 (BOOK-7: not for entries).
 
-Header: name (title style), kind label with symbol, saved Factorio version (BOOK-5a, "Version unknown" when
+Header: the entry icons tile on the left (ICN-2: 48 × 48 points, one icon filling it or two to four in a 2 × 2 grid;
+the kind symbol at the same size when there are no entry icons or no release, ICN-3), then the name (title style,
+with rich-text icons), kind label with symbol, saved Factorio version (BOOK-5a, "Version unknown" when
 invalid). Root items add Updated, Created, and size with exact bytes ("4.2 KB (4,213 bytes)"); entries add
 "Entry 5.0 in Rail Book" instead.
 
@@ -258,14 +268,15 @@ States:
   header, with Reload.
 - Success: not applicable (read-only view).
 
-Keyboard: Tab order header actions → preview → tab picker → tab content; ⌘1–⌘3 switch tabs from anywhere in the
+Keyboard: Tab order header actions → preview → warnings button (when shown) → tab picker → tab content; ⌘1–⌘3 switch tabs from anywhere in the
 window.
 
 ### Statistics tab
 
 Content: entity and tile counts; footprint "83 × 43 tiles" ("Footprint incomplete, at least 202 × 79 tiles" when
 incomplete, STA-3); Construction items (total), then Placement, Modules, Equipment, Other inserted, and Equipment
-requests (reported, not included in the total) as lists of name, quality (only when not normal), and count; then
+requests (reported, not included in the total) as lists of icon and name, quality (icon and name, only when not
+normal), and count (ICN-9; without an icon, the name alone); then
 Warnings, each one line worded from its code with the name and count, for example "8 × ee-infinity-loader: not in
 the game data; requirements and footprint are incomplete." Empty groups are omitted.
 
@@ -308,21 +319,34 @@ The inspector's preview area and preview windows share these states (PRV-1 to PR
 | Asset release unusable | "The asset release can't be used: <reason>." (SET-3, SET-4) | Open Settings… |
 | Waiting | "Waiting to render…" | none; closing or deselecting drops it |
 | Rendering | "Rendering…" with an indeterminate spinner, shown at once | none; closing or deselecting cancels it |
-| Ready | The image, fitted | zoom, pan, background |
+| Ready | The image, fitted; "3 warnings" with a warning symbol below it when the report has warnings (WRN-1) | zoom, pan, background, Copy Image, Save Image As… (IMG-1, IMG-2), warnings list |
 | Nothing to draw | "This blueprint has no entities or tiles." (PRV-12) | none |
 | Failed | "The preview couldn't be rendered" and the reason in plain words (PRV-10) | Retry (⌘R) |
 | Deleted (windows only) | "This item was deleted." or "This entry is no longer in the book." (PRV-11) | Close Window |
 
 Cached previews appear without the Waiting or Rendering states (PRV-2).
 
+Warnings (WRN-1 to WRN-3): the "N warnings" button opens a popover titled "Render warnings" with a scrolling list,
+one line per distinct text with its count ("12 × <text>"), most frequent first, at most 100 lines then "and N
+more". The popover has no actions; Esc closes it. The preview stays Ready. Keyboard: the button follows the preview
+in the focus order; View ▸ Show Render Warnings opens the popover for the focused preview (WRN-2a).
+
+Image copy and save (IMG-1 to IMG-6): Copy Image confirms "Copied preview image" at the bottom of the window;
+Save Image As… opens a save panel named "<text form of the name>.png" (" — Entry 5.0" added for an entry). A
+destination inside the library shows "Images can't be saved inside the library folder. Choose another location."
+and reopens the panel; replacing an existing file asks first as Save As TXT does; a write failure says the image
+wasn't saved and why. Success confirms "Saved “name.png”". Both commands are disabled outside the Ready state.
+
 ### Preview window
 
 User goal: look at one blueprint in detail and compare it with others side by side.
 Primary action: Zoom to Fit.
-Secondary actions: Zoom In, Zoom Out, Actual Size, Background (Checkerboard, Transparent, Solid Color…), Retry.
+Secondary actions: Zoom In, Zoom Out, Actual Size, Background (Checkerboard, Transparent, Solid Color…), Retry,
+Copy Image, Save Image As…, warnings.
 
-Title: the item name, plus "— Entry 5.0" for an entry; it follows renames (PRV-11). Toolbar: zoom out, zoom
-percentage, zoom in, Fit, Actual Size, Background pop-up. Opening an entry that already has a window brings that
+Title: the text form of the item name (ICN-7), plus "— Entry 5.0" for an entry; it follows renames (PRV-11).
+Toolbar: zoom out, zoom percentage, zoom in, Fit, Actual Size, Background pop-up, and the warnings button when the
+report has warnings. Opening an entry that already has a window brings that
 window forward (PRV-4). Windows are not restored at relaunch (PRV-13).
 
 States: as in the table above; Empty is not applicable (a window always shows one entry); Success is the Ready
@@ -333,7 +357,8 @@ Size. Resizing keeps Fit until the owner zooms or pans (PRV-8). Changing the bac
 not render again (PRV-8a).
 
 Keyboard: focus starts on the image; ⌘+ and ⌘− zoom, ⌘0 Actual Size, ⌘9 Zoom to Fit, arrow keys pan by 10% of the
-view (with ⌥ by one screen), ⌘R retries a failure, ⌘W closes. Esc does nothing.
+view (with ⌥ by one screen), ⌘C copies the image, ⌥⇧⌘E saves it, ⌘R retries a failure, ⌘W closes. Esc does
+nothing.
 
 ## Sheets
 
@@ -454,7 +479,9 @@ Every command is in the menu bar (LIFE-4); unavailable commands are disabled rat
 | File | Import… | ⇧⌘I |
 | File | Import from Clipboard | ⇧⌘V |
 | File | Save As TXT… | ⇧⌘E |
+| File | Save Image As… (preview Ready) | ⌥⇧⌘E |
 | Edit | Copy String (list or inspector header focused), otherwise Copy | ⌘C |
+| Edit | Copy Image (preview Ready; in a preview window it is also ⌘C) | ⌥⌘C |
 | Edit | Paste (opens Import with the clipboard, list focused) | ⌘V |
 | Edit | Rename… | ↩ (list focused) |
 | Edit | Move to Trash / Delete Folder | ⌘⌫ |
@@ -476,13 +503,15 @@ Every command is in the menu bar (LIFE-4); unavailable commands are disabled rat
 | View | Actual Size, Zoom to Fit | ⌘0, ⌘9 |
 | View | Background ▸ Checkerboard, Transparent, Solid Color… | |
 | View | Retry Preview | ⌘R |
+| View | Show Render Warnings (preview with warnings) | |
 | Window | standard items, then the main window and each preview window | |
 
 ## Accessibility
 
 - **VoiceOver:** list rows read name, kind, updated date, and size ("Loop, blueprint, updated 3 October 2026,
   4.2 kilobytes"); book rows add "entry 3". Kind symbols are hidden from VoiceOver because the row
-  states the kind. The preview image is labeled "Preview of <name>"; state changes (waiting, rendering, ready,
+  states the kind. Entry icons are read after the name as "icons: iron plate, rare; copper cable"; rich-text icons
+  are read in place by name (ICN-7). The warnings button reads "3 render warnings". The preview image is labeled "Preview of <name>"; state changes (waiting, rendering, ready,
   failed) are announced. Banners and confirmations are announced when they appear. Icon-only toolbar buttons have
   labels and help text (zoom, Fit, Actual Size).
 - **Keyboard:** every flow above has a keyboard path; full keyboard access reaches the toolbar. The keyboard-only
