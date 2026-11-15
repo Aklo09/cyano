@@ -20,7 +20,7 @@ Do not call `swift` directly. Shortcuts are in `justfile` (`just --list`).
 just build                 # all targets; no Node or private assets needed
 just lint                  # swift-format --strict on Package.swift, Sources, Tests, App/Sources; must pass before committing
 just format                # apply .swift-format (4 spaces, 120 cols); fix leftovers by hand
-just test                  # main suites + python3 tools/test-asset-release.py
+just test                  # main suites + python3 tools/test-asset-release.py + tools/check-artwork.py (no artwork in git/resources/app)
 just codec-test | storage-test | asset-test | renderer-test   # focused suites
 just planner-test          # JavaScriptCore planner self-test (no painting)
 just library <args>        # run the fb-native CLI (just library --help)
@@ -28,7 +28,8 @@ just preview <args>        # run preview-probe; real images need verified privat
 just app-build [Release]   # build the macOS app via tools/xcode.sh (derived data in .cache/xcode)
 just app-run               # build the Debug app and open it
 just app-smoke [--assets .cache/renderer-assets]   # scripted smoke run on a scratch library; takes the keyboard (hands off)
-just app-test              # app model suites: session, messages, selection, browsing, books, import, export, comments, organization, settings, previews, statistics, lifecycle (also in just test)
+just app-test              # app model suites: session, messages, selection, browsing, books, import, export, comments, organization, settings, previews, statistics, lifecycle, entry icons, rich-text names, preview images (also in just test)
+just qualify-corpus        # render all 239 corpus leaves (release build, private release); report + contact sheet in .cache/qualification/
 ```
 
 The app bundle comes from the thin Xcode project `App/FactorioBlueprintLibrary.xcodeproj`; build it through
@@ -83,7 +84,7 @@ Cross-cutting invariants (full contracts in `docs/contracts/`):
 - **Recoverable writes.** Mutations stage hashed intents under `operations/<uuid>/` before publishing.
   Only `staging-cleanup` removes uncommitted staging; refused operations are quarantined, never deleted.
   Deleted and replaced originals go to the Trash.
-- **Derived cache only.** `cache/` holds previews keyed by `LibraryCacheIdentity` and `source-index.json` (source hash to kind);
+- **Derived cache only.** `cache/` holds previews keyed by `LibraryCacheIdentity` and `source-index.json` (source hash to kind and root entry icons, schema 2);
   neither changes source metadata. Cleanup is scoped to known formats.
 - **Independence.** Builds and runtime must not depend on the original web checkout, Node or game files.
   `planner.js` is generated: after changing `tools/planner-entry.ts` or the vendored fpsr, run `just planner-build` and commit the resource and metadata together.

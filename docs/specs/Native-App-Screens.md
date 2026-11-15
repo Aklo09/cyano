@@ -244,10 +244,12 @@ the kind symbol at the same size when there are no entry icons or no release, IC
 with rich-text icons), kind label with symbol, saved Factorio version (BOOK-5a, "Version unknown" when
 invalid). Root items add Updated, Created, and size with exact bytes ("4.2 KB (4,213 bytes)"); entries add
 "Entry 5.0 in Rail Book" instead.
-The header shows all of its lines at ordinary window heights: it may take up to 45% of the inspector's height
-(at most 420 points) and scrolls only when the window is shorter (owner, 2026-11-15).
+The header shows all of its lines at ordinary window heights (owner, 2026-11-15): it may take the inspector's height
+less 400 points reserved below it (the preview's minimum, the tab picker, and the Comments field), at most 420
+points, and scrolls only in shorter windows. The inspector never asks the window for more height.
 
-Preview area (blueprints and planners), a fixed-height region under the header with the states listed under
+Preview area (blueprints and planners), a region under the header, 100 to 200 points high, that gives way to the whole
+header first, with the states listed under
 Previews. A book shows "Books have no preview" with its entry count and an Open Book button instead.
 
 Folders: a selected folder row (or a sidebar folder with no item selected) shows the folder name, "Folder", the

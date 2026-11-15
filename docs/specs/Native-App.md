@@ -358,8 +358,8 @@ Icons come only from the configured asset release (GEN-9). Everything in this gr
   without planet icons), when it is shown, then rows leave it out and the inspector leaves its slot empty; nothing
   else changes and no error is shown.
 - **ICN-5** Given a name containing an icon tag whose name the release has an icon for, when the name is shown in a
-  list row, the sidebar, the path bar, or the inspector header, then the tag appears as that icon at the size of the
-  surrounding text, with a quality badge for `quality=` other than normal, in its place in the name. A name made only
+  list row, the sidebar, the path bar, or the inspector header, then the tag appears as that icon (24 points in list rows,
+  20 in the sidebar and path bar, 28 in the inspector title), with a quality badge for `quality=` other than normal, in its place in the name. A name made only
   of icon tags shows only icons.
 - **ICN-6** Given a tag that does not become an icon (not an icon tag, a name the release has no icon for, malformed
   markup, or no release configured), when the name is shown, then the tag stays in the name exactly as written

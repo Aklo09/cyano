@@ -60,10 +60,26 @@ The [R0 amendments](../planning/Milestone-4.md#subtasks) added 22 criteria; 19 n
   lines ([app validation](App.md#milestone-4-smoke-runs-2026-11-15)).
 - **Defects found and fixed:** rows with tag icons were taller than others (fixed and confirmed in the acceptance
   captures); 5 compiler warnings (a missing import, and the `Text` `+` deprecated in macOS 26). The first Release
-  acceptance runs crashed when the Comments tab opened: the larger header let the inspector need more height than the
-  window, and AppKit looped on window constraints until it raised an exception. The preview now gives way to the
-  header, a fixed reserve keeps the tabs usable, and the inspector reports no minimum height (`fa8d7f8`); the old
-  build showed the overflow, the fixed one fits, and both acceptance runs then passed with no crash report.
+  acceptance runs crashed at the smoke run's Add Comment step (after typing and adding a comment in the Comments tab):
+  AppKit looped on window constraints until it raised an exception. The larger header let the inspector need more
+  height than the window, which the old build showed as an overflowing Comments tab. Opening Comments alone did not
+  crash it, so the exact trigger was not isolated. The preview now gives way to the header, a fixed reserve keeps the
+  tabs usable, and the inspector reports no minimum height, so its size can no longer drive the window's (`fa8d7f8`);
+  the fixed build fits, and both acceptance runs then passed with no crash report. Checked only at the default window
+  size with these fixtures' names; a minimum-size window was not scripted.
+
+## For the owner's walkthrough
+
+Paths no scripted run exercised:
+
+- **WRN-2a:** View ▸ Show Render Warnings, and Tab to the warnings button; Esc closes the list.
+- **Warnings in a preview window:** the toolbar button and its list.
+- **⌘C in a preview window:** copies the image (the smoke run checked ⌥⌘C from the inspector).
+- **Save Image As… (⌥⇧⌘E):** the save panel, a saved PNG, and the refusal of a folder inside the library.
+- **A small window:** the inspector at the window's minimum size, with the Comments tab open.
+
+On your own library: items imported before milestone 4 keep their tag-free names; planet icons appear once the
+everyday release is reassembled from the regenerated assets; the first open rebuilds the cache index once (schema 2).
 
 ## Outside this milestone
 
