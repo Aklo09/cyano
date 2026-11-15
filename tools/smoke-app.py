@@ -384,6 +384,7 @@ class Smoke:
         self.key('return', 'command', delay=2)
         texts = self.library_texts()
         self.record('Add Comment adds a comment', 'Added by the smoke run' in texts and 'Smoke-run comment' in texts)
+        self.capture('comments', 'Library')
         self.key('escape', delay=0.5)
 
         # New folder, move into it, move to Trash (ORG).

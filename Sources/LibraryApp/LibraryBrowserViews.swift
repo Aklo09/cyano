@@ -403,6 +403,21 @@ struct ItemInspector: View {
 
     /// The inspector's height, so the header and the preview leave room for the tabs in short windows.
     @State private var height: CGFloat = 720
+    /// The header's own height, measured inside its scroll view; it never depends on the space below it.
+    @State private var headerHeight: CGFloat = 0
+
+    /// Below the header: the preview's minimum (100) and its button (50), the tab picker (40), and the tab content's
+    /// minimum (210: the Comments list's empty line, the field, and Add Comment, measured in the Release app).
+    private static let reservedBelowHeader: CGFloat = 400
+
+    /// The header shows all of itself unless the window is short (screen specs, "Inspector").
+    private var headerCap: CGFloat { min(420, max(80, height - Self.reservedBelowHeader)) }
+
+    /// The preview takes what the whole header leaves, between 100 and 200 points, so the header never has to scroll
+    /// to make room for it.
+    private var previewHeight: CGFloat {
+        min(200, max(100, height - min(headerHeight, headerCap) - (Self.reservedBelowHeader - 100)))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -413,15 +428,17 @@ struct ItemInspector: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
+                    .onGeometryChange(for: CGFloat.self) {
+                        $0.size.height
+                    } action: {
+                        headerHeight = $0
+                    }
                 }
-                // The header shows all of itself at ordinary window heights and scrolls only in short windows, where the
-                // preview and the tabs need the room.
-                .frame(maxHeight: min(420, max(120, height * 0.45)))
+                .frame(maxHeight: headerCap)
                 .fixedSize(horizontal: false, vertical: true)
                 if browser.previewTarget != nil {
                     InspectorPreview(
-                        browser: browser, center: previews, assetsRevision: assetsRevision,
-                        height: min(200, max(100, height * 0.25))
+                        browser: browser, center: previews, assetsRevision: assetsRevision, height: previewHeight
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 12)
@@ -464,7 +481,11 @@ struct ItemInspector: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // A minimum of zero: the inspector never asks the window for more height, so its size cannot feed back into
+        // the layout (a window that grew to fit the header and the Comments field looped until AppKit stopped it).
+        .frame(minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity)
+        .clipped()
         .onGeometryChange(for: CGFloat.self) {
             $0.size.height
         } action: {
