@@ -150,8 +150,10 @@ game's icon tile (see the [app guide](development/App.md#icons)). R6 is done in 
 release. A real-app check of R6 and R7 is pending (owner: later). R8 is done in code and tests (2026-11-15):
 previews with warnings show a count that opens the grouped list, also from View ▸ Show Render Warnings; the owner
 kept the planner's wording. R9 is done in code and tests (2026-11-15):
-Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) hand out the cached PNG unchanged. Next: the
-real-app check of R6 to R9, then R10 (accessibility, smoke run, artwork check) and R11 (acceptance).
+Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) hand out the cached PNG unchanged. R10 is done (2026-11-15):
+`tools/check-artwork.py` runs in `just test`; the smoke run checks icons, tagged names, warnings, and Copy Image (31 of
+31 with assets; 27 and 5 skipped without); the visual check of R6 to R9 found rows with tag icons too tall, now fixed
+(see [validation](validation/App.md#milestone-4-smoke-runs-2026-11-15)). Next: R11, acceptance.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

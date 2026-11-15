@@ -33,6 +33,7 @@ PLANNER_BOOK = ROOT / 'tools/vendor/fpsr/fixtures/decode/06-book-with-planner.tx
 #   press <pid> <window> <label>  presses the first button titled or described <label> in that window
 #   texts <pid> <window>        the window's static texts and labels, one per line
 #   select <pid> <window> <text>  clicks the first row (in the window or its sheets) showing <text>
+#   pasteboard-png <pid> <file>   writes the clipboard's PNG data to <file>; fails when there is none
 HELPER_SOURCE = r'''
 import AppKit
 import ApplicationServices
@@ -110,6 +111,10 @@ case "select":
         usleep(60_000)
     }
     print("clicked")
+case "pasteboard-png":
+    guard let data = NSPasteboard.general.data(forType: .png) else { print("no png"); exit(1) }
+    try! data.write(to: URL(fileURLWithPath: arguments[3]))
+    print(data.count)
 case "texts":
     func collect(_ element: AXUIElement, depth: Int) {
         if depth > 16 { return }
@@ -301,6 +306,12 @@ class Smoke:
             self.cli('import', str(self.library), str(FIXTURES / f'{name}_Assembler.txt'), '--name', f'Assembler {name}')
         self.cli('import', str(self.library), str(FIXTURES / 'v0.59.0.txt'), '--folder', 'Books')
         self.cli('import-unpacked', str(self.library), str(PLANNER_BOOK), '--folder', 'Books')
+        # Milestone 4: a root label with a rich-text tag, and a leaf whose render reports a warning (a modded entity).
+        self.cli('import', str(self.library), str(FIXTURES / 'bp.txt'), '--folder', 'Books')
+        books = next(i for i in self.cli('list', str(self.library))['result']['items'] if i['name'] == 'Tileable factories')
+        leaf = self.out / 'warning-leaf.txt'
+        self.cli('export', str(self.library), books['id'], '--entry', '1.1', '--output', str(leaf))
+        self.cli('import', str(self.library), str(leaf), '--name', 'Warning leaf')
         latch = next(i for i in self.cli('list', str(self.library))['result']['items'] if i['name'] == 'Simple RS Latch')
         self.cli('comment-add', str(self.library), latch['id'], 'Smoke-run comment')
         self.saved_clipboard = self.run(['/usr/bin/pbpaste']).stdout
@@ -402,6 +413,75 @@ class Smoke:
         self.record('Open (⌘↓) shows a book\'s entries', 'Tileable factories' in texts and ', entry ' in texts)
         self.capture('book', 'Library')
         self.key('up', 'command', delay=1.5)
+
+    def milestone4(self, assets):
+        """Icons in names and rows, render warnings, and Copy Image (milestone 4, R5 to R9)."""
+        # ICN-1: rows name their entry icons for VoiceOver, with or without a release.
+        self.find('latch')
+        texts = self.library_texts()
+        self.record('Rows name their entry icons (ICN-1)', 'icons: signal R; signal S' in texts,
+                    'row label ends with the icon names' if 'icons: signal R' in texts else 'no icon names')
+        self.capture('entry-icons', 'Library')
+
+        # ICN-5, ICN-6, ICN-8: the imported tagged label keeps its tag; with a release the tag is an icon, read by name.
+        self.find('2026-06')
+        time.sleep(1.5)
+        texts = self.library_texts()
+        spoken = 'legendary (2026-06)' in texts
+        written = '[quality=legendary](2026-06)' in texts
+        self.record('A tagged root label is kept as the item name; its tag shows as an icon only with a release '
+                    '(ICN-5, ICN-6, ICN-8)', spoken if assets else written,
+                    f'read as {"icon name" if spoken else "tag text" if written else "neither"}')
+        self.capture('tagged-name', 'Library')
+        self.key('down', 'command', delay=3)
+        self.capture('tagged-book', 'Library')
+        self.key('up', 'command', delay=1.5)
+
+        # ICN-9: Statistics rows draw item icons (visual check in the capture).
+        self.find('assembler 2i')
+        self.key('1', 'command', delay=3 if assets else 0.8)
+        self.capture('statistics-icons', 'Library')
+
+        if not assets:
+            for name in ['A preview with warnings shows their count and list (WRN-1, WRN-2)',
+                         'Copy Image puts the cached PNG on the clipboard (IMG-1)']:
+                self.record(name, None, 'needs --assets')
+            return
+        # WRN-1, WRN-2: the leaf renders with one warning; the button opens the list.
+        self.find('warning leaf')
+        shown = self.wait(lambda: '1 render warning' in self.library_texts(), timeout=60, interval=1)
+        opened = shown and self.press('Library', '1 render warning', delay=1.5)
+        # The popover may be its own untitled accessibility window.
+        listed = any('Unsupported entity: ee-infinity-loader' in self.static_texts(title) for title in ['Library', ''])
+        self.capture('render-warnings', 'Library')
+        self.key('escape', delay=0.6)
+        self.record('A preview with warnings shows their count and list (WRN-1, WRN-2)', bool(shown and listed),
+                    f'button {bool(shown)}, pressed {bool(opened)}, listed {listed}')
+
+        # IMG-1: Copy Image gives exactly the cached PNG.
+        self.raise_window('Library')
+        self.key('c', 'command', 'option', delay=1.5)
+        copied = self.out / 'copied-image.png'
+        got = self.run([str(self.helper), 'pasteboard-png', str(self.process.pid), str(copied)]).returncode == 0
+        item = next(i for i in self.cli_list_unowned() if i['name'] == 'Warning leaf') if got else None
+        cached = sorted((self.library / 'cache' / item['id']).glob('*.png')) if item else []
+        same = got and any(path.read_bytes() == copied.read_bytes() for path in cached)
+        self.record('Copy Image puts the cached PNG on the clipboard (IMG-1)', same,
+                    f'clipboard PNG {copied.stat().st_size if got else 0} bytes; {len(cached)} cached images')
+
+    def cli_list_unowned(self):
+        """Items from the library's files, read without the CLI (the app owns the library while it runs)."""
+        items = []
+        for metadata in self.library.rglob('*.json'):
+            if metadata.parent.name in ('cache', 'operations') or metadata.name.startswith('.'):
+                continue
+            try:
+                record = json.loads(metadata.read_text())
+            except (OSError, ValueError):
+                continue
+            if 'sourceSha256' in record:
+                items.append({'id': record['id'], 'name': record.get('displayNameOverride') or metadata.stem})
+        return items
 
     def worker_check(self, assets):
         """One worker at most under real renders (deferred from A12): three previews opened in a row before anything
@@ -510,6 +590,7 @@ class Smoke:
         self.capture('library', 'Library')
         self.worker_check(assets)
         self.everyday_workflows(assets)
+        self.milestone4(assets)
         self.preview_windows(assets)
 
         # Quitting with preview windows open; they are not restored (PRV-13).

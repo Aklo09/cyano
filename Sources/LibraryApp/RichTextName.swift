@@ -134,8 +134,10 @@ public struct RichTextName: Equatable, Sendable {
                 guard let image = catalog?.badgedImage(for: reference, quality: quality) else {
                     return result + Text(verbatim: raw)
                 }
+                // Sized and lowered to stay within the text's ascender and descender, so rows with icons in their
+                // names are as tall as rows without.
                 let icon = Image(decorative: image, scale: CGFloat(image.width) / pointSize)
-                return result + Text(icon).baselineOffset(-pointSize * 0.2)
+                return result + Text(icon).baselineOffset(-pointSize * 0.18)
             }
         }
     }
@@ -144,7 +146,8 @@ public struct RichTextName: Equatable, Sendable {
 /// A name with its rich-text icons, read by VoiceOver with icon names in place (ICN-5 to ICN-7).
 struct RichNameText: View {
     let name: String
-    var pointSize: CGFloat = 16
+    /// The icons' height: 14 points fits body text (13 points) without making its line taller.
+    var pointSize: CGFloat = 14
     @Environment(\.iconCatalog) private var catalog
 
     var body: some View {

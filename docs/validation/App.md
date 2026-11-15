@@ -374,3 +374,26 @@ clicks); window captures stayed in the scratch directory.
 Seen but outside R5: tagged names still lose their tags (`bp.txt` shows "(2026-06)", "U235", "Carbon fiber"), which
 R6 changes; and right after selecting a large entry the preview area briefly showed an empty checkerboard, with no
 Waiting or Rendering text, before the image appeared. The latter is to be checked in R10's smoke run.
+
+## Milestone 4 smoke runs (2026-11-15)
+
+R10, with the owner's permission: `just app-smoke --assets .cache/renderer-assets` and `just app-smoke` on the Debug
+app built after R9, each on its own scratch library and preferences domain. With assets 31 of 31 checks passed; without
+assets 27 passed and 5 were skipped for needing a release (worker count, warnings, Copy Image, background, release
+change). The four new checks:
+
+| Check | With assets | Without assets |
+|---|---|---|
+| Rows name their entry icons (ICN-1) | Pass: "icons: signal R; signal S" | Pass |
+| A tagged root label stays the item name (ICN-5, ICN-6, ICN-8) | Pass: read as "legendary (2026-06)" | Pass: read as "[quality=legendary](2026-06)" |
+| Warnings count and list (WRN-1, WRN-2) | Pass: "1 warning"; popover lists "1 × Unsupported entity: ee-infinity-loader (8)" | Skipped |
+| Copy Image gives the cached PNG (IMG-1) | Pass: 2,290,116 bytes, equal to the cache file | Skipped |
+
+Visual check of R6 to R9 from the captures: icons for rich-text tags in book rows (`bp.txt`: U235, Carbon fiber, Iron
+plate), the path bar, and the inspector title; item icons in Statistics rows; the warnings button beside Open in Window
+and its popover. One defect: rows whose names held tag icons were taller than the others, because the 16-point inline
+icon exceeded the text line. Inline icons are now 14 points in rows, the sidebar, and the path bar, and 20 points in
+the inspector title, lowered to stay within the line; the acceptance runs (R11) confirm it. Seen, not changed: the
+inspector header's 48-point icon tile makes the header a little taller, so with the default window height its last
+line (Folder) scrolls under the preview, as the header's height cap (milestone 3) intends.
+

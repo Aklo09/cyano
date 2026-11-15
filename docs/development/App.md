@@ -346,7 +346,11 @@ counting windows on any Space because a directly launched app is not activated) 
 reopens the library; three previews opened before anything is cached run with at most one worker (`pgrep`, sampled
 every 50 ms; selecting an item renders it for the inspector, so this runs first); without assets, the preview and
 Statistics say what they need; Copy String gives the fixture's exact bytes; Import from Clipboard, Add Comment, New
-Folder, Move To, Move to Trash, and opening a book work; Space opens a preview window and opening it again reuses it;
+Folder, Move To, Move to Trash, and opening a book work; milestone 4 (R10): row labels name their entry icons
+(ICN-1), `bp.txt`'s tagged label stays the item name and is read by icon name only with a release (ICN-5, ICN-6,
+ICN-8), the `v0.59.0.txt` `1.1` leaf (exported as "Warning leaf") shows "1 warning" whose popover lists the modded
+entity (WRN-1, WRN-2), and ⌥⌘C puts exactly its cached PNG on the clipboard (IMG-1); captures show the entry
+icons, the tagged name and book, Statistics icons, and the warnings popover; Space opens a preview window and opening it again reuses it;
 a background change keeps the zoom and starts no worker; renaming and replacing reach the open window (title, new
 image); clearing the release in Settings reaches the window; quitting with windows open does not restore them;
 closing the library closes its windows; after quit no worker remains, `fb-native owner` reports idle, and

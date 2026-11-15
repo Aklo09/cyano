@@ -512,7 +512,7 @@ private struct InspectorHeader: View {
         HStack(alignment: .top, spacing: 10) {
             EntryIconTile(kind: kind, icons: detail?.icons ?? item?.entryIcons ?? [], side: 48)
             VStack(alignment: .leading, spacing: 4) {
-                RichNameText(name: name, pointSize: 22).font(.title2.weight(.semibold)).textSelection(.enabled)
+                RichNameText(name: name, pointSize: 20).font(.title2.weight(.semibold)).textSelection(.enabled)
                 Label(kind.label, systemImage: kind.symbol)
             }
         }
