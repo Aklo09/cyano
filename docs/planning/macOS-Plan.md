@@ -1,7 +1,6 @@
 # Native macOS port: roadmap and first milestone
 
-Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, and 3 are accepted, and the
-[milestone 4 plan](Milestone-4.md) is approved.
+Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, 3, and 4 are accepted.
 Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
 
 ## Progress
@@ -18,13 +17,13 @@ Based on the [initial assessment](macOS-Assessment.md), with the scope decisions
 - [x] Core revisions after milestone 1 review ([decisions](Core-Revisions.md)).
 - [x] Native construction statistics: contract, strict prototype map, calculator, reference parity, library/CLI integration, and measurements ([validation](../validation/Statistics.md)).
 - [x] Milestone 2 acceptance ([acceptance record](../validation/Milestone-2.md)).
-- [ ] Milestone 4 acceptance: all checks pass; owner approval pending ([acceptance record](../validation/Milestone-4.md)).
+- [x] Milestone 4 acceptance: approved by the owner on 2026-11-16 ([acceptance record](../validation/Milestone-4.md)).
 
 See [foundation validation](../validation/Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
 The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
-Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Milestone 4, rendering integration, is [approved](Milestone-4.md) (2026-11-15).
+Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Milestone 4, rendering integration, is [accepted](../validation/Milestone-4.md) (2026-11-16).
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
 The [library preview validation](../validation/Library-Previews.md) records the subsequent ownership/cache integration.
 Power-loss durability and the full workload qualification remain separate acceptance work.

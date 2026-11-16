@@ -1,6 +1,7 @@
 # Milestone 4: rendering integration
 
-Date: 2026-11-15. Status: approved by the owner on 2026-11-15, with every decision below settled.
+Date: 2026-11-15. Status: approved by the owner on 2026-11-15, with every decision below settled. Accepted by the
+owner on 2026-11-16 ([acceptance record](../validation/Milestone-4.md)).
 R0, the spec amendments, is done: the owner approved them on 2026-11-15. R3, planet icons in the release, is done
 ([validation](../validation/Renderer.md#planet-icons-2026-11-15)). R1, the corpus harness, is done: the first run
 rendered all 239 leaves ([validation](../validation/Renderer.md#corpus-run-2026-11-15)). The owner reviewed it and found
@@ -9,7 +10,8 @@ R4, the icon catalog, is done ([app guide](../development/App.md#icons)). R5, en
 ([validation](../validation/App.md#entry-icons-2026-11-15)). R6, rich-text names, R7, statistics icons, R8, render warnings, and R9, copying and saving preview images, are done
 and checked in the real app. R10 is done: the artwork check is in `just test`, and the smoke run covers icons,
 warnings, and Copy Image ([validation](../validation/App.md#milestone-4-smoke-runs-2026-11-15)). R11: every check passes
-and the [acceptance record](../validation/Milestone-4.md) is written; the owner's walkthrough and approval are pending.
+and the [acceptance record](../validation/Milestone-4.md) is written; the owner did the walkthrough and approved the
+milestone on 2026-11-16.
 Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope

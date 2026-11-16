@@ -5,7 +5,7 @@ Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified o
 images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
 Milestone 2 is [accepted](validation/Milestone-2.md), including native construction statistics approved by the owner.
 Milestone 3, the native macOS app, is [accepted](validation/Milestone-3.md) after the owner's walkthrough (2026-11-15).
-Milestone 4, rendering integration, is [approved](planning/Milestone-4.md) (2026-11-15).
+Milestone 4, rendering integration, is [accepted](validation/Milestone-4.md) after the owner's walkthrough (2026-11-16).
 
 ## Current state
 
@@ -163,8 +163,9 @@ inventory order, the statistics reference was regenerated (previous copy in
 `private-assets/statistics-reference-before-groups`), and releases assembled earlier are refused, so the owner's
 everyday release must be reassembled (their script needs no version change; see the
 [validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Statistics rows now show a quality by its
-icon alone (owner, 2026-11-16). Next: the owner checks the new Statistics tab
-on a reassembled release, then their approval of milestone 4 is recorded.
+icon alone (owner, 2026-11-16). The owner approved
+milestone 4 on 2026-11-16. Next: milestone 5, personal-use qualification (see the
+[native plan](planning/macOS-Plan.md#delivery-roadmap)); it has no plan yet.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.

@@ -1,9 +1,9 @@
 # Milestone 4 acceptance
 
-Milestone 4 (rendering integration) is **ready for the owner's acceptance**: every subtask is done and every check
-below passed on commit `fa8d7f8` (2026-11-15). The owner's walkthrough (2026-11-16) found one issue, items listed
-twice in the Statistics tab, now changed (see "Decisions and changes during the milestone"); the owner's approval is
-pending.
+Milestone 4 (rendering integration) is **accepted**: the owner approved it on 2026-11-16. Every subtask is done and
+every check below passed on commit `fa8d7f8` (2026-11-15). The owner's walkthrough (2026-11-16) found one issue,
+items listed twice in the Statistics tab, changed before approval (see "Decisions and changes during the
+milestone").
 
 Its exit condition, from the [milestone 4 plan](../planning/Milestone-4.md#scope), is that the full supplied corpus
 receives native rendering and visual qualification. Per-subtask evidence is in the [renderer validation](Renderer.md)
@@ -101,5 +101,5 @@ everyday release is reassembled from the regenerated assets; the first open rebu
 
 ## Owner approval
 
-Pending: the walkthrough found only the Statistics repetition (2026-11-16), now changed; approval waits for the
-owner's look at the new Statistics tab on a reassembled release.
+Approved by the owner on 2026-11-16, after the walkthrough and the two Statistics changes it led to: items listed once
+under the game's inventory tabs (`3dfdf29`) and qualities shown by icon alone (`4cc399d`).
