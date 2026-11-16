@@ -2,7 +2,8 @@
 
 Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A2). Amended for milestone 4
 (subtask R0, 2026-11-15): names and icons, the item list, inspector header, Statistics tab, previews (warnings, image
-copy and save), menus, and accessibility; approved by the owner on 2026-11-15.
+copy and save), menus, and accessibility; approved by the owner on 2026-11-15. Statistics tab amended at the owner's
+request on 2026-11-16 (items by inventory tab, listed once).
 Behavior and acceptance criteria: [native app spec](Native-App.md) (criterion IDs below refer to it).
 Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Milestone-4.md).
 
@@ -281,8 +282,9 @@ window.
 ### Statistics tab
 
 Content: entity and tile counts; footprint "83 × 43 tiles" ("Footprint incomplete, at least 202 × 79 tiles" when
-incomplete, STA-3); Construction items (total), then Placement, Modules, Equipment, Other inserted, and Equipment
-requests (reported, not included in the total) as lists of icon and name, quality (icon and name, only when not
+incomplete, STA-3); the construction items, each once, in one section per inventory tab with the game's English tab
+name (Logistics, Production, Intermediate products, Space, Combat, …), tabs and items in the game's order, then
+Equipment requests (reported, not included above), as lists of icon and name, quality (icon and name, only when not
 normal), and count (ICN-9; without an icon, the name alone); then
 Warnings, each one line worded from its code with the name and count, for example "8 × ee-infinity-loader: not in
 the game data; requirements and footprint are incomplete." Empty groups are omitted.

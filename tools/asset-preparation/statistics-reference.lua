@@ -56,7 +56,7 @@ local function footprint(entities, tiles, prototypes_map)
 end
 
 script.on_init(function()
-  local report = {schema = 1, gameVersion = helpers.game_version, mods = {}, qualities = {}, entities = {}, tiles = {}, items = {}, cases = {}, geometryErrors = {}}
+  local report = {schema = 2, gameVersion = helpers.game_version, mods = {}, qualities = {}, entities = {}, tiles = {}, items = {}, itemGroups = {}, itemSubgroups = {}, cases = {}, geometryErrors = {}}
   for name, version in pairs(script.active_mods) do if name ~= 'fb-statistics-reference' then report.mods[name] = version end end
   for name in pairs(prototypes.quality) do report.qualities[name] = true end
   local surface = game.create_surface('statistics-reference', {width = 64, height = 64, generate_with_lab_tiles = true, autoplace_controls = {}})
@@ -65,8 +65,11 @@ script.on_init(function()
   local platform = game.forces.player.create_space_platform{name = 'Statistics reference', planet = 'nauvis', starter_pack = 'space-platform-starter-pack'}
   local hub = platform.apply_starter_pack(true)
   for name, p in pairs(prototypes.item) do
-    report.items[name] = {type = p.type, equipment = p.place_as_equipment_result and p.place_as_equipment_result.name or nil}
+    report.items[name] = {type = p.type, equipment = p.place_as_equipment_result and p.place_as_equipment_result.name or nil, subgroup = p.subgroup.name, order = p.order}
   end
+  -- Inventory tabs (groups) and their rows (subgroups), so applications can list items in the game's order.
+  for name, g in pairs(prototypes.item_group) do report.itemGroups[name] = {order = g.order} end
+  for name, s in pairs(prototypes.item_subgroup) do report.itemSubgroups[name] = {group = s.group.name, order = s.order} end
   for name, p in pairs(prototypes.tile) do
     if p.items_to_place_this then report.tiles[name] = {placement = placements(p)} end
   end

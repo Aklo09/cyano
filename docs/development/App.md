@@ -116,13 +116,15 @@ an earlier result.
 
 `StatisticsPresentation` turns a result into what the tab shows: entity and tile counts, the footprint (complete,
 incomplete with the known bounds as "at least", or incomplete with none), whether requirements are complete, the
-non-empty groups (Construction items, Placement, Modules, Equipment, Other inserted, and Equipment requests, noted as
-not included in the total), and warnings worded from their codes with the entity, item, tile, or quality named and
+construction items once each, in one group per inventory tab (`ItemInventory` from the prototype map: tabs, rows,
+and items in the game's order, titled with the game's English tab names), then Equipment requests, noted as not
+included above (empty groups are left out), and warnings worded from their codes with the entity, item, tile, or quality named and
 the incomplete part stated (STA-3). Counts stay integers and sizes stay numbers, so the view formats them for the
 Mac's locale and tests compare values. Selected rows copy as tab-separated text with ⌘C (`copyText(rows:)`).
 
 `StatisticsParityAppTests` checks STA-2: for the seven approved blueprints it compares the presentation with
-`fb-native statistics` output for the private release in `.cache/renderer-assets`, and is skipped without it.
+`fb-native statistics` output for the private release in `.cache/renderer-assets`, and is skipped without it. The
+tabs together must list exactly the CLI's `constructionItems`, each once and under its own tab.
 
 In short windows the inspector caps its header and the preview at a quarter of its height each (header 80–260 pt,
 preview 100–200 pt), so the tabs keep room at the 500 pt minimum window height.

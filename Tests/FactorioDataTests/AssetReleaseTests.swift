@@ -55,7 +55,7 @@ struct TestAssetRelease {
             "sprites/atlas.webp": atlas, "sprites/fonts/font.ttf": font, "sprites/render-db.json": db,
             "sprites/manifest.json": manifest,
             "statistics/prototype-map.json": try prototypeMap
-                ?? assetJSON(["schema": 1, "gameVersion": gameVersion, "mods": modMap]),
+                ?? assetJSON(["schema": 2, "gameVersion": gameVersion, "mods": modMap]),
         ]
         let files: [[String: Any]] = members.keys.sorted().map { path in
             ["path": path, "bytes": members[path]!.count, "sha256": OriginalSource(bytes: members[path]!).sha256]

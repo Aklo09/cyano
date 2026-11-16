@@ -1,6 +1,7 @@
 # Construction statistics and footprint
 
-Status: approved by the owner on 2026-11-13 ([milestone 2](../planning/Milestone-2.md), subtask S1).
+Status: approved by the owner on 2026-11-13 ([milestone 2](../planning/Milestone-2.md), subtask S1). Amended on
+2026-11-16 at the owner's request: prototype map schema 2 adds the game's inventory order (item groups and subgroups).
 
 Report what a saved blueprint needs to be built and how much ground it covers, from the saved source itself,
 without game-import normalization. Statistics are derived and read-only: they never change sources, metadata,
@@ -27,13 +28,27 @@ No other map source is accepted, and no game process runs.
 Every result records the release's asset identity and the map's game version, so a result is tied to exact data.
 
 The map is read only after the release verifies, and only if its bytes still match the verified inventory.
-It must have `schema` 1 and a game version. Parsing is strict: every field has a known type, unknown fields are
-refused, and every placement item and equipment item must resolve within the map, so a statistics warning
-always concerns the blueprint, never the map. A direction entry's key is the requested blueprint direction;
+It must have `schema` 2 and a game version; a schema 1 map is refused, and so is a release holding one. Parsing is
+strict: every field has a known type, unknown fields are refused, and every placement item and equipment item must
+resolve within the map, so a statistics warning always concerns the blueprint, never the map. A direction entry's key is the requested blueprint direction;
 its `direction` field is the engine-resolved direction (a chest resolves all 16 to 0). The release profile is Factorio 2.1.24 with
 base, space-age, elevated-rails, quality, and recycler: 146 entity prototypes, 342 items, 23 placeable tiles,
 and 6 qualities. The map holds engine-resolved placement choices, item types, equipment items,
 and per-direction collision geometry; renderer sprite bounds are never used.
+
+Schema 2 also records where each item sits in the game's inventory and crafting menu, as the game reports it:
+
+| Field | Contents |
+| --- | --- |
+| `items.<name>.subgroup`, `items.<name>.order` | The item's row (subgroup) and its order string in the row |
+| `itemGroups.<name>.order` | Each inventory tab (item group), such as `logistics` or `intermediate-products` |
+| `itemSubgroups.<name>.group`, `.order` | Each row's tab and its order in the tab |
+
+Every item's subgroup and every subgroup's group must resolve. Order strings may be empty. The game's order is by
+tab, then row, then item, each level by order string and then by name, compared as UTF-8 bytes. The 2.1.24 map has
+12 tabs and 136 rows; its 342 items fall in six tabs (Logistics, Production, Intermediate products, Space, Combat,
+and the catch-all `other`). The inventory order changes no result: it only lets applications list items as the game
+does.
 
 ## Construction requirements
 
@@ -48,6 +63,8 @@ Items are grouped by item name and quality. Results contain five groups:
 | `equipmentRequests` | Bare `grid_count` requests; reported but excluded from totals |
 
 `constructionItems` is the sum of `placement`, `modules`, `equipment`, and `otherInserted`.
+The app shows `constructionItems` once, split by inventory tab in the game's order, and `equipmentRequests`
+separately; the other groups stay in the result for the CLI and for parity.
 
 Inserted items come from each entity's `items` array. Each request's `in_inventory` stacks add their `count`,
 which defaults to 1 when omitted. Logistics request filters, targets, and section stock are not requirements.

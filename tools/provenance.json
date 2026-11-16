@@ -100,15 +100,21 @@
       "path": "tools/asset-preparation/statistics-reference.lua",
       "source": "fb/tools/renderer-evaluation/statistics-reference.lua",
       "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
-      "sha256": "78dd8d3c901abc543b7c888e090199d72368d8d9c4df608121636f3fbaca84c4",
-      "bytes": 7273
+      "sha256": "1cc0afbc2c901d7233e82dd4948a611f1f8c7d3e49eb0a52ab6164b3db6f0681",
+      "bytes": 7686,
+      "sourceSha256": "78dd8d3c901abc543b7c888e090199d72368d8d9c4df608121636f3fbaca84c4",
+      "sourceBytes": 7273,
+      "adapted": true
     },
     {
       "path": "tools/asset-preparation/prototype-map.mjs",
       "source": "fb/tools/renderer-evaluation/prototype-map.mjs",
       "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
-      "sha256": "86408e98c2280afbba62b6ed74c3d8098c46a0f2c71c9218c9e2f33d6843dab6",
-      "bytes": 750
+      "sha256": "ee55598ba86f5020b70d3a182af72a4274d783479cdef79e978ee8ffdb9087c7",
+      "bytes": 828,
+      "sourceSha256": "86408e98c2280afbba62b6ed74c3d8098c46a0f2c71c9218c9e2f33d6843dab6",
+      "sourceBytes": 750,
+      "adapted": true
     },
     {
       "path": "tools/asset-preparation/evaluate-statistics.mjs",
@@ -141,8 +147,11 @@
       "path": "tools/reference/blueprint-statistics.mjs",
       "source": "fb/runtime/blueprint-statistics.mjs",
       "revision": "bf80a5e3c5a3db942d1ab872462f157912883650",
-      "sha256": "84672c1989320092e17c13c5aaeed89544f639c37f77dc590355e89e1140e06d",
-      "bytes": 7524
+      "sha256": "ad5332fd48733347626f1738d3372c2d05d1b34cbd7f81f2a06fc279214672ec",
+      "bytes": 7524,
+      "sourceSha256": "84672c1989320092e17c13c5aaeed89544f639c37f77dc590355e89e1140e06d",
+      "sourceBytes": 7524,
+      "adapted": true
     },
     {
       "path": "LICENSE",

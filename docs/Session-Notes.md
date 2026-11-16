@@ -156,14 +156,18 @@ Copy Image (⌥⌘C, ⌘C in preview windows) and Save Image As… (⌥⇧⌘E) 
 (see [validation](validation/App.md#milestone-4-smoke-runs-2026-11-15)). R11 (2026-11-15): every check passes on
 `fa8d7f8` (see the [milestone 4 acceptance record](validation/Milestone-4.md)); the first Release smoke runs found an
 inspector layout loop (crash on the Comments tab) caused by the larger header, fixed before the passing runs. The user
-guide covers icons, tags, warnings, and image copy/save. Next: the owner's walkthrough, including the
-unscripted paths listed in the [acceptance record](validation/Milestone-4.md#for-the-owners-walkthrough), then recording
-their approval of milestone 4.
+guide covers icons, tags, warnings, and image copy/save. The owner's walkthrough (2026-11-16) found one issue: the
+Statistics tab listed every item twice. It now lists each item once under the game's inventory tabs (Logistics,
+Production, Intermediate products, Space, Combat) in the game's order; the prototype map moved to schema 2 with the
+inventory order, the statistics reference was regenerated (previous copy in
+`private-assets/statistics-reference-before-groups`), and releases assembled earlier are refused, so the owner's
+everyday release must be reassembled (their script needs no version change; see the
+[validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Next: the owner checks the new Statistics tab
+on a reassembled release, then their approval of milestone 4 is recorded.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
-Connected-rail/full-corpus review (milestone 4), the 1,000-root workload targets, and power-loss qualification
-remain outstanding.
+The 1,000-root workload targets and power-loss qualification (milestone 5) remain outstanding.
 
 Preserve the [storage contract](contracts/Storage.md) and [statistics contract](contracts/Statistics.md).
 Retain original bytes, sparse entry indices, and unknown blueprint fields.

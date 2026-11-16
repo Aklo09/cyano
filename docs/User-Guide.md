@@ -99,8 +99,9 @@ Previews and statistics need an assembled asset release. Make one from your Fact
 [asset preparation guide](development/Asset-Preparation.md#regenerate), assemble it with the
 [preview guide](development/Preview.md#prepare-a-private-release), then open Settings (⌘,) and click **Choose…**.
 The app verifies the release and remembers it. Keep the release outside the repository's `.cache/` for everyday use.
-Releases assembled before the planet icons were added (2026-11-15) still work, but show planet tags as text and leave
-planet entry icons out; assemble the release again from the regenerated `private-assets/2.1.24` to get them.
+Releases assembled before 2026-11-16 hold the older prototype map and are refused, previews included; assemble the
+release again from `private-assets/2.1.24` (which has the planet icons) and the regenerated
+`private-assets/statistics-reference`.
 The app reads Factorio artwork only from this release; none is built into the app.
 
 ## Previews
@@ -131,7 +132,8 @@ file it replaces to the Trash. When the renderer reports warnings, for example a
 ## Statistics
 
 The Statistics tab (⌘1) lists a blueprint's entity and tile counts, footprint, and the items needed to build it, each
-item with its icon and quality.
+item with its icon and quality, grouped by the game's inventory tabs (Logistics, Production, Intermediate products,
+Space, Combat) in the game's order. Equipment requests are listed last and are not part of the total.
 Books and planners have no statistics. Without an asset release, the tab says what it needs.
 
 ## When something goes wrong

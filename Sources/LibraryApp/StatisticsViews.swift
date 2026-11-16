@@ -42,8 +42,8 @@ struct StatisticsTab: View {
             CalculatingView()
         case .failed(let failure):
             message("\(failure.title). \(failure.guidance)")
-        case .ready(let statistics):
-            StatisticsList(presentation: StatisticsPresentation(statistics))
+        case .ready(let statistics, let inventory):
+            StatisticsList(presentation: StatisticsPresentation(statistics, inventory: inventory))
         }
     }
 
@@ -94,7 +94,7 @@ private struct CalculatingView: View {
     }
 }
 
-/// Counts, footprint, item groups, and warnings; rows can be selected and copied as text.
+/// Counts, footprint, items by inventory tab, and warnings; rows can be selected and copied as text.
 private struct StatisticsList: View {
     let presentation: StatisticsPresentation
     @State private var selection: Set<String> = []

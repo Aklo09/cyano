@@ -24,10 +24,15 @@ func syntheticPrototypeMap() -> [String: Any] {
             "directions": directions,
         ]
     }
+    func item(_ type: String, _ subgroup: String, _ order: String, places equipment: String? = nil) -> [String: Any] {
+        var item: [String: Any] = ["type": type, "subgroup": subgroup, "order": order]
+        item["equipment"] = equipment
+        return item
+    }
     var rail = shape(0, width: 4, height: 4, box: [[-1.5, -2.5], [1.5, 2.5], 0])
     rail["secondaryCollisionBox"] = [[-2, -1], [2, 1], 0.125]
     return [
-        "schema": 1, "gameVersion": "2.1.24",
+        "schema": 2, "gameVersion": "2.1.24",
         "mods": Dictionary(uniqueKeysWithValues: FactorioProfile.initial.mods.map { ($0, "2.1.24") }),
         "qualities": ["normal": true, "rare": true],
         "footprintDefinition": "Synthetic test map.",
@@ -44,9 +49,21 @@ func syntheticPrototypeMap() -> [String: Any] {
         ],
         "tiles": ["concrete": ["placement": [["name": "concrete", "count": 1]]]],
         "items": [
-            "wooden-chest": ["type": "item"], "boiler": ["type": "item"], "car": ["type": "item-with-entity-data"],
-            "rail": ["type": "rail-planner"], "concrete": ["type": "item"], "speed-module": ["type": "module"],
-            "battery-equipment": ["type": "item", "equipment": "battery-equipment"],
+            "wooden-chest": item("item", "storage", "a[items]-a[wooden-chest]"),
+            "boiler": item("item", "energy", "b[steam-power]-a[boiler]"),
+            "car": item("item-with-entity-data", "transport", "b[personal-transport]-a[car]"),
+            "rail": item("rail-planner", "train-transport", "a[rail]-a[rail]"),
+            "concrete": item("item", "terrain", "b[concrete]-a[plain]"),
+            "speed-module": item("module", "module", "a[speed]-a[speed-module-1]"),
+            "battery-equipment": item(
+                "item", "equipment", "b[battery]-a[battery-equipment]", places: "battery-equipment"),
+        ],
+        "itemGroups": ["logistics": ["order": "a"], "production": ["order": "b"], "combat": ["order": "e"]],
+        "itemSubgroups": [
+            "storage": ["group": "logistics", "order": "b"], "train-transport": ["group": "logistics", "order": "e"],
+            "transport": ["group": "logistics", "order": "f"], "terrain": ["group": "logistics", "order": "h"],
+            "energy": ["group": "production", "order": "b"], "module": ["group": "production", "order": "g"],
+            "equipment": ["group": "combat", "order": "d"],
         ],
         "equipmentItems": ["battery-equipment": ["battery-equipment"]],
     ]
@@ -80,6 +97,31 @@ struct PrototypeMapTests {
         #expect(rail.secondaryCollisionBox?.orientation == 0.125)
         #expect(
             map.items["speed-module"] == "module" && map.equipmentItems["battery-equipment"] == ["battery-equipment"])
+        #expect(
+            map.inventory.positions["speed-module"]
+                == InventoryPosition(
+                    group: "production", groupOrder: "b", subgroup: "module", subgroupOrder: "g",
+                    order: "a[speed]-a[speed-module-1]"))
+    }
+
+    @Test("Items sort as in the game's inventory: tab, row, and order; unknown items last")
+    func inventoryOrder() throws {
+        let inventory = try parse(syntheticPrototypeMap()).inventory
+        let names = [
+            "unknown-b", "battery-equipment", "speed-module", "unknown-a", "concrete", "car", "boiler", "rail",
+            "wooden-chest",
+        ]
+        #expect(
+            names.sorted(by: inventory.precedes) == [
+                "wooden-chest", "rail", "car", "concrete", "boiler", "speed-module", "battery-equipment", "unknown-a",
+                "unknown-b",
+            ])
+        // Ties on order strings fall back to names, as the game does.
+        let tied = ItemInventory(positions: [
+            "b": InventoryPosition(group: "g", groupOrder: "a", subgroup: "s", subgroupOrder: "a", order: ""),
+            "a": InventoryPosition(group: "g", groupOrder: "a", subgroup: "s", subgroupOrder: "a", order: ""),
+        ])
+        #expect(["b", "a"].sorted(by: tied.precedes) == ["a", "b"])
     }
 
     @Test("Loading from a verified release binds the map to the release identity")
@@ -125,7 +167,27 @@ struct PrototypeMapTests {
             edit(&map)
             cases.append((name, map))
         }
-        root("schema 2") { $0["schema"] = 2 }
+        root("schema 1") { $0["schema"] = 1 }
+        func item(_ name: String, _ edit: (inout [String: Any]) -> Void) {
+            root(name) { map in
+                var items = map["items"] as! [String: Any]
+                var chest = items["wooden-chest"] as! [String: Any]
+                edit(&chest)
+                items["wooden-chest"] = chest
+                map["items"] = items
+            }
+        }
+        item("item without subgroup") { $0["subgroup"] = nil }
+        item("item without order") { $0["order"] = nil }
+        item("item order not text") { $0["order"] = 1 }
+        item("item in unknown subgroup") { $0["subgroup"] = "missing" }
+        root("missing itemGroups") { $0["itemGroups"] = nil }
+        root("subgroup in unknown group") {
+            var subgroups = $0["itemSubgroups"] as! [String: Any]
+            subgroups["storage"] = ["group": "missing", "order": "b"]
+            $0["itemSubgroups"] = subgroups
+        }
+        root("unknown item group field") { $0["itemGroups"] = ["logistics": ["order": "a", "extra": 1]] }
         root("missing gameVersion") { $0["gameVersion"] = nil }
         root("unknown root field") { $0["extra"] = true }
         root("qualities without normal") { $0["qualities"] = ["rare": true] }

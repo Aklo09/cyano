@@ -59,7 +59,7 @@ struct SyntheticPreviewAssets {
             "fonts": [],
         ])
         let map = try previewJSON([
-            "schema": 1, "gameVersion": "2.1.24", "mods": Dictionary(uniqueKeysWithValues: mods.map { ($0, "2.1.24") }),
+            "schema": 2, "gameVersion": "2.1.24", "mods": Dictionary(uniqueKeysWithValues: mods.map { ($0, "2.1.24") }),
         ])
         let members = [
             "sprites/manifest.json": manifest, "sprites/render-db.json": database, "sprites/atlas.png": png as Data,

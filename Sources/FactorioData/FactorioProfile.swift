@@ -9,6 +9,6 @@ public struct FactorioProfile: Codable, Equatable, Sendable {
         gameVersion: "2.1.24",
         mods: ["base", "elevated-rails", "quality", "recycler", "space-age"],
         assetSchema: 2,
-        prototypeMapSchema: 1
+        prototypeMapSchema: 2
     )
 }

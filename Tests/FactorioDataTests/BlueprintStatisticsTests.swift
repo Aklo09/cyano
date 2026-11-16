@@ -75,8 +75,8 @@ func statisticsMapJSON(dropSecondary: Bool = false) -> [String: Any] {
     for name in [
         "assembling-machine-3", "requester-chest", "spidertron", "locomotive", "construction-robot", "rail-ramp",
         "coal", "iron-plate", "stone-brick",
-    ] { items[name] = ["type": "item"] }
-    items["speed-module-3"] = ["type": "module"]
+    ] { items[name] = ["type": "item", "subgroup": "storage", "order": name] }
+    items["speed-module-3"] = ["type": "module", "subgroup": "module", "order": "a[speed]-c[speed-module-3]"]
     map["items"] = items
     var tiles = map["tiles"] as! [String: Any]
     tiles["stone-path"] = ["placement": [["name": "stone-brick", "count": 1]]]

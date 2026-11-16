@@ -58,7 +58,7 @@ struct AppTestAssetRelease {
             mapLoads
             ? Self.prototypeMap
             : [
-                "schema": 1, "gameVersion": version,
+                "schema": 2, "gameVersion": version,
                 "mods": Dictionary(uniqueKeysWithValues: mods.map { ($0, version) }),
             ]
         let members: [String: Data] = [
@@ -89,7 +89,7 @@ struct AppTestAssetRelease {
             "collisionBox": box, "selectionBox": [[-0.5, -0.5], [0.5, 0.5], 0],
         ]
         return [
-            "schema": 1, "gameVersion": FactorioProfile.initial.gameVersion,
+            "schema": 2, "gameVersion": FactorioProfile.initial.gameVersion,
             "mods": Dictionary(
                 uniqueKeysWithValues: FactorioProfile.initial.mods.map { ($0, FactorioProfile.initial.gameVersion) }),
             "qualities": ["normal": true], "footprintDefinition": "Test map.",
@@ -101,7 +101,10 @@ struct AppTestAssetRelease {
                     "orientationAffectsCollision": false, "directions": ["0": shape],
                 ]
             ],
-            "tiles": [:] as [String: Any], "items": ["wooden-chest": ["type": "item"]],
+            "tiles": [:] as [String: Any],
+            "items": ["wooden-chest": ["type": "item", "subgroup": "storage", "order": "a[items]-a[wooden-chest]"]],
+            "itemGroups": ["logistics": ["order": "a"]],
+            "itemSubgroups": ["storage": ["group": "logistics", "order": "b"]],
             "equipmentItems": [:] as [String: Any],
         ]
     }

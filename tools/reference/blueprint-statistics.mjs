@@ -20,7 +20,7 @@ function boxAabb(box, rotation = 0) {
 }
 
 export function calculateBlueprintStatistics(blueprint, map) {
-	if (map.schema !== 1 || !map.gameVersion) throw new Error('Unsupported prototype map');
+	if (map.schema !== 2 || !map.gameVersion) throw new Error('Unsupported prototype map');
 	const warnings = [];
 	let footprintComplete = true;
 	let requirementsComplete = true;

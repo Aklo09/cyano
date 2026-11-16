@@ -31,7 +31,8 @@ function with no I/O. In an optimized build a 6,814-entity leaf takes about 5 ms
 
 ## Code
 
-- `Sources/FactorioData/PrototypeMap.swift`: strict map model, loaded only from a verified release.
+- `Sources/FactorioData/PrototypeMap.swift`: strict map model, loaded only from a verified release; `inventory`
+  gives each item's tab, row, and order in the game's inventory, for listing items as the game does.
 - `Sources/FactorioData/BlueprintStatistics.swift`: the calculator and result types.
 - `Sources/FactorioData/LibraryStatistics.swift`: the `NativeLibrary` extension.
 - `tools/reference/blueprint-statistics.mjs`: the JavaScript reference calculator the port started from.

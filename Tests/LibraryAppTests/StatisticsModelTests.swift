@@ -85,11 +85,11 @@ private final class StatisticsFixture {
 
     func ready(_ name: String) async -> StatisticsPresentation? {
         await model.show(target(name))
-        guard case .ready(let statistics) = model.state else {
+        guard case .ready(let statistics, let inventory) = model.state else {
             Issue.record("\(name): \(model.state)")
             return nil
         }
-        return StatisticsPresentation(statistics)
+        return StatisticsPresentation(statistics, inventory: inventory)
     }
 
     func cleanup() {
@@ -126,7 +126,7 @@ struct StatisticsModelTests {
         let chest = try #require(await fixture.ready("Chest"))
         #expect(chest.entities == 1 && chest.tiles == 0 && chest.requirementsComplete)
         #expect(chest.footprint == .complete(width: 1, height: 1))
-        #expect(chest.groups.map(\.title) == ["Construction items", "Placement"])
+        #expect(chest.groups.map(\.title) == ["Logistics"])
         #expect(
             chest.groups[0].rows.map { [$0.name, $0.quality ?? "", String($0.count)] } == [["wooden-chest", "", "1"]])
         #expect(chest.warnings.isEmpty && !chest.isEmpty)
@@ -144,11 +144,11 @@ struct StatisticsModelTests {
         let target = try #require(fixture.browser.statisticsTarget)
         #expect(target.entryPath == [2] && target.kind == .blueprint)
         await fixture.model.show(target)
-        guard case .ready(let inner) = fixture.model.state else {
+        guard case .ready(let inner, let inventory) = fixture.model.state else {
             Issue.record("\(fixture.model.state)")
             return
         }
-        #expect(StatisticsPresentation(inner).groups.first?.rows.first?.count == 2)
+        #expect(StatisticsPresentation(inner, inventory: inventory).groups.first?.rows.first?.count == 2)
         #expect(fixture.assets.mapLoads == 1)
         await fixture.session.close()
     }
@@ -197,6 +197,49 @@ struct StatisticsModelTests {
         await fixture.session.close()
     }
 
+    @Test("STA-1: construction items appear once, by inventory tab in the game's order")
+    func inventoryTabs() throws {
+        var map = AppTestAssetRelease.prototypeMap
+        map["qualities"] = ["normal": true, "rare": true]
+        var items = map["items"] as! [String: Any]
+        items["speed-module"] = ["type": "module", "subgroup": "module", "order": "a[speed]-a[speed-module-1]"]
+        items["coal"] = ["type": "item", "subgroup": "raw-resource", "order": "b[coal]"]
+        map["items"] = items
+        map["itemGroups"] = [
+            "logistics": ["order": "a"], "production": ["order": "b"], "intermediate-products": ["order": "c"],
+        ]
+        map["itemSubgroups"] = [
+            "storage": ["group": "logistics", "order": "b"], "module": ["group": "production", "order": "g"],
+            "raw-resource": ["group": "intermediate-products", "order": "b"],
+        ]
+        let prototypes = try PrototypeMap.parse(
+            AppTestAssetRelease.json(map), assetIdentity: String(repeating: "0", count: 64))
+        let coal = #"{"id":{"name":"coal"},"items":{"in_inventory":[{"inventory":1,"stack":0,"count":5}]}}"#
+        let module = #"{"id":{"name":"speed-module"},"items":{"in_inventory":[{"inventory":1,"stack":0,"count":2}]}}"#
+        let statistics = try BlueprintStatisticsCalculator.calculate(
+            BlueprintCodec.decode(
+                encoded(
+                    blueprint(
+                        "Tabs",
+                        entities: [
+                            #"{"entity_number":1,"name":"wooden-chest","position":{"x":0.5,"y":0.5},"items":[\#(coal)]}"#,
+                            #"{"entity_number":2,"name":"wooden-chest","position":{"x":2.5,"y":0.5},"quality":"rare","#
+                                + #""items":[\#(module)]}"#,
+                        ]))
+            ).root, map: prototypes)
+        guard case .applicable(let result) = statistics else {
+            Issue.record("not applicable")
+            return
+        }
+        let presentation = StatisticsPresentation(result, inventory: prototypes.inventory)
+        #expect(presentation.groups.map(\.title) == ["Logistics", "Production", "Intermediate products"])
+        #expect(
+            presentation.groups.map { $0.rows.map { "\($0.name)|\($0.quality ?? "")|\($0.count)" } } == [
+                ["wooden-chest||1", "wooden-chest|rare|1"], ["speed-module||2"], ["coal||5"],
+            ])
+        #expect(StatisticsPresentation.title(tab: "some-new-tab") == "Some new tab")
+    }
+
     @Test("Statistics rows copy as text: name, quality when not normal, and count")
     func copying() throws {
         let statistics = try BlueprintStatisticsCalculator.calculate(
@@ -217,8 +260,13 @@ struct StatisticsModelTests {
             Issue.record("not applicable")
             return
         }
-        let presentation = StatisticsPresentation(result)
-        let placement = try #require(presentation.groups.first { $0.id == "placement" })
+        let presentation = StatisticsPresentation(
+            result,
+            inventory: ItemInventory(positions: [
+                "wooden-chest": InventoryPosition(
+                    group: "logistics", groupOrder: "a", subgroup: "storage", subgroupOrder: "b", order: "a")
+            ]))
+        let placement = try #require(presentation.groups.first { $0.id == "tab:logistics" })
         #expect(placement.rows.map(\.quality) == [nil, "rare"])
         #expect(presentation.copyText(rows: Set(placement.rows.map(\.id))) == "wooden-chest\t1\nwooden-chest\trare\t1")
         #expect(presentation.copyText(rows: []) == "")
@@ -304,11 +352,11 @@ struct StatisticsParityAppTests {
         for ((file, path), cliResult) in zip(cases, expected) {
             let label = "\(file.lastPathComponent) \(path)"
             await model.show(StatisticsTarget(itemId: ids[file]!, entryPath: path, kind: .blueprint, sourceSha256: ""))
-            guard case .ready(let statistics) = model.state else {
+            guard case .ready(let statistics, let inventory) = model.state else {
                 Issue.record("\(label): \(model.state)")
                 continue
             }
-            let shown = StatisticsPresentation(statistics)
+            let shown = StatisticsPresentation(statistics, inventory: inventory)
             #expect(shown.entities == cliResult["entities"] as? Int, "\(label) entities")
             #expect(shown.tiles == cliResult["tiles"] as? Int, "\(label) tiles")
             #expect(shown.requirementsComplete == cliResult["requirementsComplete"] as? Bool, "\(label) requirements")
@@ -328,18 +376,26 @@ struct StatisticsParityAppTests {
             } else {
                 #expect(shown.footprint == .unknown, "\(label) footprint")
             }
-            for (key, id) in [
-                ("constructionItems", "construction"), ("placement", "placement"), ("modules", "modules"),
-                ("equipment", "equipment"), ("otherInserted", "other"), ("equipmentRequests", "requests"),
-            ] {
-                let items = (cliResult[key] as? [[String: Any]] ?? []).map {
+            func items(_ key: String) -> [String] {
+                (cliResult[key] as? [[String: Any]] ?? []).map {
                     "\($0["name"]!)|\(($0["quality"] as? String) == "normal" ? "" : $0["quality"]!)|\($0["count"]!)"
                 }
-                let rows = (shown.groups.first { $0.id == id }?.rows ?? []).map {
-                    "\($0.name)|\($0.quality ?? "")|\($0.count)"
-                }
-                #expect(rows == items, "\(label) \(key)")
             }
+            func rows(_ groups: [StatisticsPresentation.Group]) -> [String] {
+                groups.flatMap(\.rows).map { "\($0.name)|\($0.quality ?? "")|\($0.count)" }
+            }
+            // The tabs together list exactly the construction items, each once, every item under its own tab.
+            let tabs = shown.groups.filter { $0.id.hasPrefix("tab:") }
+            #expect(rows(tabs).sorted() == items("constructionItems").sorted(), "\(label) constructionItems")
+            #expect(Set(tabs.map(\.id)).count == tabs.count, "\(label) tabs")
+            for tab in tabs {
+                #expect(
+                    tab.rows.allSatisfy { "tab:" + (inventory.positions[$0.name]?.group ?? "") == tab.id },
+                    "\(label) \(tab.id)")
+            }
+            #expect(
+                rows(shown.groups.filter { $0.id == "requests" }) == items("equipmentRequests"), "\(label) requests")
+            #expect(shown.groups.count == tabs.count + (items("equipmentRequests").isEmpty ? 0 : 1), "\(label) groups")
             let warnings = (cliResult["warnings"] as? [[String: Any]] ?? []).map { $0["count"] as? Int ?? -1 }
             #expect(shown.warnings.map(\.count) == warnings, "\(label) warnings")
         }

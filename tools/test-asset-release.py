@@ -21,7 +21,7 @@ class AssetAssemblyTests(unittest.TestCase):
         self.prototype = self.root / 'prototype-map.json'
         self.destination = self.root / 'release'
         (self.sprites / 'manifest.json').write_text(json.dumps(dict(schema=2, gameVersion='2.1.24', mods=MODS)))
-        self.prototype.write_text(json.dumps(dict(schema=1, gameVersion='2.1.24', mods={mod: '2.1.24' for mod in MODS})))
+        self.prototype.write_text(json.dumps(dict(schema=2, gameVersion='2.1.24', mods={mod: '2.1.24' for mod in MODS})))
 
     def tearDown(self):
         self.temporary.cleanup()

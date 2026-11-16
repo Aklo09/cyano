@@ -91,7 +91,7 @@ require(len(set(name.lower() for name in names)) == len(names), 'Colliding asset
 manifest = read_json(manifest_path, 4 * 1024**2)
 prototype = read_json(prototype_map, 16 * 1024**2)
 mods = ['base', 'elevated-rails', 'quality', 'recycler', 'space-age']
-require(manifest.get('schema') == 2 and prototype.get('schema') == 1, 'Unsupported asset schemas')
+require(manifest.get('schema') == 2 and prototype.get('schema') == 2, 'Unsupported asset schemas')
 require(manifest.get('gameVersion') == prototype.get('gameVersion') == '2.1.24', 'Unsupported game version')
 require(sorted(manifest['mods']) == mods and sorted(prototype['mods']) == mods, 'Unsupported mod profile')
 require(all(prototype['mods'][mod] == '2.1.24' for mod in mods), 'Unsupported mod version')

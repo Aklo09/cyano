@@ -46,7 +46,8 @@ public final class StatisticsModel {
         /// The release verifies but its prototype map can't be used (STA-6).
         case mapUnsuitable(LibraryMessage)
         case calculating
-        case ready(BlueprintStatistics)
+        /// A result, with the map's inventory order for listing its items as the game does.
+        case ready(BlueprintStatistics, ItemInventory)
         case failed(LibraryMessage)
     }
 
@@ -103,7 +104,7 @@ public final class StatisticsModel {
         }
         guard current == request else { return }
         switch outcome {
-        case .success(.applicable(let statistics)): state = .ready(statistics)
+        case .success(.applicable(let statistics)): state = .ready(statistics, map.inventory)
         case .success(.notApplicable(let result)): state = .notApplicable(ItemKind(stored: result.entryKind))
         case .failure(let message): state = .failed(message)
         case .ignored: break
@@ -122,10 +123,11 @@ public struct StatisticsPresentation: Equatable, Sendable {
         public let count: Int
     }
 
+    /// One of the game's inventory tabs, or the equipment requests.
     public struct Group: Identifiable, Equatable, Sendable {
         public let id: String
         public let title: String
-        /// "reported, not included in the total" for equipment requests.
+        /// "reported, not included above" for equipment requests.
         public let note: String?
         public let rows: [Row]
     }
@@ -154,7 +156,9 @@ public struct StatisticsPresentation: Equatable, Sendable {
     /// An empty blueprint: "This blueprint has no entities or tiles." with a 0 × 0 footprint.
     public var isEmpty: Bool { entities == 0 && tiles == 0 }
 
-    public init(_ statistics: BlueprintStatistics) {
+    /// Construction items appear once, split into the game's inventory tabs (Logistics, Production, and so on) in the
+    /// game's order, with equipment requests last because they are not part of the total.
+    public init(_ statistics: BlueprintStatistics, inventory: ItemInventory) {
         entities = statistics.entities
         tiles = statistics.tiles
         let print = statistics.footprint
@@ -168,14 +172,25 @@ public struct StatisticsPresentation: Equatable, Sendable {
             footprint = .unknown
         }
         requirementsComplete = statistics.requirementsComplete
-        let named: [(String, String, String?, [StatisticsItem])] = [
-            ("construction", "Construction items", nil, statistics.constructionItems),
-            ("placement", "Placement", nil, statistics.placement),
-            ("modules", "Modules", nil, statistics.modules),
-            ("equipment", "Equipment", nil, statistics.equipment),
-            ("other", "Other inserted", nil, statistics.otherInserted),
-            ("requests", "Equipment requests", "reported, not included in the total", statistics.equipmentRequests),
-        ]
+        // Items the map has no position for (none in practice: unknown items are left out with a warning) join the
+        // game's own catch-all tab, which sorts last.
+        let tabs = Dictionary(grouping: statistics.constructionItems) {
+            inventory.positions[$0.name]?.group ?? "other"
+        }
+        func order(_ tab: String) -> [UInt8] {
+            let known = tabs[tab]?.lazy.compactMap { inventory.positions[$0.name]?.groupOrder }.first
+            return Array((known ?? "\u{10FFFF}").utf8) + [0] + Array(tab.utf8)
+        }
+        var named: [(String, String, String?, [StatisticsItem])] = tabs.keys
+            .sorted { order($0).lexicographicallyPrecedes(order($1)) }
+            .map { tab in
+                let items = tabs[tab]!.sorted { left, right in
+                    if left.name != right.name { return inventory.precedes(left.name, right.name) }
+                    return Array(left.quality.utf8).lexicographicallyPrecedes(Array(right.quality.utf8))
+                }
+                return ("tab:\(tab)", Self.title(tab: tab), nil, items)
+            }
+        named.append(("requests", "Equipment requests", "reported, not included above", statistics.equipmentRequests))
         groups = named.filter { !$0.3.isEmpty }.map { id, title, note, items in
             Group(
                 id: id, title: title, note: note,
@@ -187,6 +202,25 @@ public struct StatisticsPresentation: Equatable, Sendable {
         }
         warnings = statistics.warnings.enumerated().map { index, warning in
             Warning(id: "warning:\(index)", count: warning.count, text: Self.text(for: warning))
+        }
+    }
+
+    /// The game's English name for an inventory tab; tabs the game data adds later read as their internal name.
+    static func title(tab: String) -> String {
+        switch tab {
+        case "logistics": "Logistics"
+        case "production": "Production"
+        case "intermediate-products": "Intermediate products"
+        case "space": "Space"
+        case "combat": "Combat"
+        case "fluids": "Fluids"
+        case "signals": "Signals"
+        case "enemies": "Enemies"
+        case "tiles": "Tiles"
+        case "environment": "Environment"
+        case "effects": "Effects"
+        case "other": "Unsorted"
+        default: tab.prefix(1).uppercased() + tab.dropFirst().replacingOccurrences(of: "-", with: " ")
         }
     }
 

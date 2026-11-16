@@ -405,3 +405,29 @@ row height, the kind symbols matching the icons, and the whole header (Updated, 
 and `bp.txt` entry 6. Rows with tag icons in their names were still 3 to 4 points taller; the minimum row height is now
 the icon size plus 12 points, to be confirmed in the acceptance runs.
 
+
+## Statistics by inventory tab (2026-11-16)
+
+From the owner's walkthrough: the Statistics tab listed every item twice, once under Construction items and again
+under Placement, Modules, Equipment, or Other inserted. The owner chose to group the items by the game's inventory
+tabs. The tab now shows each construction item once, in one section per tab (Logistics, Production, Intermediate
+products, Space, Combat, and Unsorted for the game's catch-all tab), in the game's order, then Equipment requests.
+This needed the game's inventory order in the prototype map (schema 2, see the
+[statistics contract](../contracts/Statistics.md#prototype-data)), so the statistics reference was regenerated from
+Factorio 2.1.24 ([asset preparation](../development/Asset-Preparation.md#regenerate)).
+
+| Check | Result |
+| --- | --- |
+| Regenerated map against the previous one | Only `schema`, `itemGroups`, `itemSubgroups`, and each item's `subgroup` and `order` differ; every item resolves to a tab |
+| `evaluate-statistics.mjs` | 347 passed, 1 expected failure (`ee-infinity-loader`), as before |
+| `just statistics-golden` against the previous golden | All 348 expected results identical; only the map and reference calculator hashes changed |
+| `just statistics-test` | 13 of 13 pass |
+| `just tools-check` | Pass, with the three adapted copied files recorded in `tools/provenance.json` |
+| `just lint` | No findings |
+| `just test` | Four Swift test runs (43, 69, 99, and 34 tests, none skipped, including both statistics parity suites and the private map), 4 Python asset-release tests, and the artwork check (406 files) pass |
+| `just app-build` | Pass, no warnings |
+
+New tests: `PrototypeMapTests` reads the inventory order and refuses items or rows that do not resolve, a missing
+order, and schema 1; `StatisticsModelTests` checks tabs and their order with a module and fuel, and STA-2 now requires
+the tabs together to list exactly the CLI's `constructionItems`, each once and under its own tab. Not yet checked in
+the real app: the owner's look at the new tab.

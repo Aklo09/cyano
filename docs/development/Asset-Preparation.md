@@ -165,3 +165,11 @@ prototype map does not depend on icons. Compared with the
 copied 2.1.23 assets, the render databases gained only `utility/indication-line` and the inserter
 `pickupPosition`/`insertPosition` data; the prototype map and every statistics golden result were identical apart
 from the game version.
+
+2026-11-16: the game reference moved to schema 2 to export the inventory order (each item's subgroup and order, and
+every item group and subgroup), so the prototype map is now schema 2 and releases holding a schema 1 map are refused.
+Only the statistics reference was regenerated; the previous one is kept as
+`private-assets/statistics-reference-before-groups`. Evaluation gave the same 347 passes and one expected failure.
+Apart from `schema` and the new fields the map is identical, and all 348 statistics golden results are identical;
+only the map and reference calculator hashes changed. Reassemble any release from `private-assets/2.1.24` and the
+new `private-assets/statistics-reference`.

@@ -174,7 +174,7 @@ public enum AssetRelease {
         else { throw AssetReleaseError.invalid("Invalid asset mod profile.") }
         let mods = modValues.compactMap(\.string)
         try require(
-            manifest["schema"]?.safeInteger == 2 && map["schema"]?.safeInteger == 1
+            manifest["schema"]?.safeInteger == 2 && map["schema"]?.safeInteger == initial.prototypeMapSchema
                 && manifest["gameVersion"]?.string == initial.gameVersion
                 && map["gameVersion"]?.string == initial.gameVersion
                 && profile["gameVersion"]?.string == initial.gameVersion && modValues.count == mods.count

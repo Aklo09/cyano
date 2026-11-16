@@ -2,7 +2,8 @@
 
 Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A1). Amended for milestone 4
 (subtask R0, 2026-11-15): GEN-9, BRW-1, BRW-5, IMP-5, STA-1, and the Icons, Render warnings, and Preview images
-groups; approved by the owner on 2026-11-15.
+groups; approved by the owner on 2026-11-15. STA-1 amended at the owner's request on 2026-11-16 (items by inventory
+tab, listed once).
 Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Milestone-4.md). Screen layout, focus order, and shortcuts belong to the A2 screen specs.
 
 ## Problem
@@ -306,9 +307,10 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 
 ### Statistics (A13)
 
-- **STA-1** Given assets are configured and a blueprint entry is selected, when statistics are shown, then the five
-  requirement groups, their total, and the footprint in tiles appear with item names as text and quality where not
-  normal, each with its icon (ICN-9).
+- **STA-1** Given assets are configured and a blueprint entry is selected, when statistics are shown, then the
+  construction items appear once each, under the game's inventory tabs (Logistics, Production, Intermediate products,
+  Space, Combat, …) in the game's order, followed by equipment requests, and the footprint in tiles; item names
+  appear as text and quality where not normal, each with its icon (ICN-9).
 - **STA-2** Given the seven blueprints approved in [milestone 2](../validation/Milestone-2.md) (`RS.txt`,
   `4x_Rocket_Silo.txt`, `Hazard_Patterns.txt`, `bp.txt` `0.0` and `1.1`, and `v0.59.0.txt` `1.1` from
   `Tests/LibraryCoreTests/Fixtures/Blueprints/`, plus

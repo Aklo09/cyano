@@ -1,7 +1,9 @@
 # Milestone 4 acceptance
 
 Milestone 4 (rendering integration) is **ready for the owner's acceptance**: every subtask is done and every check
-below passed on commit `fa8d7f8` (2026-11-15). The owner's walkthrough and approval are pending.
+below passed on commit `fa8d7f8` (2026-11-15). The owner's walkthrough (2026-11-16) found one issue, items listed
+twice in the Statistics tab, now changed (see "Decisions and changes during the milestone"); the owner's approval is
+pending.
 
 Its exit condition, from the [milestone 4 plan](../planning/Milestone-4.md#scope), is that the full supplied corpus
 receives native rendering and visual qualification. Per-subtask evidence is in the [renderer validation](Renderer.md)
@@ -68,6 +70,14 @@ The [R0 amendments](../planning/Milestone-4.md#subtasks) added 22 criteria; 19 n
   the fixed build fits, and both acceptance runs then passed with no crash report. Checked only at the default window
   size with these fixtures' names; a minimum-size window was not scripted.
 
+- **Owner's walkthrough (2026-11-16):** the Statistics tab repeated every item (Construction items, then Placement,
+  Modules, Equipment, Other inserted). At the owner's choice it now lists each item once under the game's inventory
+  tabs, in the game's order. This moved the prototype map to schema 2 (inventory order), regenerated the statistics
+  reference, and amended STA-1, the screen specs, and the statistics contract. Releases assembled earlier are refused
+  and must be reassembled. `just lint`, `just test` (43, 69, 99, and 34 tests, none skipped), `just statistics-test`,
+  `just tools-check`, and `just app-build` pass after the change; the Release build, smoke runs, and independence
+  check above were not rerun ([validation](App.md#statistics-by-inventory-tab-2026-11-16)).
+
 ## For the owner's walkthrough
 
 Paths no scripted run exercised:
@@ -91,4 +101,5 @@ everyday release is reassembled from the regenerated assets; the first open rebu
 
 ## Owner approval
 
-Pending: the owner's walkthrough on their own library and release.
+Pending: the walkthrough found only the Statistics repetition (2026-11-16), now changed; approval waits for the
+owner's look at the new Statistics tab on a reassembled release.
