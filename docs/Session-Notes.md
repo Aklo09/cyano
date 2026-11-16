@@ -162,7 +162,8 @@ Production, Intermediate products, Space, Combat) in the game's order; the proto
 inventory order, the statistics reference was regenerated (previous copy in
 `private-assets/statistics-reference-before-groups`), and releases assembled earlier are refused, so the owner's
 everyday release must be reassembled (their script needs no version change; see the
-[validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Next: the owner checks the new Statistics tab
+[validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Statistics rows now show a quality by its
+icon alone (owner, 2026-11-16). Next: the owner checks the new Statistics tab
 on a reassembled release, then their approval of milestone 4 is recorded.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.

@@ -431,3 +431,7 @@ New tests: `PrototypeMapTests` reads the inventory order and refuses items or ro
 order, and schema 1; `StatisticsModelTests` checks tabs and their order with a module and fuel, and STA-2 now requires
 the tabs together to list exactly the CLI's `constructionItems`, each once and under its own tab. Not yet checked in
 the real app: the owner's look at the new tab.
+
+Follow-up (owner, 2026-11-16): a quality is shown by its icon alone, without its name; VoiceOver and the tooltip
+name it, a quality without an icon still shows its name, and ⌘C still copies it. `just lint`, `just app-test` (99
+tests), and `just app-build` (no warnings) pass.

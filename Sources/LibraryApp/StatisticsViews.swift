@@ -76,6 +76,28 @@ private struct StatisticsIcon: View {
     }
 }
 
+/// A quality other than normal: its icon alone, named for VoiceOver and in a tooltip, or its name when the release
+/// has no icon for it (ICN-9).
+private struct StatisticsQuality: View {
+    let quality: String
+    @Environment(\.iconCatalog) private var catalog
+    @ScaledMetric(relativeTo: .body) private var size: CGFloat = 16
+
+    var body: some View {
+        if let reference = IconReference(tagKind: "quality", name: quality),
+            let image = catalog?.image(for: reference)
+        {
+            Image(decorative: image, scale: 1).resizable().interpolation(.high)
+                .frame(width: size, height: size)
+                .help(quality)
+                .accessibilityLabel(quality)
+        } else {
+            // Hierarchy by size, not lighter text (screen specs, "Color and contrast").
+            Text(quality).font(.callout)
+        }
+    }
+}
+
 /// "Calculating…" with a spinner, shown only after 0.5 s so quick results never flash it.
 private struct CalculatingView: View {
     @State private var visible = false
@@ -121,11 +143,7 @@ private struct StatisticsList: View {
                             // Icons from the release before the item and its quality; names stay text (ICN-9).
                             StatisticsIcon(reference: IconReference(signalType: nil, name: row.name))
                             Text(row.name)
-                            if let quality = row.quality {
-                                StatisticsIcon(reference: IconReference(tagKind: "quality", name: quality))
-                                // Hierarchy by size, not lighter text (screen specs, "Color and contrast").
-                                Text(quality).font(.callout)
-                            }
+                            if let quality = row.quality { StatisticsQuality(quality: quality) }
                             Spacer()
                             Text(row.count, format: .number).monospacedDigit()
                         }

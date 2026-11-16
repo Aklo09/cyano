@@ -284,8 +284,8 @@ window.
 Content: entity and tile counts; footprint "83 × 43 tiles" ("Footprint incomplete, at least 202 × 79 tiles" when
 incomplete, STA-3); the construction items, each once, in one section per inventory tab with the game's English tab
 name (Logistics, Production, Intermediate products, Space, Combat, …), tabs and items in the game's order, then
-Equipment requests (reported, not included above), as lists of icon and name, quality (icon and name, only when not
-normal), and count (ICN-9; without an icon, the name alone); then
+Equipment requests (reported, not included above), as lists of icon and name, quality (its icon, or its name without
+one; only when not normal), and count (ICN-9; without an icon, the name alone); then
 Warnings, each one line worded from its code with the name and count, for example "8 × ee-infinity-loader: not in
 the game data; requirements and footprint are incomplete." Empty groups are omitted.
 

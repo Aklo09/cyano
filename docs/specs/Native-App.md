@@ -377,7 +377,9 @@ Icons come only from the configured asset release (GEN-9). Everything in this gr
   this change keep their names. Renaming accepts any name, tags included, and shows the tags as icons. A label over
   the name limit (1,024 characters) keeps the name derived from the file name.
 - **ICN-9** Given statistics are shown (STA-1), when an item or quality has an icon in the release, then the icon
-  appears before the item's name and with its quality; an item without one shows its name alone.
+  appears before the item's name, and a quality is shown by its icon alone (its name is spoken and shown as a
+  tooltip); an item or quality without an icon shows its name alone. Quality shown by icon alone at the owner's
+  request (2026-11-16).
 - **ICN-10** Given the owner selects a different release or clears it (SET-5a, SET-6), when names, rows, and
   statistics are shown again, then every icon comes from the new release or falls back as in ICN-3, ICN-4, and ICN-6.
 - **ICN-11** Given a release prepared with planet icons, when Nauvis, Vulcanus, Gleba, Fulgora, or Aquilo appears as
