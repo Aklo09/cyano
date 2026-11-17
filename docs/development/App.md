@@ -1,6 +1,6 @@
 # macOS app
 
-Build and run the Factorio Blueprint Library app from this repository.
+Build and run the Cyano app from this repository.
 Behavior is specified in the [app spec](../specs/App.md) and the [screen specs](../specs/App-Screens.md);
 the delivery plan is [milestone 3](../planning/Milestone-3.md).
 
@@ -9,12 +9,12 @@ the delivery plan is [milestone 3](../planning/Milestone-3.md).
 | Part | Location | Contents |
 | --- | --- | --- |
 | Interface and logic | `Sources/LibraryApp` (SwiftPM target and product `LibraryApp`) | Scenes, views, and their models; builds and tests with SwiftPM like the other targets |
-| App bundle | `App/FactorioBlueprintLibrary.xcodeproj`, `App/Sources` | One app target whose only source is the `@main` entry point, linking the local package product `LibraryApp` |
+| App bundle | `App/Cyano.xcodeproj`, `App/Sources` | One app target whose only source is the `@main` entry point, linking the local package product `LibraryApp` |
 | Build wrapper | `tools/xcode.sh` | Runs `xcodebuild` for the shared scheme with derived data and package caches under `.cache/` |
 
 Put new interface code in `Sources/LibraryApp`, not in `App/Sources`, so it stays testable under `just test`.
 The Xcode project holds only bundle settings: change them in Xcode or in `project.pbxproj`, and keep the shared
-scheme `FactorioBlueprintLibrary` committed.
+scheme `Cyano` committed.
 
 ## Library session
 
@@ -70,7 +70,7 @@ the current folder, or the open book's folder; afterwards the new items, or the 
 **Export** acts on `exportTarget`: the selected item's root, or the selected entry in an open book. Copy String
 (⌘C in the item list, the row menu, or the inspector) puts the exact exported bytes on the clipboard; Save As TXT
 (⇧⌘E) uses a save panel. A destination inside the library is refused before anything changes, and the panel
-reopens; a file the panel agreed to replace goes to the Trash first (honoring `FB_NATIVE_TRASH_DIRECTORY`) and comes
+reopens; a file the panel agreed to replace goes to the Trash first (honoring `CYANO_TRASH_DIRECTORY`) and comes
 back if the write fails. Both show a two-second confirmation at the bottom of the window, also announced to
 VoiceOver.
 
@@ -111,7 +111,7 @@ changes. Books and planners are not applicable without touching the release. The
 asks for one (STA-4), a checking release shows nothing until its revision changes, a problem or a library overlap
 says the release can't be used, and only a `prototypeMap()` failure after that is "can't provide statistics"
 (STA-6). The map loads once per release (SET-5); the calculation itself (`NativeLibrary.statistics`, the same call
-as `fb-native statistics`) runs through the library worker, because it takes milliseconds. A later request drops
+as `cyano statistics`) runs through the library worker, because it takes milliseconds. A later request drops
 an earlier result.
 
 `StatisticsPresentation` turns a result into what the tab shows: entity and tile counts, the footprint (complete,
@@ -123,7 +123,7 @@ the incomplete part stated (STA-3). Counts stay integers and sizes stay numbers,
 Mac's locale and tests compare values. Selected rows copy as tab-separated text with ⌘C (`copyText(rows:)`).
 
 `StatisticsParityAppTests` checks STA-2: for the seven approved blueprints it compares the presentation with
-`fb-native statistics` output for the private release in `.cache/renderer-assets`, and is skipped without it. The
+`cyano statistics` output for the private release in `.cache/renderer-assets`, and is skipped without it. The
 tabs together must list exactly the CLI's `constructionItems`, each once and under its own tab.
 
 In short windows the inspector caps its header and the preview at a quarter of its height each (header 80–260 pt,
@@ -216,7 +216,7 @@ release, off the main thread, like the prototype map, and drops it when the rele
   (`BrowserRow.sortName`); `spoken(showing:)` gives VoiceOver labels. Entry names are the labels as stored.
 - **Statistics (R7):** Statistics rows draw the item's icon before its name and, for qualities other than normal,
   the quality icon alone (owner, 2026-11-16), at text height; VoiceOver and the tooltip name the quality. Names stay
-  the prototype names as text, so ⌘C (which still includes the quality) and parity with `fb-native statistics` are
+  the prototype names as text, so ⌘C (which still includes the quality) and parity with `cyano statistics` are
   unchanged. Without an icon the item's or quality's name stands alone.
 - **Tests:** `IconCatalogTests` use a generated release with a PNG atlas; `PrivateIconCatalogTests` decode the real
   WebP atlases when `.cache/renderer-assets` exists, and `PrivateStatisticsIconTests` check that every item and
@@ -254,8 +254,8 @@ release, off the main thread, like the prototype map, and drops it when the rele
 
 ### Preferences and scripted launches
 
-Recents and the library to reopen live in the app's preferences (`local.fb.library`). Launch with
-`-FBNativeDefaultsSuite <name>` to use a separate domain instead; every scripted launch must, so it never reads the
+Recents and the library to reopen live in the app's preferences (`local.cyano`). Launch with
+`-CyanoDefaultsSuite <name>` to use a separate domain instead; every scripted launch must, so it never reads the
 owner's recents or reopens their library, and should delete the domain afterwards
 (`defaults delete <name>`). `just app-run` uses the owner's real preferences.
 
@@ -268,8 +268,8 @@ just app-run              # build the Debug app and open it
 just app-test             # session and message tests (also part of just test)
 ```
 
-The app is written to `.cache/xcode/Build/Products/<configuration>/Factorio Blueprint Library.app`.
-Open `App/FactorioBlueprintLibrary.xcodeproj` in Xcode for SwiftUI previews and debugging; Xcode then uses its own
+The app is written to `.cache/xcode/Build/Products/<configuration>/Cyano.app`.
+Open `App/Cyano.xcodeproj` in Xcode for SwiftUI previews and debugging; Xcode then uses its own
 derived data location instead of `.cache/`.
 
 `tools/xcode.sh` passes `-IDEPackageSupportDisableManifestSandbox=YES` and the Swift flag `-disable-sandbox`, the
@@ -305,8 +305,8 @@ Rules the views follow (screen specs, "Accessibility"; checks in the
 
 | Setting | Value |
 | --- | --- |
-| Name | Factorio Blueprint Library |
-| Bundle identifier | `local.fb.library` |
+| Name | Cyano |
+| Bundle identifier | `local.cyano` |
 | Version | 0.1.0 (build 1), a placeholder until the owner sets a versioning scheme |
 | Minimum system | macOS 27.0, Apple Silicon (`arm64`), matching `Package.swift` |
 | Signing | Ad-hoc ("Sign to Run Locally", identity `-`), no team |
@@ -341,7 +341,7 @@ just app-smoke --assets .cache/renderer-assets --deny-path ../fb
 `tools/smoke-app.py` (after `just build` and `just app-build`, which the recipe runs) copies the Debug app into a new
 `.cache/smoke/<time>/`, makes a scratch library there from committed fixtures with the CLI, and launches the copy under
 `sandbox-exec` with IP networking denied (a blanket `deny network*` also blocks the local connections a GUI app needs),
-the given paths unreadable, a fresh `-FBNativeDefaultsSuite`, and `FB_NATIVE_TRASH_DIRECTORY` pointing into the run,
+the given paths unreadable, a fresh `-CyanoDefaultsSuite`, and `CYANO_TRASH_DIRECTORY` pointing into the run,
 so replaced originals never reach the owner's Trash. It drives the app with System Events keystrokes and menu clicks,
 saves window captures (`NN-<screen>.png`), `report.md`, and `results.json` there, and exits 1 if a check fails.
 Without `--assets` the worker and release-change checks are skipped.
@@ -358,8 +358,8 @@ entity (WRN-1, WRN-2), and ⌥⌘C puts exactly its cached PNG on the clipboard 
 icons, the tagged name and book, Statistics icons, and the warnings popover; Space opens a preview window and opening it again reuses it;
 a background change keeps the zoom and starts no worker; renaming and replacing reach the open window (title, new
 image); clearing the release in Settings reaches the window; quitting with windows open does not restore them;
-closing the library closes its windows; after quit no worker remains, `fb-native owner` reports idle, and
-`fb-native list` shows the imported, moved, renamed, and deleted items as expected, with removed originals in the
+closing the library closes its windows; after quit no worker remains, `cyano owner` reports idle, and
+`cyano list` shows the imported, moved, renamed, and deleted items as expected, with removed originals in the
 run's `trash/`.
 
 The tool presses Escape before each step's search, so a sheet a failed step left open does not take the following

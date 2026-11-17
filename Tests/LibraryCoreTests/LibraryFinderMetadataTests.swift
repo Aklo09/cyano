@@ -7,7 +7,7 @@ private struct FinderLibrary {
     let parent: URL
     let url: URL
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-finder-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-finder-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
     }

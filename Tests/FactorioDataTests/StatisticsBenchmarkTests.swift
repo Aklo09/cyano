@@ -31,13 +31,13 @@ private func leaves(_ entry: BlueprintEntry) throws -> [BlueprintEntry] {
 
 @Suite("Statistics performance")
 struct StatisticsBenchmarkTests {
-    /// Run with `just statistics-benchmark`: a release build, the private release, and FB_NATIVE_BENCHMARK=1.
+    /// Run with `just statistics-benchmark`: a release build, the private release, and CYANO_BENCHMARK=1.
     @Test(
         "Statistics timings for the large leaf and every leaf of the large book",
         .enabled(
-            if: ProcessInfo.processInfo.environment["FB_NATIVE_BENCHMARK"] == "1"
+            if: ProcessInfo.processInfo.environment["CYANO_BENCHMARK"] == "1"
                 && FileManager.default.fileExists(atPath: release.path),
-            "Benchmark: set FB_NATIVE_BENCHMARK=1 with the private release present"))
+            "Benchmark: set CYANO_BENCHMARK=1 with the private release present"))
     func timings() throws {
         let mapBytes = try Data(contentsOf: release.appendingPathComponent(PrototypeMap.path))
         var map: PrototypeMap?

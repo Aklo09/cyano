@@ -302,7 +302,7 @@ extension NativeLibrary {
 
 /// Where the originals of a deleted or replaced item went (spec ORG-9).
 public enum LibraryRemovalPlace: String, Codable, Sendable {
-    /// The macOS Trash (or `FB_NATIVE_TRASH_DIRECTORY`).
+    /// The macOS Trash (or `CYANO_TRASH_DIRECTORY`).
     case trash
     /// `operations-quarantine/` inside the library, because the Trash refused them.
     case quarantine
@@ -354,9 +354,9 @@ extension NativeLibrary {
         try stage.remove("removed", directory: true)
     }
 
-    /// `FB_NATIVE_TRASH_DIRECTORY` redirects removed items for tests and development; otherwise the macOS Trash.
+    /// `CYANO_TRASH_DIRECTORY` redirects removed items for tests and development; otherwise the macOS Trash.
     static func moveToTrash(_ source: URL, name: String, operationId: String) throws {
-        if let override = ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"], override.hasPrefix("/") {
+        if let override = ProcessInfo.processInfo.environment["CYANO_TRASH_DIRECTORY"], override.hasPrefix("/") {
             let directory = URL(fileURLWithPath: override, isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             var destination = directory.appendingPathComponent(name)

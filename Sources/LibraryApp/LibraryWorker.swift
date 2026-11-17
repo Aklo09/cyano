@@ -6,7 +6,7 @@ import Foundation
 final class LibraryWorker: Sendable {
     private let queue: DispatchQueue
 
-    init(label: String = "fb-native.app.library-worker") {
+    init(label: String = "cyano.app.library-worker") {
         queue = DispatchQueue(label: label, qos: .userInitiated)
     }
 

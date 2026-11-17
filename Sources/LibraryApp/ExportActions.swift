@@ -29,7 +29,7 @@ public enum ExportSaveOutcome: Equatable, Sendable {
 /// Moves a replaced export to the Trash, honoring the test redirect the library uses.
 enum ExportTrash {
     static func move(_ url: URL) throws -> URL {
-        if let override = ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"], override.hasPrefix("/") {
+        if let override = ProcessInfo.processInfo.environment["CYANO_TRASH_DIRECTORY"], override.hasPrefix("/") {
             let directory = URL(fileURLWithPath: override, isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             let destination = directory.appendingPathComponent("\(UUID().uuidString) \(url.lastPathComponent)")

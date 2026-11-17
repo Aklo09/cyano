@@ -12,7 +12,7 @@ private struct PreviewTestDirectory {
     let url: URL
     init() throws {
         url = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-preview-test-\(UUID().uuidString)")
+            "cyano-preview-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
     }
     func worker(_ mode: String) throws -> URL {

@@ -2,7 +2,7 @@
 """Corpus qualification run (milestone 4, R1).
 
 Imports the full supplied corpus (the nine committed fixtures and the vendored fpsr visual tests) into a scratch
-library, renders every blueprint and planner leaf through `fb-native preview` with a verified private release, and
+library, renders every blueprint and planner leaf through `cyano preview` with a verified private release, and
 writes under the output directory (default `.cache/qualification/<time>`, ignored by Git):
 
 - `report.json`: one record per leaf with its outcome, dimensions, timings, memory, warnings, and rail count;
@@ -248,8 +248,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--assets', type=Path, default=ROOT / '.cache/renderer-assets',
                         help='verified private asset release (default .cache/renderer-assets)')
-    parser.add_argument('--cli', type=Path, default=ROOT / '.build/release/fb-native',
-                        help='fb-native executable (default: the release build)')
+    parser.add_argument('--cli', type=Path, default=ROOT / '.build/release/cyano',
+                        help='cyano executable (default: the release build)')
     parser.add_argument('--output', type=Path, default=ROOT / '.cache/qualification',
                         help='parent of the run directory (default .cache/qualification)')
     options = parser.parse_args()

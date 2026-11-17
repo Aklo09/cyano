@@ -10,9 +10,9 @@ shift
 export CLANG_MODULE_CACHE_PATH="$project_root/.cache/clang"
 export SWIFTPM_MODULECACHE_OVERRIDE="$project_root/.cache/swift-modules"
 # Tests delete and replace items; keep their removed originals out of the user's Trash.
-if [ "$swift_command" = test ] && [ -z "${FB_NATIVE_TRASH_DIRECTORY:-}" ]; then
-    export FB_NATIVE_TRASH_DIRECTORY="$project_root/.cache/test-trash"
-    rm -rf "$FB_NATIVE_TRASH_DIRECTORY"
+if [ "$swift_command" = test ] && [ -z "${CYANO_TRASH_DIRECTORY:-}" ]; then
+    export CYANO_TRASH_DIRECTORY="$project_root/.cache/test-trash"
+    rm -rf "$CYANO_TRASH_DIRECTORY"
 fi
 exec swift "$swift_command" \
     --package-path "$project_root" \

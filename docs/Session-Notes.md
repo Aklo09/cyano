@@ -47,18 +47,18 @@ attached case-sensitive image too), and regular `.DS_Store` files are ignored th
 [storage contract](contracts/Storage.md)). A2, the [screen specs](specs/App-Screens.md), is approved
 (2026-11-14): books browse like folders, the inspector keeps the preview above Statistics/Details/Comments tabs, and
 dark mode uses a darker content background (`#121212`). A3, the [app scaffold](development/App.md), is done:
-`Sources/LibraryApp` holds the interface, `App/` the thin Xcode target (`local.fb.library`, ad-hoc signed, no
+`Sources/LibraryApp` holds the interface, `App/` the thin Xcode target (`local.cyano`, ad-hoc signed, no
 sandbox), `just app-build`/`just app-run` build through `tools/xcode.sh`, and the independence check builds and
 launches the app offline. A4 is done: `LibrarySession` runs library calls on a serial worker, publishes listing
 snapshots, handles recovery states, and `LibraryMessage` words every error; `just app-test` runs its suites (also in
 `just test`). A5 is done: `LibrarySelectionModel` drives the selection and library windows, recents, and reopening at
-launch; scripted launches must pass `-FBNativeDefaultsSuite <name>` (see the [app guide](development/App.md)).
+launch; scripted launches must pass `-CyanoDefaultsSuite <name>` (see the [app guide](development/App.md)).
 A6 is done: `LibraryBrowserModel` drives the sidebar, path bar, item list, filter, and empty and issue states.
 Verification rule (owner, 2026-11-14): UI subtasks use `just lint`, `just test`, and `just app-build`; the
 independence check runs only for dependency, tooling, bundle, or network changes and at acceptance, and its app launch
 moves to the A17 smoke runs. The terminal now has Screen Recording and Accessibility access, so real-window captures
 (`screencapture -l`) and scripted UI actions (System Events) work for checks and A17; always launch with
-`-FBNativeDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
+`-CyanoDefaultsSuite`. A7 is done: books open like folders by stored index, with versions, descriptions, and planner settings in the inspector.
 A8 is done: Import (paste, TXT files, drag and drop; one book or
 unpacked) keeps exact bytes and selects the result. A9 is done: Copy String and Save As TXT
 for items and book entries, refusing destinations inside the library. Capture only app windows
@@ -76,7 +76,7 @@ idle owner; see [validation](validation/App.md#previews-2026-11-14)). The real-a
 the list, windows closing with the library, rename or replace with a window open, a release change, one worker at
 most) are in the A17 smoke run. A13 is done: the Statistics tab shows counts,
 footprint, item groups, and worded warnings from `StatisticsModel`/`StatisticsPresentation`; STA-2 parity with
-`fb-native statistics` for the seven approved blueprints is a test that needs the private release (see the
+`cyano statistics` for the seven approved blueprints is a test that needs the private release (see the
 [app guide](development/App.md#statistics)). In short windows the inspector now caps its header and preview so the
 tabs keep room. A real-app run checked the tab at minimum window size, a nested book entry, a book, a planner, and
 ⌘C (see [validation](validation/App.md#statistics-2026-11-14)). Scripted runs while the owner uses the Mac: launch
@@ -100,7 +100,7 @@ worker, rename and replace with a window open, release change, close and quit), 
 `.cache/smoke/`; the independence check no longer launches the app (see the [app guide](development/App.md#smoke-run)
 and [validation](validation/App.md#tests-and-smoke-runs-2026-11-15)). PRV-11's intermittent failure was a test race (it
 finished a fake render before it had started) and is fixed; LIFE-2 failed once in 15 full runs and now reports the
-viewer state. Test cleanups no longer leave `local.fb.library.tests-*.plist` files in `~/Library/Preferences`. A18 (2026-11-15): the [user guide](User-Guide.md), the
+viewer state. Test cleanups no longer leave `local.cyano.tests-*.plist` files in `~/Library/Preferences`. A18 (2026-11-15): the [user guide](User-Guide.md), the
 [milestone 3 acceptance record](validation/Milestone-3.md) with every check and the offline Release smoke runs (27 of
 27 with assets; 25 and 3 skipped without), REC-1a's test, the smoke run's everyday-workflow checks, and BRW-9 dropped
 by the owner. The owner did the walkthrough and accepted milestone 3
@@ -164,7 +164,12 @@ inventory order, the statistics reference was regenerated (previous copy in
 everyday release must be reassembled (their script needs no version change; see the
 [validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Statistics rows now show a quality by its
 icon alone (owner, 2026-11-16). The owner approved
-milestone 4 on 2026-11-16. Next: milestone 5, personal-use qualification (see the
+milestone 4 on 2026-11-16. The project is renamed Cyano (owner, 2026-11-17): the app is `Cyano.app`
+(`App/Cyano.xcodeproj`, bundle id `local.cyano`), the CLI is `cyano`, and the environment and defaults overrides are
+`CYANO_TRASH_DIRECTORY`, `CYANO_BENCHMARK`, and `-CyanoDefaultsSuite`. Preferences under the old bundle id
+`local.fb.library` are deliberately not carried over: reopen libraries and choose the asset release again once.
+Validation records and
+archived documents keep the old names as they were run. Next: milestone 5, personal-use qualification (see the
 [plan](planning/macOS-Plan.md#delivery-roadmap)); it has no plan yet.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.

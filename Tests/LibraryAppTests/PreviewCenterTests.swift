@@ -98,7 +98,7 @@ private final class PreviewFixture {
     /// `standardBackend` uses the app's real lookup with no worker in place of the fake renders.
     init(release: Bool = true, standardBackend: Bool = false) async throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-previews-\(UUID().uuidString)")
+            "cyano-previews-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)
@@ -110,7 +110,7 @@ private final class PreviewFixture {
             """
         ids["Book"] = try library.importSource(encoded(book)).id
         library.close()
-        suite = "local.fb.library.tests-\(UUID().uuidString)"
+        suite = "local.cyano.tests-\(UUID().uuidString)"
         assets = AssetSettings(defaults: try #require(UserDefaults(suiteName: suite)))
         if release { await assets.choose(try AppTestAssetRelease(in: parent).root, library: url) }
         center = PreviewCenter(

@@ -23,7 +23,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parent.parent
-APP_NAME = 'Factorio Blueprint Library'
+APP_NAME = 'Cyano'
 FIXTURES = ROOT / 'Tests/LibraryCoreTests/Fixtures/Blueprints'
 PLANNER_BOOK = ROOT / 'tools/vendor/fpsr/fixtures/decode/06-book-with-planner.txt'
 
@@ -146,7 +146,7 @@ class Smoke:
         self.out = args.output
         self.results = []
         self.process = None
-        self.suite = f'local.fb.library.smoke-{uuid.uuid4()}'
+        self.suite = f'local.cyano.smoke-{uuid.uuid4()}'
         self.app = self.out / f'{APP_NAME}.app'
         self.library = self.out / 'Library'
         self.helper = self.out / 'smoke-helper'
@@ -169,7 +169,7 @@ class Smoke:
     def cli(self, *arguments):
         result = self.run([str(self.args.cli), *arguments])
         if result.returncode != 0:
-            raise SystemExit(f'fb-native {" ".join(arguments)} failed: {result.stderr.strip()}')
+            raise SystemExit(f'cyano {" ".join(arguments)} failed: {result.stderr.strip()}')
         return json.loads(result.stdout) if result.stdout.startswith('{') else result.stdout
 
     def windows(self):
@@ -264,9 +264,9 @@ class Smoke:
         executable = self.app / 'Contents/MacOS' / APP_NAME
         # Replaced and deleted originals go to a scratch directory, never the owner's Trash.
         environment = dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin',
-                           FB_NATIVE_TRASH_DIRECTORY=str(self.out / 'trash'))
+                           CYANO_TRASH_DIRECTORY=str(self.out / 'trash'))
         self.process = subprocess.Popen(
-            ['/usr/bin/sandbox-exec', '-p', profile, str(executable), '-FBNativeDefaultsSuite', self.suite],
+            ['/usr/bin/sandbox-exec', '-p', profile, str(executable), '-CyanoDefaultsSuite', self.suite],
             env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def quit(self):
@@ -620,7 +620,7 @@ class Smoke:
         items = {i['name']: i['folder'] for i in self.cli('list', str(self.library))['result']['items']}
         expected = {'concrete patterns': '', 'Assembler 6i': 'Smoke folder', 'Latch renamed': ''}
         wrong = {name: items.get(name) for name, folder in expected.items() if items.get(name) != folder}
-        self.record('fb-native list matches: imported, moved, renamed, and deleted items',
+        self.record('cyano list matches: imported, moved, renamed, and deleted items',
                     not wrong and 'Assembler 4i' not in items, f'unexpected {wrong}' if wrong else '')
         trashed = sorted(p.name for p in (self.out / 'trash').iterdir())
         self.record('Deleted and replaced originals went to the run\'s trash, not the owner\'s', len(trashed) >= 2,
@@ -656,7 +656,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--app', type=Path,
                         default=ROOT / '.cache/xcode/Build/Products/Debug' / f'{APP_NAME}.app')
-    parser.add_argument('--cli', type=Path, default=ROOT / '.build/debug/fb-native')
+    parser.add_argument('--cli', type=Path, default=ROOT / '.build/debug/cyano')
     parser.add_argument('--assets', type=Path, help='a verified asset release, for the preview and worker checks')
     parser.add_argument('--deny-path', type=Path, action='append', default=[],
                         help='paths the app may not read, such as the original web checkout')

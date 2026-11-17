@@ -12,7 +12,7 @@ import Foundation
 
 /// Owns one local library until close. Every complete operation runs on one serial queue.
 public final class NativeLibrary: @unchecked Sendable {
-    let queue = DispatchQueue(label: "fb-native.library")
+    let queue = DispatchQueue(label: "cyano.library")
     let root: LibraryDirectory
     let lease: LibraryLease
     let library: LibraryDirectory

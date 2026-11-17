@@ -1,9 +1,9 @@
 import Foundation
 
-/// The app's preferences domain. Scripted and test launches pass `-FBNativeDefaultsSuite <name>` so they never read
+/// The app's preferences domain. Scripted and test launches pass `-CyanoDefaultsSuite <name>` so they never read
 /// or change the owner's recent libraries or reopen their library.
 public enum LibraryPreferences {
-    public static let suiteArgument = "FBNativeDefaultsSuite"
+    public static let suiteArgument = "CyanoDefaultsSuite"
 
     public static func defaults(_ standard: UserDefaults = .standard) -> UserDefaults {
         guard let suite = standard.string(forKey: suiteArgument), !suite.isEmpty,

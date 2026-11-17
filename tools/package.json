@@ -1,5 +1,5 @@
 {
-  "name": "fb-native-development-tools",
+  "name": "cyano-development-tools",
   "private": true,
   "type": "module",
   "engines": { "node": ">=24.22.1 <25", "npm": ">=12 <13" },

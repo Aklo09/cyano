@@ -18,7 +18,7 @@ private struct IconFixture {
     let plainId: String
 
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-icons-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-icons-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)

@@ -14,7 +14,7 @@ MODS = ['base', 'elevated-rails', 'quality', 'recycler', 'space-age']
 
 class AssetAssemblyTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = tempfile.TemporaryDirectory(prefix='fb-native-asset-assembly-test-')
+        self.temporary = tempfile.TemporaryDirectory(prefix='cyano-asset-assembly-test-')
         self.root = Path(self.temporary.name)
         self.sprites = self.root / 'sprites'
         self.sprites.mkdir()

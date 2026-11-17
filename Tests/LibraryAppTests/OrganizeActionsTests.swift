@@ -22,7 +22,7 @@ private struct OrganizeFixture {
 
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-organize-\(UUID().uuidString)")
+            "cyano-organize-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)

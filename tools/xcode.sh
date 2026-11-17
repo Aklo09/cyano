@@ -15,8 +15,8 @@ esac
 [ "$#" -gt 0 ] && shift
 export CLANG_MODULE_CACHE_PATH="$project_root/.cache/clang"
 exec xcodebuild \
-    -project "$project_root/App/FactorioBlueprintLibrary.xcodeproj" \
-    -scheme FactorioBlueprintLibrary \
+    -project "$project_root/App/Cyano.xcodeproj" \
+    -scheme Cyano \
     -configuration "$configuration" \
     -destination 'platform=macOS,arch=arm64' \
     -derivedDataPath "$project_root/.cache/xcode" \

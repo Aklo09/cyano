@@ -105,7 +105,7 @@ def check(root, private_dir, bundles):
 
 
 def self_test():
-    with tempfile.TemporaryDirectory(prefix='fb-native-artwork-') as scratch:
+    with tempfile.TemporaryDirectory(prefix='cyano-artwork-') as scratch:
         root = Path(scratch) / 'repo'
         private_dir = root / 'private-assets'
         bundles = root / '.cache/xcode/Build/Products'

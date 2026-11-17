@@ -162,7 +162,7 @@ extension LibraryBrowserModel {
         return failures
     }
 
-    /// Rows dragged as "fb-native-row:<id>" lines, resolved against the current list.
+    /// Rows dragged as "cyano-row:<id>" lines, resolved against the current list.
     public func rows(fromDragged text: String) -> [BrowserRow] {
         let ids = text.split(separator: "\n").compactMap { line -> String? in
             line.hasPrefix(Self.dragPrefix) ? String(line.dropFirst(Self.dragPrefix.count)) : nil
@@ -171,7 +171,7 @@ extension LibraryBrowserModel {
         return rows.filter { ids.contains($0.id) && $0.entryPath == nil }
     }
 
-    public static let dragPrefix = "fb-native-row:"
+    public static let dragPrefix = "cyano-row:"
 
     /// What dragging a row carries: the row, or the whole selection when the row is part of it.
     public func dragPayload(for row: BrowserRow) -> String {

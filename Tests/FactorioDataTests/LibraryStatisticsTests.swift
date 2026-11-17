@@ -12,7 +12,7 @@ private struct StatisticsLibrary {
     let bookId: String
 
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-stats-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-stats-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         library = parent.appendingPathComponent("Library")
         release = try TestAssetRelease(prototypeMap: assetJSON(statisticsMapJSON()))
@@ -50,7 +50,7 @@ private struct StatisticsLibrary {
 private func cli(_ args: [String]) throws -> (status: Int32, json: [String: Any]) {
     let process = Process()
     process.executableURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-        .deletingLastPathComponent().appendingPathComponent(".build/debug/fb-native")
+        .deletingLastPathComponent().appendingPathComponent(".build/debug/cyano")
     process.arguments = args
     let out = Pipe()
     let err = Pipe()

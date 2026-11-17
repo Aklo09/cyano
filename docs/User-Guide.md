@@ -1,4 +1,4 @@
-# Factorio Blueprint Library: user guide
+# Cyano: user guide
 
 The app keeps your Factorio blueprint strings, books, and planners in an ordinary folder on your Mac, exactly as you
 imported them, with folders, comments, previews, and construction statistics. Everything works offline; previews and
@@ -16,7 +16,7 @@ From the repository root:
 
 ```sh
 just app-build Release
-open ".cache/xcode/Build/Products/Release/Factorio Blueprint Library.app"
+open ".cache/xcode/Build/Products/Release/Cyano.app"
 ```
 
 You can copy the app to Applications. The app holds one library at a time; opening another closes the current one.
@@ -138,17 +138,17 @@ Books and planners have no statistics. Without an asset release, the tab says wh
 
 ## When something goes wrong
 
-- **"…is in use":** another app or an `fb-native` command has the library open. Close it and choose Try Again.
+- **"…is in use":** another app or an `cyano` command has the library open. Close it and choose Try Again.
 - **A change was interrupted:** if the app or the CLI stopped during a change, the library completes it when opened
   and says so. If a change can't be completed, the window shows **Recover**; if recovery still fails, it shows the
-  `fb-native recover … --quarantine <id>` command to set the change aside.
+  `cyano recover … --quarantine <id>` command to set the change aside.
 - **"N items can't be used":** the sidebar footer lists files the library can't read; nothing is changed.
 
 Every message says what happened and what you can do; the error code is in the details.
 
 ## Use the command line alongside
 
-The `fb-native` CLI works on the same library (see the [CLI guide](development/Library-CLI.md)), but only one of them
+The `cyano` CLI works on the same library (see the [CLI guide](development/Library-CLI.md)), but only one of them
 can hold it at a time: close the library in the app (⇧⌘W) before running a CLI command that changes it. Cache
 cleanup, staging cleanup, quarantine, and usage reports are CLI-only.
 

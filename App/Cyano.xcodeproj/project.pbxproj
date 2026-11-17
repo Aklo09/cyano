@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F0A000000000000000000001 /* FactorioBlueprintLibraryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */; };
+		F0A000000000000000000001 /* CyanoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A000000000000000000002 /* CyanoApp.swift */; };
 		F0A000000000000000000003 /* LibraryApp in Frameworks */ = {isa = PBXBuildFile; productRef = F0A000000000000000000004 /* LibraryApp */; };
 		F0A000000000000000000014 /* preview-worker in Embed Preview Worker */ = {isa = PBXBuildFile; productRef = F0A000000000000000000015 /* preview-worker */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -27,8 +27,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorioBlueprintLibraryApp.swift; sourceTree = "<group>"; };
-		F0A000000000000000000005 /* Factorio Blueprint Library.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Factorio Blueprint Library.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0A000000000000000000002 /* CyanoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyanoApp.swift; sourceTree = "<group>"; };
+		F0A000000000000000000005 /* Cyano.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cyano.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +54,7 @@
 		F0A000000000000000000008 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				F0A000000000000000000002 /* FactorioBlueprintLibraryApp.swift */,
+				F0A000000000000000000002 /* CyanoApp.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -62,7 +62,7 @@
 		F0A000000000000000000009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F0A000000000000000000005 /* Factorio Blueprint Library.app */,
+				F0A000000000000000000005 /* Cyano.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,9 +70,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F0A00000000000000000000A /* FactorioBlueprintLibrary */ = {
+		F0A00000000000000000000A /* Cyano */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "FactorioBlueprintLibrary" */;
+			buildConfigurationList = F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "Cyano" */;
 			buildPhases = (
 				F0A00000000000000000000C /* Sources */,
 				F0A000000000000000000006 /* Frameworks */,
@@ -82,13 +82,13 @@
 			);
 			dependencies = (
 			);
-			name = FactorioBlueprintLibrary;
+			name = Cyano;
 			packageProductDependencies = (
 				F0A000000000000000000004 /* LibraryApp */,
 				F0A000000000000000000015 /* preview-worker */,
 			);
-			productName = FactorioBlueprintLibrary;
-			productReference = F0A000000000000000000005 /* Factorio Blueprint Library.app */;
+			productName = Cyano;
+			productReference = F0A000000000000000000005 /* Cyano.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -101,7 +101,7 @@
 				LastSwiftUpdateCheck = 2720;
 				LastUpgradeCheck = 2720;
 			};
-			buildConfigurationList = F0A00000000000000000000E /* Build configuration list for PBXProject "FactorioBlueprintLibrary" */;
+			buildConfigurationList = F0A00000000000000000000E /* Build configuration list for PBXProject "Cyano" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -116,7 +116,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F0A00000000000000000000A /* FactorioBlueprintLibrary */,
+				F0A00000000000000000000A /* Cyano */,
 			);
 		};
 /* End PBXProject section */
@@ -126,7 +126,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F0A000000000000000000001 /* FactorioBlueprintLibraryApp.swift in Sources */,
+				F0A000000000000000000001 /* CyanoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,15 +183,15 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Factorio Blueprint Library";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cyano";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = local.fb.library;
-				PRODUCT_NAME = "Factorio Blueprint Library";
+				PRODUCT_BUNDLE_IDENTIFIER = local.cyano;
+				PRODUCT_NAME = "Cyano";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 			};
 			name = Debug;
@@ -208,15 +208,15 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Factorio Blueprint Library";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cyano";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = local.fb.library;
-				PRODUCT_NAME = "Factorio Blueprint Library";
+				PRODUCT_BUNDLE_IDENTIFIER = local.cyano;
+				PRODUCT_NAME = "Cyano";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 			};
 			name = Release;
@@ -224,7 +224,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "FactorioBlueprintLibrary" */ = {
+		F0A00000000000000000000B /* Build configuration list for PBXNativeTarget "Cyano" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F0A000000000000000000012 /* Debug */,
@@ -233,7 +233,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F0A00000000000000000000E /* Build configuration list for PBXProject "FactorioBlueprintLibrary" */ = {
+		F0A00000000000000000000E /* Build configuration list for PBXProject "Cyano" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F0A000000000000000000010 /* Debug */,

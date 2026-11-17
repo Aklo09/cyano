@@ -305,7 +305,7 @@ public final class LibrarySession {
         let operations = committed.map {
             PendingOperation(
                 id: $0.id, kind: $0.kind,
-                quarantineCommand: "fb-native recover \(Self.shellQuoted(url.path)) --quarantine \($0.id)")
+                quarantineCommand: "cyano recover \(Self.shellQuoted(url.path)) --quarantine \($0.id)")
         }
         phase = .recoveryRequired(url, operations: operations, message: message, retried: retried)
     }

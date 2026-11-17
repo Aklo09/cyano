@@ -43,7 +43,7 @@ The first milestone delivers a CLI and preview harness that prove storage, recov
 - **LibraryCore:** blueprint decoding, validation, filesystem storage, comments, organization, ownership, and interrupted-operation recovery. No dependency on SwiftUI or rendering.
 - **FactorioData:** versioned asset and prototype-map loading, compatibility checks, and construction statistics.
 - **PreviewRenderer:** planner bridge, composition, worker lifecycle, and derived-result caching.
-- **Executables:** `fb-native` for library operations and separate preview harness/worker products.
+- **Executables:** `cyano` for library operations and separate preview harness/worker products.
 - **Application:** SwiftUI navigation and editing, with AppKit for file panels and image inspection.
 
 Use a Swift package for shared code, executables, and tests. Add an Xcode application target when UI work begins.

@@ -55,7 +55,7 @@ Without that override, obsolete cleanup compares against the default rendering c
 
 ## Lifetime and maintenance
 
-Keep `preview-worker` adjacent to `fb-native` when installing binaries; repository builds produce both.
+Keep `preview-worker` adjacent to `cyano` when installing binaries; repository builds produce both.
 The command holds ownership through selection, rendering, independent PNG validation, and publication.
 Another application or CLI process cannot open the same library during that work.
 Within the owning process, rendering runs off the library queue, so listing, comments, and other operations proceed.

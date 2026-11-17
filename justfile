@@ -36,7 +36,7 @@ app-build configuration="Debug":
 
 # Build the Debug app and open it.
 app-run: app-build
-    open -n ".cache/xcode/Build/Products/Debug/Factorio Blueprint Library.app"
+    open -n ".cache/xcode/Build/Products/Debug/Cyano.app"
 
 # Scripted smoke run of the Debug app on a scratch library; drives the keyboard (hands off). Captures in .cache/smoke/.
 app-smoke *args: build app-build
@@ -48,7 +48,7 @@ app-test:
 
 # Run native CLI commands; export stdout contains only source bytes.
 library *args:
-    sh tools/swift.sh run fb-native "$@"
+    sh tools/swift.sh run cyano "$@"
 
 # Run focused codec admission, preservation, and selected-entry export checks.
 codec-test:
@@ -56,7 +56,7 @@ codec-test:
 
 # Print the currently available CLI capabilities.
 release:
-    sh tools/swift.sh run fb-native release
+    sh tools/swift.sh run cyano release
 
 # Run the planner loading/empty-diagram probe. Does not paint images.
 planner-test:
@@ -103,7 +103,7 @@ statistics-test:
 
 # Time statistics in an optimized build with the private release (.cache/renderer-assets).
 statistics-benchmark:
-    FB_NATIVE_BENCHMARK=1 sh tools/swift.sh test -c release -Xswiftc -enable-testing --filter StatisticsBenchmarkTests
+    CYANO_BENCHMARK=1 sh tools/swift.sh test -c release -Xswiftc -enable-testing --filter StatisticsBenchmarkTests
 
 # Write reference statistics for native parity to .cache/statistics-golden.json (needs the private map).
 statistics-golden:

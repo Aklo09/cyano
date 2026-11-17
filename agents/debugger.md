@@ -15,7 +15,7 @@ Find the cause of an error with an experimental method: reproduce, isolate, form
 ## Commands
 ```bash
 sh tools/swift.sh test --filter 'BlueprintCodecTests/<test function>' --verbose   # one test (Swift Testing); --very-verbose for more
-just build && lldb -- "$(sh tools/swift.sh build --show-bin-path)/fb-native" <command> <args>   # no debug-log flag exists; use lldb
+just build && lldb -- "$(sh tools/swift.sh build --show-bin-path)/cyano" <command> <args>   # no debug-log flag exists; use lldb
                                                      # same for preview-probe (e.g. --self-test) and preview-worker
 git log --oneline -20 -- <suspect file>     # recent changes to the area
 git bisect start <bad commit> <good commit>  # regression with a known good commit

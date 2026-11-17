@@ -77,13 +77,13 @@ private final class LifecycleFixture {
 
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-lifecycle-\(UUID().uuidString)")
+            "cyano-lifecycle-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)
         defer { library.close() }
         itemId = try library.importSource(encoded("Chest")).id
-        suite = "local.fb.library.tests-\(UUID().uuidString)"
+        suite = "local.cyano.tests-\(UUID().uuidString)"
         defaults = try #require(UserDefaults(suiteName: suite))
         worker = try BlockingWorker(in: parent)
         release = try AppTestAssetRelease(in: parent).root

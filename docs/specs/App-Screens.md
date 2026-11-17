@@ -31,7 +31,7 @@ and the exact values of the two color tokens.
   in place (ICN-5): 24 points in list rows, 20 in the sidebar and path bar, 28 in the inspector title (owner,
   2026-11-15); every other tag stays as written (ICN-6). Where icons can't be drawn (window
   titles, suggested file names, sort order) the text form is used (ICN-7). Statistics item names are the prototype
-  names as text (for example `fast-inserter`), matching `fb-native statistics`, with the item's icon before them.
+  names as text (for example `fast-inserter`), matching `cyano statistics`, with the item's icon before them.
 - **Icons:** Factorio icons come only from the configured asset release and are drawn at their own colors on every
   background; they are never the only carrier of meaning, because the kind label, name text, or VoiceOver name says
   the same. Quality badges sit in the bottom-left corner of the icon, as in the game.
@@ -112,7 +112,7 @@ States:
 - Empty: no recent libraries (LIB-1): "Open an existing library or create a new one in an empty folder." with
   both buttons.
 - Error: shown in place of the recent list, with the library's folder name, until dismissed with "Back":
-  - In use (LIB-8): "“Trains Library” is in use" / "Another app or an `fb-native` command has it open. Close it,
+  - In use (LIB-8): "“Trains Library” is in use" / "Another app or an `cyano` command has it open. Close it,
     then try again." Buttons: Try Again (default), Back.
   - Not a library and not empty (LIB-5), synchronized location (LIB-6), unsupported version or malformed controls
     (LIB-7): wording from the appendix; button Back. Nothing is written.
@@ -140,7 +140,7 @@ Content: title "“Trains Library” needs recovery", the text "An interrupted c
 automatically. Recover tries again. If it still fails, set the change aside with the command below in Terminal,
 then choose Try Again.", then the list of committed pending operations (kind and ID; unpublished staging and
 other entries are not shown) each with a read-only, selectable
-command `fb-native recover '<library path>' --quarantine <id>` and a Copy Command button.
+command `cyano recover '<library path>' --quarantine <id>` and a Copy Command button.
 
 States:
 - Loading: "Recovering…" with a spinner; buttons disabled.
@@ -543,7 +543,7 @@ codec, preview, statistics, and asset wording in the same style.
 
 | Code | Title | What to do |
 | --- | --- | --- |
-| `LIBRARY_IN_USE` | “Name” is in use | Close the other app or `fb-native` command, then try again. |
+| `LIBRARY_IN_USE` | “Name” is in use | Close the other app or `cyano` command, then try again. |
 | `LIBRARY_CLOSED` | The library is closed | Open it again to continue. |
 | `UNSUPPORTED_FILESYSTEM` | This location can't hold a library | Choose a folder on a local drive outside iCloud Drive and other synchronized folders. |
 | `UNSAFE_PATH` | A file in the library isn't safe to use | Links, aliases, and special files aren't allowed. Close the library and fix it in Finder. |
@@ -553,7 +553,7 @@ codec, preview, statistics, and asset wording in the same style.
 | `INTEGRITY_CONFLICT` | Stored files don't match what was expected | Nothing was overwritten. Close the library and check the item in Finder. |
 | `RECOVERY_REQUIRED` | The library needs recovery | Choose Recover. |
 | `ITEM_NOT_FOUND` | The item no longer exists | It may have been deleted. |
-| `LIBRARY_LIMIT` | A library limit was reached | With too many unfinished operations, run `fb-native staging-cleanup '<library>'` (GEN-3b); otherwise the message names the limit. |
+| `LIBRARY_LIMIT` | A library limit was reached | With too many unfinished operations, run `cyano staging-cleanup '<library>'` (GEN-3b); otherwise the message names the limit. |
 | `INVALID_INPUT` | That name or comment can't be used | Names can't be empty, start with a dot, or contain / : and similar characters. |
 | `NAME_COLLISION` | “Name” already exists here | Choose a different name. Names that differ only in letter case count as the same. |
 | `FOLDER_NOT_EMPTY` | The folder isn't empty | Move or delete its items first. |

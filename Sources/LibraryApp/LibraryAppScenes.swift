@@ -49,7 +49,7 @@ public struct LibraryAppScenes: Scene {
 
 /// Names shared by the scenes and the app target.
 public enum LibraryAppIdentity {
-    public static let name = "Factorio Blueprint Library"
+    public static let name = "Cyano"
     public static let selectionWindow = "library-selection"
     public static let libraryWindow = "library"
     public static let previewWindow = "preview"

@@ -17,7 +17,7 @@ struct TestAssetRelease {
         frameOutside: Bool = false, density: Int = 2, gameVersion: String = "2.1.24", packedFrame: Bool = false,
         prototypeMap: Data? = nil
     ) throws {
-        root = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-assets-\(UUID().uuidString)")
+        root = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-assets-\(UUID().uuidString)")
         try FileManager.default.createDirectory(
             at: root.appendingPathComponent("sprites/fonts"), withIntermediateDirectories: true)
         try FileManager.default.createDirectory(
@@ -88,7 +88,7 @@ struct AssetReleaseTests {
         #expect(report.profile == .initial && report.totalBytes > 0 && !report.imageDecodingPerformed)
         let process = Process()
         process.executableURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .deletingLastPathComponent().appendingPathComponent(".build/debug/fb-native")
+            .deletingLastPathComponent().appendingPathComponent(".build/debug/cyano")
         process.arguments = ["assets-verify", assets.root.path]
         let output = Pipe()
         process.standardOutput = output

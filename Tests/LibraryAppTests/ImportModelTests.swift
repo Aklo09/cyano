@@ -27,7 +27,7 @@ private struct ImportFixture {
     let url: URL
 
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-import-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-import-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)

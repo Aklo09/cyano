@@ -12,9 +12,9 @@ private struct Fixture {
     let defaults: UserDefaults
 
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-select-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-select-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
-        suite = "local.fb.library.tests-\(UUID().uuidString)"
+        suite = "local.cyano.tests-\(UUID().uuidString)"
         defaults = try #require(UserDefaults(suiteName: suite))
     }
 
@@ -288,7 +288,7 @@ struct LibrarySelectionModelTests {
         let fixture = try Fixture()
         defer { fixture.cleanup() }
         #expect(LibraryPreferences.defaults(fixture.defaults) === fixture.defaults)
-        let isolated = "local.fb.library.tests-isolated-\(UUID().uuidString)"
+        let isolated = "local.cyano.tests-isolated-\(UUID().uuidString)"
         fixture.defaults.set(isolated, forKey: LibraryPreferences.suiteArgument)
         let chosen = LibraryPreferences.defaults(fixture.defaults)
         chosen.set("marker", forKey: "probe")

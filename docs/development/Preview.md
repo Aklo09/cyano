@@ -122,7 +122,7 @@ just qualify-corpus --assets <release> --output <parent directory>
 
 `tools/qualify-corpus.py` builds the release executables, imports the full supplied corpus (the nine fixtures in
 `Tests/LibraryCoreTests/Fixtures/Blueprints` and the vendored `tools/vendor/fpsr/fixtures/visual-tests`) into a
-scratch library, and renders every blueprint and planner leaf by stored indices with `fb-native preview`, one at a
+scratch library, and renders every blueprint and planner leaf by stored indices with `cyano preview`, one at a
 time. The release defaults to `.cache/renderer-assets` and must verify first. Each run gets its own directory,
 `.cache/qualification/<time>/`, holding:
 

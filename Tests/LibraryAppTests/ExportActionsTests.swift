@@ -16,7 +16,7 @@ private struct ExportFixture {
     let bookId: String
 
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-export-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-export-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)
@@ -94,7 +94,7 @@ struct ExportActionsTests {
         try previous.write(to: destination)
         #expect(await browser.save(target, to: destination) == .saved(bytes: fixture.rootBytes.count))
         #expect(try Data(contentsOf: destination) == fixture.rootBytes)
-        let trash = try #require(ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"])
+        let trash = try #require(ProcessInfo.processInfo.environment["CYANO_TRASH_DIRECTORY"])
         let trashed = try FileManager.default.contentsOfDirectory(
             at: URL(fileURLWithPath: trash), includingPropertiesForKeys: nil)
         #expect(trashed.contains { (try? Data(contentsOf: $0)) == previous })

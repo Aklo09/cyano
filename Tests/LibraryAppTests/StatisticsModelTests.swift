@@ -31,7 +31,7 @@ private final class StatisticsFixture {
 
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-statistics-\(UUID().uuidString)")
+            "cyano-statistics-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
         let library = try NativeLibrary.initialize(at: url)
@@ -73,7 +73,7 @@ private final class StatisticsFixture {
             ),
         ]
         for (name, json) in sources { ids[name] = try library.importSource(encoded(json)).id }
-        suite = "local.fb.library.tests-\(UUID().uuidString)"
+        suite = "local.cyano.tests-\(UUID().uuidString)"
         assets = AssetSettings(defaults: try #require(UserDefaults(suiteName: suite)))
         model = StatisticsModel(session: session, assets: assets)
         browser = LibraryBrowserModel(session: session)
@@ -278,7 +278,7 @@ struct StatisticsModelTests {
 private let repository = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
     .deletingLastPathComponent()
 private let privateRelease = repository.appendingPathComponent(".cache/renderer-assets")
-private let cli = repository.appendingPathComponent(".build/debug/fb-native")
+private let cli = repository.appendingPathComponent(".build/debug/cyano")
 
 /// Runs the CLI and returns its standard output.
 private func runCLI(_ arguments: [String]) throws -> Data {
@@ -302,13 +302,13 @@ private func cliResult(_ bytes: Data) throws -> [String: Any] {
 @Suite("Statistics parity with the CLI")
 struct StatisticsParityAppTests {
     @Test(
-        "STA-2: the tab shows every count, footprint, completeness flag, and warning that fb-native statistics reports",
+        "STA-2: the tab shows every count, footprint, completeness flag, and warning that cyano statistics reports",
         .enabled(
             if: FileManager.default.fileExists(atPath: privateRelease.appendingPathComponent("release.json").path),
             "Needs the private release in .cache/renderer-assets"))
     func sevenBlueprints() async throws {
         let parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-statistics-parity-\(UUID().uuidString)")
+            "cyano-statistics-parity-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         defer { try? FileManager.default.removeItem(at: parent) }
         let url = parent.appendingPathComponent("Library")
@@ -342,7 +342,7 @@ struct StatisticsParityAppTests {
         let outputs = try await Task.detached { try runs.map { try runCLI($0) } }.value
         let expected = try outputs.map(cliResult)
 
-        let suite = "local.fb.library.tests-\(UUID().uuidString)"
+        let suite = "local.cyano.tests-\(UUID().uuidString)"
         defer { removeTestPreferences(suite) }
         let assets = AssetSettings(defaults: try #require(UserDefaults(suiteName: suite)))
         await assets.choose(privateRelease, library: url)

@@ -11,7 +11,7 @@ private struct PreviewLibrary {
     let root: URL
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-owned-preview-\(UUID().uuidString)")
+            "cyano-owned-preview-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         root = parent.appendingPathComponent("Library")
     }
@@ -515,13 +515,13 @@ struct LibraryPreviewTests {
         library.close()
         let arguments = ["preview", target.root.path, item.id, "--assets", assets.root.path, "--max-dimension", "128"]
         for (extra, hit) in [([], false), ([], true), (["--refresh"], false)] {
-            let response = try ownedChild("fb-native", arguments + extra)
+            let response = try ownedChild("cyano", arguments + extra)
             #expect(response.0 == 0, "\(String(decoding: response.2, as: UTF8.self))")
             let json = try #require(JSONSerialization.jsonObject(with: response.1) as? [String: Any])
             let result = try #require(json["result"] as? [String: Any])
             #expect(result["cacheHit"] as? Bool == hit)
             #expect(result["png"] == nil && result["cachePath"] as? String != nil)
         }
-        #expect(try ownedChild("fb-native", ["preview", target.root.path, item.id]).0 == 2)
+        #expect(try ownedChild("cyano", ["preview", target.root.path, item.id]).0 == 2)
     }
 }

@@ -16,7 +16,7 @@ struct SyntheticPreviewAssets {
     let root: URL
     init() throws {
         root = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-render-assets-\(UUID().uuidString)")
+            "cyano-render-assets-\(UUID().uuidString)")
         try FileManager.default.createDirectory(
             at: root.appendingPathComponent("sprites"), withIntermediateDirectories: true)
         try FileManager.default.createDirectory(
@@ -127,7 +127,7 @@ struct PreviewIntegrationTests {
         let data = try #require(bitmap.data?.assumingMemoryBound(to: UInt8.self))
         #expect((0..<(image.width * image.height)).contains { data[$0 * 4 + 3] > 0 })
         let output = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-preview-\(UUID().uuidString).png")
+            "cyano-preview-\(UUID().uuidString).png")
         defer { try? FileManager.default.removeItem(at: output) }
         try PreviewProcess.writeNew(result, to: output, protecting: assets.root)
         #expect(try Data(contentsOf: output) == result.png)

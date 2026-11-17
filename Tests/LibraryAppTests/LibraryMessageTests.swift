@@ -65,7 +65,7 @@ struct LibraryMessageTests {
         let listing = try #require(LibraryMessage.describing(NativeLibraryError.limitExceeded, activity: .listing))
         #expect(listing.title == "This library is too large to list")
         let change = try #require(LibraryMessage.describing(NativeLibraryError.limitExceeded, activity: .changing))
-        #expect(change.guidance.contains("fb-native staging-cleanup"))
+        #expect(change.guidance.contains("cyano staging-cleanup"))
         let comment = try #require(LibraryMessage.describing(NativeLibraryError.invalidInput, activity: .commenting))
         #expect(comment.title == "That comment can't be used")
         let inUse = try #require(

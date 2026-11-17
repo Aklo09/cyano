@@ -96,7 +96,7 @@ public struct LibraryMessage: Sendable, Equatable, Error {
         switch error {
         case .inUse:
             return message(
-                "\(named) is in use", "Close the other app or fb-native command that has it open, then try again.")
+                "\(named) is in use", "Close the other app or cyano command that has it open, then try again.")
         case .closed:
             return message("The library is closed", "Open it again to continue.")
         case .unsupportedFilesystem:
@@ -145,7 +145,7 @@ public struct LibraryMessage: Sendable, Equatable, Error {
             default:
                 return message(
                     "A library limit was reached",
-                    "If many interrupted operations are pending, run fb-native staging-cleanup on this library "
+                    "If many interrupted operations are pending, run cyano staging-cleanup on this library "
                         + "with the library closed; otherwise the item or folder is too large for this change.")
             }
         case .invalidInput:

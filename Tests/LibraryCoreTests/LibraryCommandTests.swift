@@ -9,7 +9,7 @@ private struct CommandLibrary {
     let url: URL
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-commands-\(UUID().uuidString)")
+            "cyano-commands-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         url = parent.appendingPathComponent("Library")
     }
@@ -55,7 +55,7 @@ private func commandChild(_ name: String, _ args: [String], environment: [String
 /// Folders in the test Trash (set by tools/swift.sh) whose metadata preimage belongs to `id`.
 private func trashedCopies(of id: String) throws -> [URL] {
     let trash = try #require(
-        ProcessInfo.processInfo.environment["FB_NATIVE_TRASH_DIRECTORY"], "Run tests through tools/swift.sh")
+        ProcessInfo.processInfo.environment["CYANO_TRASH_DIRECTORY"], "Run tests through tools/swift.sh")
     let folders =
         (try? FileManager.default.contentsOfDirectory(
             at: URL(fileURLWithPath: trash), includingPropertiesForKeys: nil)) ?? []
@@ -108,7 +108,7 @@ struct LibraryCommandTests {
         library.close()
 
         var environment = ProcessInfo.processInfo.environment
-        environment["FB_NATIVE_TRASH_DIRECTORY"] = "/dev/null/no-trash"
+        environment["CYANO_TRASH_DIRECTORY"] = "/dev/null/no-trash"
         let deleted = try commandChild(
             "StorageTestDriver", ["delete-report", target.url.path, doomed], environment: environment)
         #expect(deleted.0 == 0, "\(String(decoding: deleted.2, as: UTF8.self))")
@@ -373,9 +373,9 @@ struct LibraryCommandTests {
         try Data().write(to: blocked)
         let process = Process()
         process.executableURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .deletingLastPathComponent().appendingPathComponent(".build/debug/fb-native")
+            .deletingLastPathComponent().appendingPathComponent(".build/debug/cyano")
         process.arguments = ["delete", target.url.path, replaced.id]
-        process.environment = ["FB_NATIVE_TRASH_DIRECTORY": blocked.path]
+        process.environment = ["CYANO_TRASH_DIRECTORY": blocked.path]
         try process.run()
         process.waitUntilExit()
         #expect(process.terminationStatus == 0)
@@ -593,7 +593,7 @@ struct LibraryCommandTests {
         let target = try CommandLibrary()
         defer { target.cleanup() }
         func call(_ args: [String]) throws -> [String: Any] {
-            let response = try commandChild("fb-native", args)
+            let response = try commandChild("cyano", args)
             #expect(response.0 == 0, "\(String(decoding: response.2, as: UTF8.self))")
             return try #require(JSONSerialization.jsonObject(with: response.1) as? [String: Any])
         }
@@ -616,15 +616,15 @@ struct LibraryCommandTests {
         _ = try call([
             "export", target.url.path, id, "--output", target.parent.appendingPathComponent("export.txt").path,
         ])
-        #expect(try commandChild("fb-native", ["export", target.url.path, id]).1 == commandBook())
+        #expect(try commandChild("cyano", ["export", target.url.path, id]).1 == commandBook())
         _ = try call(["update", target.url.path, id, input.path])
         _ = try call(["usage", target.url.path])
         _ = try call(["cache-cleanup", target.url.path, "all", "--apply"])
         _ = try call(["delete", target.url.path, id])
         _ = try call(["folder-delete", target.url.path, "Moved"])
         _ = try call(["import-unpacked", target.url.path, input.path])
-        #expect(try commandChild("fb-native", ["folder-create", target.url.path, ""]).0 == 2)
-        #expect(try commandChild("fb-native", ["cache-cleanup", target.url.path, "obsolete"]).0 == 2)
-        #expect(try commandChild("fb-native", ["cache-cleanup", target.url.path, "all", "--apply", "--apply"]).0 == 2)
+        #expect(try commandChild("cyano", ["folder-create", target.url.path, ""]).0 == 2)
+        #expect(try commandChild("cyano", ["cache-cleanup", target.url.path, "obsolete"]).0 == 2)
+        #expect(try commandChild("cyano", ["cache-cleanup", target.url.path, "all", "--apply", "--apply"]).0 == 2)
     }
 }

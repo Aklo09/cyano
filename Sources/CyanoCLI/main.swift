@@ -5,7 +5,7 @@ import LibraryCore
 import PreviewRenderer
 
 private let usage = """
-    Usage: fb-native <command> [arguments]
+    Usage: cyano <command> [arguments]
 
       release
       init <library>
@@ -64,7 +64,7 @@ private struct Failure: Encodable {
 }
 
 private struct ReleaseReport: Encodable {
-    let product = "fb-native"
+    let product = "cyano"
     let stage = "owned-library-previews"
     let nativeFormatVersion = 1
     let profile = FactorioProfile.initial
@@ -348,7 +348,7 @@ do {
             message: "Statistics need a verified asset release: pass --assets <release-directory>.", exitCode: 2)
     } else if error is ArgumentsError {
         detail = .init(
-            category: "arguments", code: "INVALID_ARGUMENTS", message: "Invalid arguments. Run fb-native --help.",
+            category: "arguments", code: "INVALID_ARGUMENTS", message: "Invalid arguments. Run cyano --help.",
             exitCode: 2)
     } else {
         detail = .init(

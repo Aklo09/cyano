@@ -7,7 +7,7 @@ import Testing
 private struct InsensitiveVolume {
     let root: URL
     init() throws {
-        root = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-names-\(UUID().uuidString)")
+        root = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-names-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
     }
     func cleanup() { try? FileManager.default.removeItem(at: root) }
@@ -18,7 +18,7 @@ private struct SensitiveVolume {
     let parent: URL
     let root: URL
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-cs-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-cs-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
         let image = parent.appendingPathComponent("volume.dmg").path
         root = parent.appendingPathComponent("mount")

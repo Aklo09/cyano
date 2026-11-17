@@ -208,8 +208,8 @@ public final class PreviewCenter {
     private let session: LibrarySession
     private let assets: AssetSettings
     private let backend: PreviewBackend
-    private let lookupWorker = LibraryWorker(label: "fb-native.app.preview-lookup")
-    private let renderWorker = LibraryWorker(label: "fb-native.app.preview-render")
+    private let lookupWorker = LibraryWorker(label: "cyano.app.preview-lookup")
+    private let renderWorker = LibraryWorker(label: "cyano.app.preview-render")
     @ObservationIgnored private var pending: [Job] = []
     @ObservationIgnored private var active: Job?
     @ObservationIgnored private var running = 0

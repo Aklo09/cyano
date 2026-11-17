@@ -1,5 +1,6 @@
-# Factorio Blueprint Library for macOS
+# Cyano
 
+A personal library for Factorio blueprints on macOS.
 Keep original blueprint strings, books, planners, and comments in an ordinary local directory.
 This project is an independent macOS port of the original web application.
 

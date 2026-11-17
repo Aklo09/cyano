@@ -8,7 +8,7 @@ Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Mile
 
 ## Problem
 
-The owner keeps Factorio blueprint strings in a library that only the `fb-native` CLI can operate today.
+The owner keeps Factorio blueprint strings in a library that only the `cyano` CLI can operate today.
 Every everyday task (finding a blueprint, reading a book's contents, importing a string from the clipboard, copying
 one back into the game, writing a note, comparing two designs) needs a terminal command, an item UUID copied from
 JSON output, and stored entry indices typed by hand.
@@ -61,7 +61,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **GEN-3a** Given a render cancelled by the owner's own action (selection change, window close, quit), when it ends,
   then no error is shown.
 - **GEN-3b** Given an action refused because the library holds the maximum number of pending operations
-  (`LIBRARY_LIMIT`), when the message is shown, then it names `fb-native staging-cleanup <library>` as the remedy.
+  (`LIBRARY_LIMIT`), when the message is shown, then it names `cyano staging-cleanup <library>` as the remedy.
 - **GEN-4** Given any failed action, when its message is dismissed, then stored originals, metadata, and comments are
   unchanged unless the message says otherwise.
 - **GEN-6** Given a library on any volume, case-sensitive or case-insensitive, when the owner creates, imports,
@@ -108,7 +108,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **LIB-9** Given a library is open, when the owner opens a different library, then the current library and all of
   its preview windows close and its ownership is released before the new one is opened; if the new one fails to
   open, the owner is back at library selection.
-- **LIB-10** Given a library is open in the app, when `fb-native owner <library>` runs, then it reports the library as
+- **LIB-10** Given a library is open in the app, when `cyano owner <library>` runs, then it reports the library as
   owned; after the owner closes the library, it reports it as free.
 - **LIB-11** Given a library was open when the app last quit, when the app launches and that library is still
   available, then it reopens automatically (recovery and in-use states apply as on any open); when it is unavailable,
@@ -123,8 +123,8 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **REC-1a** Given only uncommitted staging is left from an interrupted change (it never altered the library), when the
   owner opens it, then no warning is shown; that staging stays a CLI `staging-cleanup` matter (decision 6).
 - **REC-2** Given replay refuses an operation, when the owner opens the library, then the app shows that recovery is
-  required, lists the pending committed operations by ID and kind (as `fb-native operations` does), and offers
-  Recover and, for each listed operation, a copyable `fb-native recover <library> --quarantine <operation-id>`
+  required, lists the pending committed operations by ID and kind (as `cyano operations` does), and offers
+  Recover and, for each listed operation, a copyable `cyano recover <library> --quarantine <operation-id>`
   command with the library path filled in. (The core reports pending operations, not which one replay refused.)
 - **REC-3** Given REC-2, when the owner chooses Recover and replay still refuses, then the library stays closed, the
   same explanation and command remain available, and nothing in the library is moved or deleted by the app.
@@ -213,11 +213,11 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 ### Export (A9)
 
 - **EXP-1** Given a selected item, when the owner copies its string, then the clipboard text equals the stored root
-  bytes exactly, the same bytes `fb-native export` writes.
+  bytes exactly, the same bytes `cyano export` writes.
 - **EXP-2** Given a selected entry inside a book, when the owner copies the entry, then the clipboard holds the
-  standalone entry string that `fb-native export --entry <indices>` writes for that entry.
+  standalone entry string that `cyano export --entry <indices>` writes for that entry.
 - **EXP-3** Given a selected item or entry, when the owner saves it as TXT to a new file, then the file's bytes equal
-  the corresponding `fb-native export` output (with `--entry` for an entry), with no added newline.
+  the corresponding `cyano export` output (with `--entry` for an entry), with no added newline.
 - **EXP-4** Given the chosen file already exists, when the owner confirms replacing it, then the new file contains
   exactly the exported bytes and the previous file is moved to the Trash rather than overwritten in place; when the
   owner declines, nothing changes.
@@ -315,7 +315,7 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
   `4x_Rocket_Silo.txt`, `Hazard_Patterns.txt`, `bp.txt` `0.0` and `1.1`, and `v0.59.0.txt` `1.1` from
   `Tests/LibraryCoreTests/Fixtures/Blueprints/`, plus
   `tools/vendor/fpsr/fixtures/visual-tests/official-mods/elevated-rails.bp.txt` `0`), when their statistics are shown, then every count,
-  footprint, completeness flag, and warning matches `fb-native statistics` for the same release.
+  footprint, completeness flag, and warning matches `cyano statistics` for the same release.
 - **STA-3** Given a result with warnings or incomplete parts, when it is shown, then each warning appears once with its
   count, worded from its code and naming the entity, item, tile, or quality involved, and incomplete requirements or
   footprint are marked as incomplete (with known bounds when given).
@@ -416,7 +416,7 @@ Icons come only from the configured asset release (GEN-9). Everything in this gr
 ### Menus and lifecycle (A15)
 
 - **LIFE-1** Given an open library, when the owner closes the main window, then its preview windows close, renders are
-  cancelled, and ownership is released (`fb-native owner` reports it free).
+  cancelled, and ownership is released (`cyano owner` reports it free).
 - **LIFE-2** Given renders in progress, when the owner quits, then the app exits, no preview worker process remains, and
   the library is released.
 - **LIFE-3** Given a mutation in progress, when the owner quits, then the mutation completes or is recoverable on the

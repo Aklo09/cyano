@@ -12,9 +12,9 @@ private struct SettingsFixture {
 
     init() throws {
         parent = FileManager.default.temporaryDirectory.appendingPathComponent(
-            "fb-native-settings-\(UUID().uuidString)")
+            "cyano-settings-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
-        suite = "local.fb.library.tests-\(UUID().uuidString)"
+        suite = "local.cyano.tests-\(UUID().uuidString)"
         defaults = try #require(UserDefaults(suiteName: suite))
     }
 

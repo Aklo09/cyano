@@ -18,7 +18,7 @@ if not Path('/usr/bin/sandbox-exec').exists():
 def sandbox_literal(value):
     return '"' + str(value).replace('\\', '\\\\').replace('"', '\\"') + '"'
 
-with tempfile.TemporaryDirectory(prefix='fb-native-independent-') as temporary:
+with tempfile.TemporaryDirectory(prefix='cyano-independent-') as temporary:
     destination = Path(temporary)
     shutil.copy2(root / 'Package.swift', destination / 'Package.swift')
     for directory in ['Sources', 'Tests', 'App']:
@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory(prefix='fb-native-independent-') as temporary:
     environment = dict(os.environ, PATH='/usr/bin:/bin:/usr/sbin:/sbin')
     for command in [
         ['sh', 'tools/swift.sh', 'test', '--filter', 'OriginalSourceTests|BlueprintCodecTests|NativeLibraryTests|LibraryCommandTests|AssetReleaseTests|PlannerRuntimeTests|NativePainterTests|PreviewProcessTests|PreviewIntegrationTests|LibraryPreviewTests'],
-        ['.build/debug/fb-native', 'release'],
+        ['.build/debug/cyano', 'release'],
         ['.build/debug/preview-probe', '--self-test'],
         ['sh', 'tools/xcode.sh', 'Debug'],
     ]:

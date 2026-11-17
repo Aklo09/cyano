@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F0A00000000000000000000A"
-               BuildableName = "Factorio Blueprint Library.app"
-               BlueprintName = "FactorioBlueprintLibrary"
-               ReferencedContainer = "container:FactorioBlueprintLibrary.xcodeproj">
+               BuildableName = "Cyano.app"
+               BlueprintName = "Cyano"
+               ReferencedContainer = "container:Cyano.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,9 +37,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F0A00000000000000000000A"
-            BuildableName = "Factorio Blueprint Library.app"
-            BlueprintName = "FactorioBlueprintLibrary"
-            ReferencedContainer = "container:FactorioBlueprintLibrary.xcodeproj">
+            BuildableName = "Cyano.app"
+            BlueprintName = "Cyano"
+            ReferencedContainer = "container:Cyano.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>

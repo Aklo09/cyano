@@ -10,7 +10,7 @@ struct PreviewImageExportTests {
     private let png = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3])
 
     private func scratch() throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-images-\(UUID().uuidString)")
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-images-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
         return url
     }
@@ -55,7 +55,7 @@ struct PreviewImageExportTests {
 
     @Test("IMG-1: Copy Image puts the exact PNG bytes on the clipboard as an image")
     func copy() {
-        let pasteboard = NSPasteboard(name: NSPasteboard.Name("fb-native-tests-\(UUID().uuidString)"))
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("cyano-tests-\(UUID().uuidString)"))
         defer { pasteboard.releaseGlobally() }
         pasteboard.setString("before", forType: .string)
         PreviewImageExport.copy(png, to: pasteboard)

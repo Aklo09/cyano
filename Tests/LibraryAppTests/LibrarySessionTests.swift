@@ -7,7 +7,7 @@ import Testing
 private struct Scratch {
     let parent: URL
     init() throws {
-        parent = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-app-\(UUID().uuidString)")
+        parent = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-app-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: false)
     }
     func url(_ name: String = "Library") -> URL { parent.appendingPathComponent(name) }
@@ -142,7 +142,7 @@ struct LibrarySessionTests {
         #expect(!retried && operations.count == 1 && operations[0].kind == "tree-move")
         #expect(
             operations[0].quarantineCommand
-                == "fb-native recover '\(url.path.replacingOccurrences(of: "'", with: "'\\''"))' --quarantine "
+                == "cyano recover '\(url.path.replacingOccurrences(of: "'", with: "'\\''"))' --quarantine "
                 + operations[0].id)
 
         await session.retryOpen()

@@ -31,7 +31,7 @@ private struct IconTestRelease {
     }
 
     init(icons: [String: Any]? = icons, frames: [[String: Any]] = frames) throws {
-        root = FileManager.default.temporaryDirectory.appendingPathComponent("fb-native-icons-\(UUID().uuidString)")
+        root = FileManager.default.temporaryDirectory.appendingPathComponent("cyano-icons-\(UUID().uuidString)")
         atlasURL = root.appendingPathComponent("sprites/atlas.png")
         try FileManager.default.createDirectory(
             at: root.appendingPathComponent("sprites"), withIntermediateDirectories: true)
