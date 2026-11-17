@@ -29,7 +29,10 @@ extension NativeLibrary {
         _ = try LibraryRecords.format(root.read(".library-format.json", maximum: LibraryBounds.journal))
         let lease = try LibraryLease(directory: root, create: false)
         defer { lease.close() }
-        guard Set(try root.entries()).isSubset(of: allowedRootEntries) else { throw NativeLibraryError.invalidFormat }
+        // An interrupted format migration may leave its stage; the next owning open completes it.
+        guard Set(try root.entries()).isSubset(of: allowedRootEntries.union([formatMigrationName])) else {
+            throw NativeLibraryError.invalidFormat
+        }
         let operations = try root.info("operations") == nil ? nil : try root.child("operations")
         return try body(root, operations)
     }

@@ -3,7 +3,7 @@ import Dispatch
 import Foundation
 
 @_spi(Testing) public enum LibraryWritePhase: String, CaseIterable, Sendable {
-    case formatPublished, sourceStaged, metadataStaged, intentPublished
+    case formatPublished, formatMigrationStaged, formatMigrated, sourceStaged, metadataStaged, intentPublished
     case sourcePublished, metadataPublished, intentRemoved
     case changesStaged, fileRemoved, filePublished, treeStaged, treeWithdrawn, treePublished, cacheRemoved
     case previewImageStaged, previewManifestStaged, previewImagePublished, previewManifestPublished
@@ -103,8 +103,11 @@ public final class NativeLibrary: @unchecked Sendable {
                 try root.barrier()
                 try hook?(.formatPublished)
             }
-            let formatBytes = try root.read(".library-format.json", maximum: LibraryBounds.journal)
-            _ = try LibraryRecords.format(formatBytes)
+            var formatBytes = try root.read(".library-format.json", maximum: LibraryBounds.journal)
+            let format = try LibraryRecords.format(formatBytes)
+            if format.format != LibraryFormat.current {
+                formatBytes = try Self.migrateFormat(format, in: root, hook: hook)
+            }
             guard Set(try root.entries()).isSubset(of: Self.allowedRootEntries) else {
                 throw NativeLibraryError.invalidFormat
             }
@@ -124,6 +127,27 @@ public final class NativeLibrary: @unchecked Sendable {
     }
 
     deinit { lease.close() }
+
+    static let formatMigrationName = ".format.migrating"
+
+    /// Rewrites a marker from before the rename to the current format name, keeping its identity and version.
+    /// The new marker is staged beside the old one and replaces it in one rename, so an interruption leaves one
+    /// complete marker. A stage left behind holds nothing the old marker lacks, so it is removed and staged again.
+    private static func migrateFormat(
+        _ record: LibraryFormat, in root: LibraryDirectory, hook: ((LibraryWritePhase) throws -> Void)?
+    ) throws -> Data {
+        let migrated = LibraryFormat(
+            format: LibraryFormat.current, schemaVersion: record.schemaVersion, id: record.id,
+            createdAt: record.createdAt)
+        let bytes = try LibraryRecords.encode(migrated, maximum: LibraryBounds.journal)
+        if try root.info(formatMigrationName) != nil { try root.remove(formatMigrationName) }
+        try root.writeNew(formatMigrationName, data: bytes)
+        try hook?(.formatMigrationStaged)
+        try root.move(formatMigrationName, to: root, as: ".library-format.json", replacing: true)
+        try root.barrier()
+        try hook?(.formatMigrated)
+        return bytes
+    }
 
     public func close() {
         lifecycleLock.lock()

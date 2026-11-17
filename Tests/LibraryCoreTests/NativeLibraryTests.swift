@@ -27,6 +27,13 @@ private func binary(_ name: String) -> URL {
         .deletingLastPathComponent().appendingPathComponent(".build/debug/\(name)")
 }
 
+/// The marker as written before the rename: the same record under the old format name.
+private func legacyMarker(_ current: Data) throws -> Data {
+    let text = String(decoding: current, as: UTF8.self)
+    #expect(text.contains("\"format\":\"cyano-library\""))
+    return Data(text.replacingOccurrences(of: "\"cyano-library\"", with: "\"fb-native-library\"").utf8)
+}
+
 private func child(_ name: String, _ args: [String]) throws -> (Int32, Data, Data) {
     let process = Process()
     process.executableURL = binary(name)
@@ -557,6 +564,56 @@ struct NativeLibraryTests {
         defer { reopened.close() }
         #expect(try reopened.list().items.isEmpty)
         #expect(try Data(contentsOf: marker) == bytes)
+    }
+
+    @Test("Libraries created before the rename migrate their format marker when opened")
+    func legacyFormatMigration() throws {
+        let target = try TemporaryLibrary()
+        defer { target.cleanup() }
+        try NativeLibrary.initialize(at: target.url).close()
+        let marker = target.url.appendingPathComponent(".library-format.json")
+        let stage = target.url.appendingPathComponent(".format.migrating")
+        let current = try Data(contentsOf: marker)
+        let legacy = try legacyMarker(current)
+        try legacy.write(to: marker)
+
+        #expect(try NativeLibrary.inspectOwnership(at: target.url) == .idle)
+        #expect(try Data(contentsOf: marker) == legacy)
+        // A partial stage from an interrupted migration is staged again, never trusted.
+        try Data("{\"format\":".utf8).write(to: stage)
+        let library = try NativeLibrary(at: target.url)
+        #expect(try library.list().items.isEmpty)
+        library.close()
+        #expect(try Data(contentsOf: marker) == current)
+        #expect(!FileManager.default.fileExists(atPath: stage.path))
+    }
+
+    @Test("An interrupted format migration completes on the next open without changing identity")
+    func legacyFormatMigrationInterruption() throws {
+        for phase in ["formatMigrationStaged", "formatMigrated"] {
+            let target = try TemporaryLibrary()
+            defer { target.cleanup() }
+            try NativeLibrary.initialize(at: target.url).close()
+            let marker = target.url.appendingPathComponent(".library-format.json")
+            let stage = target.url.appendingPathComponent(".format.migrating")
+            let current = try Data(contentsOf: marker)
+            let legacy = try legacyMarker(current)
+            try legacy.write(to: marker)
+
+            let killed = try child("StorageTestDriver", ["open-crash", target.url.path, phase])
+            #expect(killed.0 == SIGKILL)
+            let staged = phase == "formatMigrationStaged"
+            #expect(try Data(contentsOf: marker) == (staged ? legacy : current))
+            #expect(FileManager.default.fileExists(atPath: stage.path) == staged)
+            #expect(try NativeLibrary.inspectOwnership(at: target.url) == .idle)
+            #expect(try NativeLibrary.inspectOperations(at: target.url).isEmpty)
+
+            let reopened = try NativeLibrary(at: target.url)
+            #expect(try reopened.list().items.isEmpty)
+            reopened.close()
+            #expect(try Data(contentsOf: marker) == current)
+            #expect(!FileManager.default.fileExists(atPath: stage.path))
+        }
     }
 
     @Test("Concurrent comments serialize complete read-modify-write operations")

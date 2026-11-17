@@ -29,8 +29,9 @@ do {
         let library = try NativeLibrary(at: url)
         defer { library.close() }
         _ = try library.export(id: args[2], to: URL(fileURLWithPath: args[3]))
-    case "initialize-crash", "import-crash", "comment-crash", "rename-crash", "move-crash", "delete-crash",
-        "update-crash", "comment-delete-crash", "folder-move-crash", "folder-delete-crash", "unpack-crash":
+    case "initialize-crash", "open-crash", "import-crash", "comment-crash", "rename-crash", "move-crash",
+        "delete-crash", "update-crash", "comment-delete-crash", "folder-move-crash", "folder-delete-crash",
+        "unpack-crash":
         guard let phase = LibraryWritePhase(rawValue: args.last!) else { exit(2) }
         let library = try NativeLibrary.testingOpen(at: url, initializing: args[0] == "initialize-crash") { current in
             if current == phase { kill(getpid(), SIGKILL) }

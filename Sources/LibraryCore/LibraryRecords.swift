@@ -57,8 +57,12 @@ struct LibraryFormat: Codable, Equatable {
     let id: String
     let createdAt: String
 
+    static let current = "cyano-library"
+    /// The name used before the project was renamed. Readers accept it; an owning open rewrites it to `current`.
+    static let legacy = "fb-native-library"
+
     static func fresh() -> Self {
-        Self(format: "fb-native-library", schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: LibraryRecords.now())
+        Self(format: current, schemaVersion: 1, id: LibraryRecords.uuid(), createdAt: LibraryRecords.now())
     }
 }
 
@@ -148,7 +152,9 @@ enum LibraryRecords {
     static func format(_ data: Data) throws -> LibraryFormat {
         let value = try parse(data, maximum: LibraryBounds.journal)
         try fields(value, required: ["format", "schemaVersion", "id", "createdAt"])
-        guard value["format"]?.string == "fb-native-library" else { throw NativeLibraryError.invalidFormat }
+        guard let name = value["format"]?.string, name == LibraryFormat.current || name == LibraryFormat.legacy else {
+            throw NativeLibraryError.invalidFormat
+        }
         guard value["schemaVersion"]?.safeInteger == 1 else { throw NativeLibraryError.unsupportedVersion }
         guard let record = try? JSONDecoder().decode(LibraryFormat.self, from: data),
             validUUID(record.id), validDate(record.createdAt)

@@ -168,7 +168,8 @@ milestone 4 on 2026-11-16. The project is renamed Cyano (owner, 2026-11-17): the
 (`App/Cyano.xcodeproj`, bundle id `local.cyano`), the CLI is `cyano`, and the environment and defaults overrides are
 `CYANO_TRASH_DIRECTORY`, `CYANO_BENCHMARK`, and `-CyanoDefaultsSuite`. Preferences under the old bundle id
 `local.fb.library` are deliberately not carried over: reopen libraries and choose the asset release again once.
-Validation records and
+New libraries use the format `cyano-library`, and an owning open rewrites an older `fb-native-library` marker
+recoverably (see the [storage contract](contracts/Storage.md#library-identity-and-layout)). Validation records and
 archived documents keep the old names as they were run. Next: milestone 5, personal-use qualification (see the
 [plan](planning/macOS-Plan.md#delivery-roadmap)); it has no plan yet.
 

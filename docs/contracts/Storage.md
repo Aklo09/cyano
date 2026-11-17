@@ -25,9 +25,17 @@ Chosen Library/
 ```
 
 The library marker contains exactly `format`, `schemaVersion`, `id`, and `createdAt`.
-The format is `fb-native-library`; its current version is integer `1`.
+The format is `cyano-library`; its current version is integer `1`.
 Identity uses a canonical lowercase UUID; dates use UTC with millisecond precision.
 The marker is immutable during ordinary library sessions.
+
+Libraries created before the project was renamed carry the format `fb-native-library`.
+Readers accept both names. An owning open, before the session starts, rewrites a `fb-native-library` marker to
+`cyano-library` with the same `schemaVersion`, `id`, and `createdAt`: it stages the new marker as `.format.migrating`
+beside the old one, renames it over the marker, and issues a drive barrier.
+An interruption leaves one complete marker; a leftover `.format.migrating` holds nothing the old marker lacks, so the
+next owning open removes it and stages again. Inspection, quarantine, and staging cleanup tolerate the leftover and
+never migrate.
 
 Initialization refuses unknown nonempty directories, including a bare foreign lockfile; a directory holding only
 Finder metadata counts as empty.
