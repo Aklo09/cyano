@@ -6,9 +6,9 @@ items listed twice in the Statistics tab, changed before approval (see "Decision
 milestone").
 
 Its exit condition, from the [milestone 4 plan](../planning/Milestone-4.md#scope), is that the full supplied corpus
-receives native rendering and visual qualification. Per-subtask evidence is in the [renderer validation](Renderer.md)
-(R1 to R3) and the [app validation](App.md) (R5 to R10); the criteria are in the [app spec](../specs/Native-App.md) and
-the [screen specs](../specs/Native-App-Screens.md). People using the app start from the [user guide](../User-Guide.md).
+receives rendering and visual qualification. Per-subtask evidence is in the [renderer validation](Renderer.md)
+(R1 to R3) and the [app validation](App.md) (R5 to R10); the criteria are in the [app spec](../specs/App.md) and
+the [screen specs](../specs/App-Screens.md). People using the app start from the [user guide](../User-Guide.md).
 
 ## Checks
 
@@ -29,7 +29,7 @@ the [screen specs](../specs/Native-App-Screens.md). People using the app start f
 | Evidence | Result |
 | --- | --- |
 | Corpus (decision 1) | 239 leaves: 198 from the nine supplied fixtures (185 blueprints, 12 upgrade planners, 1 deconstruction planner) and 41 from the vendored fpsr visual tests, including every rail kind |
-| Native rendering (R1) | `just qualify-corpus`, release build: 239 of 239 rendered, 0 failed; one warning, the modded `ee-infinity-loader`; median 1.8 s, maximum 5.0 s; peak memory at most 362 MiB ([corpus run](Renderer.md#corpus-run-2026-11-15)) |
+| Rendering (R1) | `just qualify-corpus`, release build: 239 of 239 rendered, 0 failed; one warning, the modded `ee-infinity-loader`; median 1.8 s, maximum 5.0 s; peak memory at most 362 MiB ([corpus run](Renderer.md#corpus-run-2026-11-15)) |
 | Visual qualification (decision 2) | The owner reviewed the contact sheet, rail leaves included, and found no defects (2026-11-15); R2 needed no corrections |
 | Planet icons (R3) | The release gained the five planet icons; renders before and after are pixel-identical ([validation](Renderer.md#planet-icons-2026-11-15)) |
 

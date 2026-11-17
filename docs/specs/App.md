@@ -1,4 +1,4 @@
-# Manage a blueprint library in a native macOS app
+# Manage a blueprint library in the macOS app
 
 Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A1). Amended for milestone 4
 (subtask R0, 2026-11-15): GEN-9, BRW-1, BRW-5, IMP-5, STA-1, and the Icons, Render warnings, and Preview images
@@ -8,7 +8,7 @@ Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Mile
 
 ## Problem
 
-The owner keeps Factorio blueprint strings in a native library that only the `fb-native` CLI can operate today.
+The owner keeps Factorio blueprint strings in a library that only the `fb-native` CLI can operate today.
 Every everyday task (finding a blueprint, reading a book's contents, importing a string from the clipboard, copying
 one back into the game, writing a note, comparing two designs) needs a terminal command, an item UUID copied from
 JSON output, and stored entry indices typed by hand.
@@ -25,7 +25,7 @@ and the private renderer assets may be missing, for example on a fresh machine.
 
 ## Terms
 
-- **Library:** a native library directory ([storage contract](../contracts/Storage.md)). The app opens one at a time.
+- **Library:** a library directory ([storage contract](../contracts/Storage.md)). The app opens one at a time.
 - **Item:** one saved root string (blueprint, book, or planner) with its comments.
 - **Entry:** the root or any blueprint, planner, or book inside a book, addressed by its actual stored indices
   (for example `5.0`); indices can be sparse.
@@ -93,11 +93,11 @@ Every user-facing date is shown in the Mac's time zone and date format; stored t
 - **LIB-2** Given an empty folder on local storage, when the owner chooses New Library and selects it, then a
   library is created there, opened, and shown with an empty root folder; choosing an empty folder with Open Library
   offers to create a library there in the same way.
-- **LIB-3** Given an existing native library, when the owner opens it, then its root folder is listed and it is added
+- **LIB-3** Given an existing library, when the owner opens it, then its root folder is listed and it is added
   to the recent libraries list.
 - **LIB-4** Given a recent library whose folder no longer exists or is unreachable, when the list is shown, then that
   entry is marked unavailable, cannot be opened, and can be removed from the list.
-- **LIB-5** Given a non-empty folder that is not a native library, when the owner tries to open or create a library in
+- **LIB-5** Given a non-empty folder that is not a library, when the owner tries to open or create a library in
   it, then the app refuses, explains that the folder is not a library and not empty, and writes nothing there.
 - **LIB-6** Given a folder in iCloud Drive or another FileProvider location, when the owner tries to open or create a
   library in it, then the app refuses and asks for local storage outside synchronized locations.

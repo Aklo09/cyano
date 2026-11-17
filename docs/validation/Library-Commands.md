@@ -1,16 +1,16 @@
-# Complete native library commands
+# Complete library commands
 
-Organization and maintenance commands now share the native library's ownership and recovery rules.
+Organization and maintenance commands now share the library's ownership and recovery rules.
 The prior storage checkpoint was committed as `aa6d5e5` before this implementation began.
 Recorded: 2026-11-13, in the [foundation environment](Foundation.md#environment).
-Native statistics, real-image painting, and the macOS application remain pending.
+Statistics, real-image painting, and the macOS application remain pending.
 
 ## Command coverage
 
 The comparison used the original `fb` CLI command inventory and storage behavior.
-Native commands use explicit library-path arguments; folder and entry selectors follow the [CLI guide](../development/Library-CLI.md).
+Commands use explicit library-path arguments; folder and entry selectors follow the [CLI guide](../development/Library-CLI.md).
 
-| Capability | Native command | Result |
+| Capability | Command | Result |
 | --- | --- | --- |
 | Initialize, inspect ownership, list, recover | `init`, `owner`, `list`, `recover` | Retained |
 | Import a whole source | `import` | Exact original bytes retained |
@@ -26,16 +26,16 @@ Native commands use explicit library-path arguments; folder and entry selectors 
 | Verify offline release | `assets-verify` | Independent inventory/hash/profile/schema verification |
 | Application-managed backup and restore | None | Deliberately excluded by the owner |
 
-Scoped cleanup recognizes the reserved native identity format rather than historical web manifests.
+Scoped cleanup recognizes the reserved identity format rather than historical web manifests.
 Unknown formats remain protected unless `all` is selected.
-There is no native preview writer yet; the default generator identifier reserves that future integration.
+There is no preview writer yet; the default generator identifier reserves that future integration.
 
 ## Verification
 
 | Check | Result |
 | --- | --- |
-| `just test` | 54 native tests pass across six suites |
-| Relocated isolation check | Fresh build, all native tests, CLI release, and planner probe pass without readable original checkouts, networking, or Node on PATH |
+| `just test` | 54 tests pass across six suites |
+| Relocated isolation check | Fresh build, all tests, CLI release, and planner probe pass without readable original checkouts, networking, or Node on PATH |
 | `just tools-check` | All 153 copied files, 42 planner inputs, and five pinned development dependencies remain valid |
 | CLI guide workflow | All runnable examples pass through `just library`, using a disposable library path containing spaces |
 | Private release verification | 451 inventoried files, 211,964,616 bytes, both tiers; no image decoding |
@@ -94,7 +94,7 @@ Non-regular objects named `.DS_Store` remain listing issues.
 
 ## Maintenance and asset admission
 
-Tests verify dry-run immutability, applied selections, orphaned native manifests, obsolete identities,
+Tests verify dry-run immutability, applied selections, orphaned manifests, obsolete identities,
 unknown-manifest protection, item-cache invalidation, and refusal before deletion when caches contain unsafe aliases or shared inodes.
 Cache results disclose selected files and directories.
 Usage tests verify separate categories, shared-inode deduplication, optional assets, and visible unsafe-path issues.
@@ -122,4 +122,4 @@ Process-kill coverage does not establish power-loss durability or concurrent ext
 Unpublished operations staging remains preserved; cache cleanup never discards recovery evidence.
 Allocated usage is an inode-based estimate, not an APFS clone-sharing measurement or guaranteed reclaim figure.
 Asset verification does not decode images, render previews, or perform complete semantic validation of prototype statistics.
-The 1,000-root workload, renderer lifecycle, statistics integration, and native UI remain separate work.
+The 1,000-root workload, renderer lifecycle, statistics integration, and UI remain separate work.

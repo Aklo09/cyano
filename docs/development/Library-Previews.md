@@ -1,6 +1,6 @@
 # Cached library previews
 
-Render a saved item while its native library remains exclusively owned, then reuse a validated derived image.
+Render a saved item while its library remains exclusively owned, then reuse a validated derived image.
 The caller publishes the cache after the worker exits; the worker receives source bytes only.
 
 ## Generate and reuse a preview
@@ -85,4 +85,4 @@ A late cancellation may leave an already completed, valid cache entry.
 Do not edit library or asset files concurrently with a live owner.
 
 See the [preview cache contract](../contracts/Preview-Cache.md) and [validation](../validation/Library-Previews.md).
-The macOS interface, visible-item scheduling, native statistics, and workload qualification remain separate work.
+The macOS interface, visible-item scheduling, app statistics, and workload qualification remain separate work.

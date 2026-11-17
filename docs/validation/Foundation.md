@@ -1,8 +1,8 @@
 # Independent foundation validation
 
-The native scaffold builds without access to the original web project.
+The scaffold builds without access to the original web project.
 This evidence covers the first foundation checkpoint, not complete milestone 1 acceptance.
-The subsequent [codec checkpoint](Codec.md) adds native admission and selected-entry export.
+The subsequent [codec checkpoint](Codec.md) adds codec admission and selected-entry export.
 The [storage checkpoint](Storage.md) adds persistent libraries, CLI commands, and interrupted-operation recovery.
 
 Recorded: 2026-11-13.
@@ -24,7 +24,7 @@ Recorded: 2026-11-13.
 
 | Check | Result |
 | --- | --- |
-| `just build` | Native libraries and both executables compile |
+| `just build` | Libraries and both executables compile |
 | `just test` at the foundation checkpoint | Five Swift tests pass across two suites |
 | `just release` | CLI reports only the implemented release-information capability |
 | `just planner-test` | Pinned planner executes through system JavaScriptCore |
@@ -42,7 +42,7 @@ The source wrapper is not yet a Factorio codec or persistent library implementat
 The planner tests load independent JavaScriptCore contexts.
 They plan empty upgrade/deconstruction diagrams and check finite bounds.
 The contexts expose neither Node globals nor network API bridges.
-No native image is painted by these tests.
+No image is painted by these tests.
 
 Private asset verification checked all 446 manifest members against hashes and lengths.
 The copied prototype map's version matches the sprite bundle.
@@ -62,15 +62,15 @@ From the project root, run:
 python3 tools/check-independence.py --deny-path ../fb
 ```
 
-At this checkpoint, the relocated build passed all five tests and ran both native executables.
-The [codec checkpoint](Codec.md) extends this isolation check to all 21 native tests.
+At this checkpoint, the relocated build passed all five tests and ran both executables.
+The [codec checkpoint](Codec.md) extends this isolation check to all 21 tests.
 The script removes only its own temporary checkout afterward.
 This check uses macOS `sandbox-exec` as a development qualification tool.
 It does not define the finished application's sandbox or distribution design.
 
 ## Remaining qualification
 
-Native codec admission was subsequently implemented and validated separately.
+Codec admission was subsequently implemented and validated separately.
 Storage ownership, journaled publication, and process-interruption recovery were subsequently implemented and validated separately.
 So do worker deadlines, image composition, caching, and UI workflows.
 Asset regeneration and game-reference generation have not been rerun.

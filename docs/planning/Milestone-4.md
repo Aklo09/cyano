@@ -12,7 +12,7 @@ and checked in the real app. R10 is done: the artwork check is in `just test`, a
 warnings, and Copy Image ([validation](../validation/App.md#milestone-4-smoke-runs-2026-11-15)). R11: every check passes
 and the [acceptance record](../validation/Milestone-4.md) is written; the owner did the walkthrough and approved the
 milestone on 2026-11-16.
-Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 4.
+Roadmap entry: [plan](macOS-Plan.md#delivery-roadmap), milestone 4.
 
 ## Scope
 
@@ -20,7 +20,7 @@ Roadmap deliverable: visible-item scheduling, bounded queues, cache identity, pr
 retry; icons from the private sprite atlases for Factorio rich-text tags in item and entry names (owner decision,
 2026-11-14) and for statistics items.
 
-Exit condition: the full supplied corpus receives native rendering and visual qualification.
+Exit condition: the full supplied corpus receives rendering and visual qualification.
 
 No Factorio artwork is embedded. Icons, sprites, and planet icons are read at runtime from the private release the
 owner prepares from their own game installation and selects in Settings. They are never committed, never added to
@@ -126,7 +126,7 @@ Numbering uses R for rendering.
 
 | # | Subtask | Delivers | Done when | Depends on |
 | --- | --- | --- | --- | --- |
-| R0 | Spec amendments | New criteria in the [app spec](../specs/Native-App.md) for entry icons, rich-text icons (including S5's fallback), statistics icons, warnings, and image copy/save, with layouts, states, and accessibility in the [screen specs](../specs/Native-App-Screens.md). BRW and thumbnail references updated for S1 | Owner approves | Decisions |
+| R0 | Spec amendments | New criteria in the [app spec](../specs/App.md) for entry icons, rich-text icons (including S5's fallback), statistics icons, warnings, and image copy/save, with layouts, states, and accessibility in the [screen specs](../specs/App-Screens.md). BRW and thumbnail references updated for S1 | Owner approves | Decisions |
 | R1 | Corpus qualification harness | `just` recipe and script: scratch library, import of the corpus, render of every leaf through the existing CLI, report and contact sheets in `.cache/qualification/` | First full run recorded: per-leaf success, dimensions, timings, warnings; no images committed | Decisions 1, 2 |
 | R2 | Renderer corrections | Fixes for defects that R1 and the owner's review find, including connected-rail seams. Each fpsr change is a patch in `tools/vendor/fpsr-patches/`; a render-database change regenerates the private assets | Every corpus leaf renders without failure or unexplained warning; the owner accepts the seam crops | R1 |
 | R3 | Planet icons in the release | An fpsr pipeline patch that exports the planet icons; `private-assets/2.1.24` regenerated; asset-preparation guide and renderer validation updated; the owner reminded to reassemble the everyday release | The five corpus planets resolve in the new release; `just asset-test` and `just tools-check` pass | Decision 6 |

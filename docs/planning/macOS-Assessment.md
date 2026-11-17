@@ -1,43 +1,43 @@
-# Native macOS port assessment
+# macOS port assessment
 
-Keep libraries portable and fully usable offline through a native macOS application.
+Keep libraries portable and fully usable offline through a macOS application.
 
 Date: 2026-11-12. Baseline: source release `v0.0.3` and the current implementation.
-Status: assessment and proposed direction; no native implementation or contract changes are approved here.
+Status: assessment and proposed direction; no implementation or contract changes are approved here.
 Existing [contracts](../README.md#agreed-contracts) remain authoritative for the web application.
 The owner confirmed that the web application has only held test data.
-Existing web stores, snapshots, operational state, and CLI protocols require no native compatibility.
+Existing web stores, snapshots, operational state, and CLI protocols need not be supported.
 
 ## Recommendation
 
 Build a shared Swift library core, a SwiftUI application, and a standalone Swift CLI.
 Use AppKit selectively for file panels, desktop interactions, and image viewing.
-Evaluate reusable planners and native helpers before committing to a complete renderer rewrite.
-Use Core Graphics for an initial native compositor; evaluate Metal against measured workloads.
+Evaluate reusable planners and system helpers before committing to a complete renderer rewrite.
+Use Core Graphics for an initial compositor; evaluate Metal against measured workloads.
 Keep renderer planning separate from painting and application UI.
 
-Preserve adjacent TXT/JSON files, real folders, and independently verifiable native backups.
-Design new metadata, journal, ownership, and backup formats where they simplify native implementation.
+Preserve adjacent TXT/JSON files, real folders, and independently verifiable backups.
+Design new metadata, journal, ownership, and backup formats where they simplify implementation.
 Keep originals independent from previews, statistics, assets, and application availability.
 The UI can adopt standard macOS controls without reproducing browser layout.
 
-This is a fresh native implementation preserving useful behavioral guarantees.
+This is a fresh implementation preserving useful behavioral guarantees.
 Existing storage logic and fixtures provide design references, without requiring protocol compatibility.
 
 ## Contracts to retain or adapt
 
-| Existing contract | Native treatment |
+| Existing contract | Treatment |
 | --- | --- |
-| [Storage](../contracts/Storage-Layout.md) | Retain exact originals, adjacent sidecars, UUIDs, real folders, bounded input, and interruption safety. Native schemas and recovery protocols can change. |
-| [Backups](../contracts/Backups.md) | Retain complete inventories, hashes, safe publication, and independent verification. Define a native backup format. |
-| [Restoration](../contracts/Restoration.md) | Retain fresh targets, guarded activation, and deliberate interrupted-restore handling. Simplify the native state machine where possible. |
-| [Ownership](../contracts/Ownership-and-Shutdown.md) | Retain kernel exclusion and safe shutdown. Define native controls without Node domain compatibility. |
+| [Storage](../contracts/Storage-Layout.md) | Retain exact originals, adjacent sidecars, UUIDs, real folders, bounded input, and interruption safety. Schemas and recovery protocols can change. |
+| [Backups](../contracts/Backups.md) | Retain complete inventories, hashes, safe publication, and independent verification. Define a dedicated backup format. |
+| [Restoration](../contracts/Restoration.md) | Retain fresh targets, guarded activation, and deliberate interrupted-restore handling. Simplify the state machine where possible. |
+| [Ownership](../contracts/Ownership-and-Shutdown.md) | Retain kernel exclusion and safe shutdown. Define controls without Node domain compatibility. |
 | [Cache maintenance](../contracts/Cache-Maintenance.md) | Retain dry-run scopes, confinement, revalidation, bounded scans, and byte-accounting distinctions. |
 | [Statistics](../contracts/Statistics-and-Footprint.md) | Retain saved-source requirements, quality grouping, building rectangles, and incomplete-result warnings. |
 | [Rendering](../contracts/Renderer-Evaluation.md) | Retain local rendering, explicit support scope, planner diagrams, warnings, and source independence. Replace implementation-specific dependencies. |
 | [Application](../contracts/Application-Integration.md) | Retain user workflows and entry addressing. Replace routes, forms, cookies, and browser-specific interactions. |
-| [Resource limits](../contracts/Resource-Limits.md) | Retain workloads and bounded scheduling. Establish new native measurements and hardware targets. |
-| [Release compatibility](../contracts/Release-Compatibility.md) | Version native formats and assets explicitly. Define future native upgrades separately from historical web releases. |
+| [Resource limits](../contracts/Resource-Limits.md) | Retain workloads and bounded scheduling. Establish new measurements and hardware targets. |
+| [Release compatibility](../contracts/Release-Compatibility.md) | Version formats and assets explicitly. Define future upgrades separately from historical web releases. |
 
 Basic authentication, HTTPS proxying, CSRF checks, and HTTP health routes serve deployment-specific needs.
 A local-only application needs no equivalent HTTP service.
@@ -69,11 +69,11 @@ Chosen Library/
 ```
 
 The chosen directory contains both user-visible content and private operational directories.
-The proposed `.library-format.json` identifies the native format and supported version.
-It prevents accidental treatment of a web store as a native library.
+The proposed `.library-format.json` identifies the format and supported version.
+It prevents accidental treatment of a web store as a library.
 Operational filenames remain design choices, rather than compatibility commitments.
 Keep transactional staging on the library filesystem for atomic publication.
-Keeping `cache/` alongside it is convenient, but native caches could use system storage instead.
+Keeping `cache/` alongside it is convenient, but caches could use system storage instead.
 Private immutable assets and portable backups can live separately.
 
 - **Preserve imported bytes:** read TXT files as bytes and retain whitespace and line endings.
@@ -99,8 +99,8 @@ Both meanings of offline matter: disconnected operation and maintenance without 
 | `LibraryCore` | Codec, validation, metadata, scanning, operations, ownership, journals, backups, restore, maintenance. |
 | `FactorioData` | Versioned prototype maps, asset descriptors, requirements, footprints, and support warnings. |
 | `PreviewRenderer` | Planning and painting interface, bounded jobs, cancellation, and versioned derived results. |
-| macOS application | Native navigation, editing controls, clipboard, file selection, progress, and image inspection. |
-| Standalone CLI | Offline operations using the same core and a documented native result protocol. |
+| macOS application | Navigation, editing controls, clipboard, file selection, progress, and image inspection. |
+| Standalone CLI | Offline operations using the same core and a documented result protocol. |
 
 These are proposed boundaries, not implemented package names or commands.
 
@@ -123,7 +123,7 @@ Ship UI resources locally; avoid making first launch depend on downloads.
 ## Storage implementation risks
 
 Use the current persistence logic to identify failure cases and required guarantees.
-Implement a smaller native protocol without interpreting historical web journals or restore markers.
+Implement a smaller protocol without interpreting historical web journals or restore markers.
 Its implementation includes [storage](../../src/lib/server/storage/library.ts), [ownership](../../runtime/ownership.mjs),
 [backup](../../runtime/backup.mjs), and [restore](../../runtime/restore.mjs) modules.
 
@@ -133,8 +133,8 @@ Its implementation includes [storage](../../src/lib/server/storage/library.ts), 
 - **Bound decoding:** retain strict base64, zlib framing, UTF-8 validation, and decompression limits.
 - **Preserve unknown content:** generic blueprint JSON must retain fields outside the app's typed projections.
 - **Validate metadata strictly:** default Codable decoding must not silently accept unsupported fields or versions.
-- **Define native serialization:** specify deterministic checksums without reproducing JavaScript object order or JSON encoding.
-- **Version recovery state:** use native journals and restore guards with documented publication points.
+- **Define serialization:** specify deterministic checksums without reproducing JavaScript object order or JSON encoding.
+- **Version recovery state:** use journals and restore guards with documented publication points.
 - **Test naming behavior:** cover normalization, case comparison, numeric limits, and filename byte counts on APFS.
 - **Retain failure evidence:** unknown live bytes and conflicting journals remain preserved for investigation.
 
@@ -142,10 +142,10 @@ Ordinary atomic file writes do not make a TXT/JSON pair transactional.
 Choose an explicit commit point and make every interrupted phase recoverable.
 This remains necessary even with entirely new metadata and journal schemas.
 Factorio strings still require their zlib wrapper format; raw DEFLATE is insufficient.
-Native compressors can produce different valid standalone-entry strings; exact root bytes remain mandatory.
+Compressors can produce different valid standalone-entry strings; exact root bytes remain mandatory.
 
 Apple distinguishes `fsync` from stronger `F_FULLFSYNC` drive-flush requests.
-Choose and measure the native durability policy explicitly.
+Choose and measure the durability policy explicitly.
 Do not claim power-loss guarantees from process-interruption tests alone.
 See Apple's [fsync reference](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fsync.2.html).
 
@@ -167,24 +167,24 @@ The [construction calculator](../../runtime/blueprint-statistics.mjs) is already
 Port it with the matching prototype map and existing reference fixtures.
 Do not derive construction quantities or building footprints from renderer sprite bounds.
 
-### Native painting choices
+### Painting choices
 
 | Approach | Assessment |
 | --- | --- |
 | Core Graphics bitmap compositor | Recommended starting point for capped, cached previews. Implement atlas crops, transforms, alpha, ordering, and PNG encoding. Benchmark representative leaves. |
 | Metal compositor | Consider for measured drawing bottlenecks or a future interactive scene viewer. It still needs Factorio planning, texture management, and offscreen image export. |
 | SwiftUI Canvas | Suitable for small diagrams. Keep heavy preview generation outside the UI view lifecycle. |
-| AppKit image viewport | Display cached images with native pan, zoom, fit, and background controls. Independent from the image generator. |
+| AppKit image viewport | Display cached images with pan, zoom, fit, and background controls. Independent from the image generator. |
 
 SwiftUI can embed AppKit views through [NSViewRepresentable](https://developer.apple.com/documentation/swiftui/nsviewrepresentable).
 Metal supports [offscreen rendering passes](https://developer.apple.com/documentation/metal/customizing-render-pass-setup).
 Neither API provides Factorio prototype resolution or connection rules.
 
 Existing measurements show PNG encoding can exceed painting time.
-The [native benchmark](../validation/Renderer-macOS-Validation.md#initial-resource-measurements) records that distinction.
+The [benchmark](../validation/Renderer-macOS-Validation.md#initial-resource-measurements) records that distinction.
 Therefore, GPU adoption does not establish a faster end-to-end preview pipeline.
 The current renderer explicitly disables GPU output for its approved pixel hashes.
-Native output needs new image and visual acceptance; those hashes are not portable requirements.
+Output needs new image and visual acceptance; those hashes are not portable requirements.
 
 Retain meaningful visual structure, readable planners, warnings, and complete source preservation.
 Pixel equality with the browser interface is unnecessary.
@@ -194,7 +194,7 @@ If preview simplification is acceptable, define omissions explicitly before redu
 
 Evaluate reuse before assuming that fpsr needs complete replacement.
 Distinguish reusable helper executables from code suitable for translation into Swift.
-Both can support a native interface and offline operation.
+Both can support a macOS interface and offline operation.
 
 The following revisions were inspected through GitHub source and repository metadata.
 Commit dates describe inspected revisions, without establishing support or image correctness.
@@ -206,12 +206,12 @@ Commit dates describe inspected revisions, without establishing support or image
 | [Factorio-FBSR perfectsine fork](https://github.com/perfectsine/Factorio-FBSR/tree/18d0b6a268b1434351ab9eaf0eae6ef805fc2ef2) | `18d0b6a268b1434351ab9eaf0eae6ef805fc2ef2` | 2026-10-26 |
 | [factorio-scanner](https://github.com/fgardt/factorio-scanner/tree/361bb762f799cf57bad201dbcb7ab5d0ac3d4b1f) | `361bb762f799cf57bad201dbcb7ab5d0ac3d4b1f` | 2026-10-07 |
 
-| Approach | Native integration | Principal limitation | Initial position |
+| Approach | Integration | Principal limitation | Initial position |
 | --- | --- | --- | --- |
 | fpsr planner through JavaScriptCore, Swift compositor | System JavaScript engine plus Core Graphics; no Node runtime required in the proposed design. | Requires bundling, engine compatibility, bridge-cost measurement, and a new compositor. | Prototype first. |
-| factorio-scanner helper | Compiled Rust executable; a C interface could follow after qualification. | Target-version alignment, offline loader changes, and missing planner previews. | Strong native-binary alternative. |
+| factorio-scanner helper | Compiled Rust executable; a C interface could follow after qualification. | Target-version alignment, offline loader changes, and missing planner previews. | Strong compiled-binary alternative. |
 | FBSR helper | Java 21/Java2D with a bundled runtime and local asset profiles. | JVM packaging, dependency extraction, and unproven current-profile acceptance. | Evaluate as a complete backend. |
-| Full Swift renderer | Native planning and composition under application control. | Reimplements Factorio-specific rules and carries the largest engineering cost. | Retain as the rewrite baseline. |
+| Full Swift renderer | Planning and composition under application control. | Reimplements Factorio-specific rules and carries the largest engineering cost. | Retain as the rewrite baseline. |
 
 #### fpsr: reuse planning before rewriting it
 
@@ -229,14 +229,14 @@ This supports a portability hypothesis; it does not prove JavaScriptCore executi
 Apple's [JavaScriptCore framework](https://developer.apple.com/documentation/javascriptcore) executes JavaScript from Swift.
 Bundle the planner as ordinary JavaScript, supplying decoded blueprint JSON and the render database.
 Receive its draw list and execute commands through a Swift compositor.
-Keep file access, asset decoding, original-byte preservation, and cache publication in native code.
+Keep file access, asset decoding, original-byte preservation, and cache publication in application code.
 Avoid bridging individual draw calls; transfer the complete bounded draw list instead.
 Measure copying, serialization, peak memory, and supported JavaScript features on the minimum macOS version.
 Retain helper-process isolation where deadlines require terminating synchronous planning.
 
 This approach can remove Node and skia-canvas without immediately translating Factorio planning logic.
 It also retains existing upgrade/deconstruction planner planning and the current asset pipeline.
-Successful planner execution still leaves native painting and visual acceptance to implement.
+Successful planner execution still leaves painting and visual acceptance to implement.
 
 #### FBSR: viable helper candidate, substantial Swift translation
 
@@ -267,7 +267,7 @@ Its Maven configuration also targets Java 21, despite its README listing Java 11
 Evaluate each pinned revision separately; fork identity does not establish interchangeable behavior.
 Do not choose a revision solely because its last commit is newer.
 
-#### factorio-scanner: native packaging with integration work
+#### factorio-scanner: packaging with integration work
 
 Rust permits a compiled renderer helper without a separate Node or Java runtime.
 Its [CI configuration](https://github.com/fgardt/factorio-scanner/blob/361bb762f799cf57bad201dbcb7ab5d0ac3d4b1f/.github/workflows/rust.yml) includes Intel and Apple Silicon macOS build targets.
@@ -279,7 +279,7 @@ Therefore, inspect code and corpus behavior rather than relying solely on that R
 The project also explicitly withholds stability guarantees.
 
 The [scanner documentation](https://github.com/fgardt/factorio-scanner/blob/361bb762f799cf57bad201dbcb7ab5d0ac3d4b1f/scanner/README.md) describes limited Alt mode and absent upgrade/deconstruction planner rendering.
-Native planner diagrams would need separate implementation or another backend.
+Planner diagrams would need separate implementation or another backend.
 The [loader source](https://github.com/fgardt/factorio-scanner/blob/361bb762f799cf57bad201dbcb7ab5d0ac3d4b1f/scanner/src/lib.rs) requests an exact targeted base-game version.
 The current 2.1.23 profile therefore needs target alignment and fresh compatibility checks.
 
@@ -322,7 +322,7 @@ The [existing builder](../../tools/renderer-evaluation/build-assets.mjs) invokes
 It prepares a licensed game's isolated dump, distilled sprite definitions, and packed atlases.
 The prototype-map generator also depends on matching engine reference data.
 
-Initially, keep existing private bundles and exporter tooling if native consumers can read them.
+Initially, keep existing private bundles and exporter tooling if consumers can read them.
 Validate database semantics and image decoding before committing to format reuse.
 This permits a Node-free application runtime while retaining external build-time tooling.
 A completely Node-free preparation workflow requires additional exporter work.
@@ -330,21 +330,21 @@ The full-rewrite estimates below assume exporter reuse, not its complete replace
 Alternative backends need their own prepared assets and cannot assume fpsr bundle compatibility.
 
 Private artwork remains separate from distributable source and application resources.
-Current source-release approval does not qualify a new distributed native binary.
+Current source-release approval does not qualify a new distributed binary.
 The existing [distribution review](../validation/License-Compliance.md) records that boundary.
 
 ### Isolation and cache identity
 
-Use a bounded native helper process when rendering needs enforceable deadlines or crash isolation.
+Use a bounded helper process when rendering needs enforceable deadlines or crash isolation.
 Swift task cancellation requires cooperation and cannot stop arbitrary synchronous work.
 An initial proposal lets helpers receive source bytes and read immutable assets only.
 The owning application validates results and publishes all store cache writes.
 Such helpers must have no surviving ability to modify the store.
-Document helper lifetimes and cache publication in the native ownership contract.
+Document helper lifetimes and cache publication in the ownership contract.
 Any helper writing store files must instead retain exclusion throughout its writing lifetime.
 
 Keep cache keys based on source hash, entry path, generator settings, and asset identity.
-Give the native generator a new fingerprint; never reuse fpsr identity for changed output.
+Give the generator a new fingerprint; never reuse fpsr identity for changed output.
 Retain bounded scheduling, persisted failures, explicit retry, and source-independent availability.
 
 ## macOS access and distribution
@@ -360,38 +360,38 @@ A standalone CLI needs its own access design; GUI permission does not automatica
 Apple documents these mechanisms in [sandbox file access](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox).
 
 Choose the minimum supported macOS version and processor scope during the initial prototype.
-Existing native evidence covers macOS ARM64, not a new Swift application or Intel Macs.
+Existing evidence covers macOS ARM64, not a new Swift application or Intel Macs.
 
-## Fresh libraries and native acceptance
+## Fresh libraries and acceptance
 
 Existing data compatibility is outside scope, following the owner's clarification.
 The web application has only run against test data.
 No web-store migration, historical backup reader, or bidirectional CLI acceptance is required.
 
-Create fresh native libraries with explicit native format identification.
+Create fresh libraries with explicit format identification.
 Refuse nonempty unknown stores; do not silently reinterpret their control files or sidecars.
-Users can import ordinary Factorio TXT strings through the native import workflow.
-Importing those strings creates new native metadata without transferring web application state.
+Users can import ordinary Factorio TXT strings through the import workflow.
+Importing those strings creates new metadata without transferring web application state.
 
-The native application and CLI must agree on their own formats and exclusion protocol.
-Standalone native tools must verify and restore backups without the GUI or asset bundle.
+The application and CLI must agree on their formats and exclusion protocol.
+Standalone tools must verify and restore backups without the GUI or asset bundle.
 Choose a documented, accessible snapshot format rather than preserving the web manifest schema.
-Format versioning protects future native upgrades; historical web rollback matrices do not apply.
+Format versioning protects future upgrades; historical web rollback matrices do not apply.
 
-Native qualification should include:
+Qualification should include:
 
-- **Verify native snapshots:** standalone verification detects corruption, missing members, and incomplete publication.
-- **Restore native snapshots:** fresh-target restoration preserves exact originals, sidecars, hierarchy, and empty folders.
-- **Check native mutations:** app and CLI preserve comments, identities, dates, and replacement semantics.
-- **Check unsupported formats:** native readers refuse unknown versions without silently changing stored bytes.
+- **Verify snapshots:** standalone verification detects corruption, missing members, and incomplete publication.
+- **Restore snapshots:** fresh-target restoration preserves exact originals, sidecars, hierarchy, and empty folders.
+- **Check mutations:** app and CLI preserve comments, identities, dates, and replacement semantics.
+- **Check unsupported formats:** readers refuse unknown versions without silently changing stored bytes.
 - **Exercise durable interruptions:** test publication boundaries, replacements, unpacking, deletion, restore resume, and discard.
 - **Exercise process exclusion:** app versus CLI, aliases, second app, crashes, and surviving writers.
-- **Exercise native filesystems:** qualify case-sensitive and case-insensitive APFS naming and target collisions.
+- **Exercise filesystems:** qualify case-sensitive and case-insensitive APFS naming and target collisions.
 - **Separate evidence types:** metadata validation, image decoding, statistics, and visual approval remain distinct.
 
 Keep supplied blueprint strings and historical examples unchanged.
 Use expected source behavior and statistics as fixtures, without adopting web storage formats.
-Retain the 1,000-root workload and 149-leaf large book for new native performance qualification.
+Retain the 1,000-root workload and 149-leaf large book for new performance qualification.
 
 ## Proposed delivery and effort
 
@@ -400,28 +400,28 @@ They cover the current official profile and behavioral scope, without matching i
 They assume access to a Mac, licensed local assets, and existing exporter tooling.
 They exclude legacy data compatibility, new game profiles, mods, cloud sync, and exporter replacement.
 These are engineering estimates, not measured delivery commitments.
-They describe the full native-planner rewrite scenario.
+They describe the full planner rewrite scenario.
 Successful planner or backend reuse could reduce effort; quantify savings after the renderer prototype.
 The source review above does not establish a replacement implementation schedule.
 
 | Phase | Deliverable | Estimated effort |
 | --- | --- | --- |
-| 1 | Native format design, codec, APFS ownership probe, and renderer-reuse comparison. | 1–2 weeks |
-| 2 | Shared storage core, native recovery, maintenance CLI, backup, restore, and interruption fixtures. | 3–5 weeks |
-| 3 | Native browsing, books, import/export, comments, replacement, organization, and image viewport. | 3–5 weeks |
-| 4 | Native resolver/planner/compositor, planner diagrams, asset integration, and image acceptance. | 6–12 weeks |
+| 1 | Format design, codec, APFS ownership probe, and renderer-reuse comparison. | 1–2 weeks |
+| 2 | Shared storage core, recovery, maintenance CLI, backup, restore, and interruption fixtures. | 3–5 weeks |
+| 3 | Browsing, books, import/export, comments, replacement, organization, and image viewport. | 3–5 weeks |
+| 4 | Resolver/planner/compositor, planner diagrams, asset integration, and image acceptance. | 6–12 weeks |
 | 5 | Performance qualification, packaging, permissions, lifecycle, and documentation. | 1–3 weeks |
 
 Sequential total: approximately 14–27 engineer-weeks, or roughly three to six months.
-A useful source-and-maintenance application without native sprite previews could arrive after phases 1–3.
+A useful source-and-maintenance application without sprite previews could arrive after phases 1–3.
 That earlier milestone represents approximately 7–12 weeks, with deferred image acceptance.
 Removing historical compatibility saves an estimated three to four engineer-weeks.
 Durability, backup correctness, offline behavior, and Factorio rendering still require qualification.
 Renderer and asset-format feasibility dominate uncertainty; revise estimates after phase 1.
 
-A temporary Node/fpsr helper could deliver native UI before replacing image generation.
-That path retains runtime packaging and existing native dependencies.
-It should remain an optional delivery strategy, rather than the final native architecture.
+A temporary Node/fpsr helper could deliver the UI before replacing image generation.
+That path retains runtime packaging and existing dependencies.
+It should remain an optional delivery strategy, rather than the final architecture.
 
 ## First milestone acceptance
 
@@ -429,15 +429,15 @@ Prove the filesystem and rendering boundaries before implementing the complete U
 
 Use disposable test directories; this prototype does not qualify complete production recovery.
 
-1. Define native metadata, control files, and a minimal recoverable TXT/JSON publication protocol.
+1. Define metadata, control files, and a minimal recoverable TXT/JSON publication protocol.
 2. Import supplied TXT bytes, add a comment, reopen, and export the original bytes exactly.
 3. Acquire the real kernel lease and demonstrate competing-process refusal.
 4. Interrupt one published operation and demonstrate deterministic recovery without lost originals.
-5. Exercise a native snapshot prototype, preserving file bytes, hierarchy, and empty folders.
+5. Exercise a snapshot prototype, preserving file bytes, hierarchy, and empty folders.
 6. Compare renderer candidates on RS, rails, a nested planner, and one large supplied leaf.
 7. Independently decode generated images and inspect representative structure, layering, and clipping.
 8. Confirm missing assets still permit source operations and snapshot creation.
 9. Measure codec, planning, painting, encoding, memory, and cancellation separately.
 
 This assessment involved documentation and implementation inspection, plus primary Apple API references.
-No Swift compilation, native prototype, new image validation, or runtime benchmarks were performed.
+No Swift compilation, prototype, new image validation, or runtime benchmarks were performed.

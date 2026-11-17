@@ -1,11 +1,11 @@
 # Factorio Blueprint Library for macOS
 
 Keep original blueprint strings, books, planners, and comments in an ordinary local directory.
-This project is an independent native port of the original web application.
+This project is an independent macOS port of the original web application.
 
-**Current status:** native storage and the library CLI are implemented, including organization, replacement,
+**Current status:** library storage and the CLI are implemented, including organization, replacement,
 deletion, book unpacking, maintenance, and offline asset verification.
-The standalone renderer paints real previews through supervised native workers.
+The standalone renderer paints real previews through supervised workers.
 Saved-item previews reuse validated derived caches.
 Construction statistics report a blueprint's building requirements and footprint from a verified asset release.
 The macOS app browses, imports, exports, comments on, and organizes a library, with preview windows and statistics;
@@ -13,7 +13,7 @@ see the [user guide](docs/User-Guide.md). Milestone 3 is accepted.
 
 ## Requirements
 
-- **Native development:** Xcode 27.2, Swift 6.4.2, macOS 27.2, Apple Silicon are validated.
+- **Development environment:** Xcode 27.2, Swift 6.4.2, macOS 27.2, Apple Silicon are validated.
 - **Command shortcuts:** just 1.54.0 is validated.
 - **Development tooling:** Node 24.22.1 and npm 12.2.1 are validated.
 - **Private artwork:** prepared assets require your licensed Factorio 2.1.24 installation.
@@ -36,7 +36,7 @@ just planner-test
 just renderer-test
 ```
 
-Native builds need no Node installation, game process, or private assets.
+Builds need no Node installation, game process, or private assets.
 The committed planner resource runs through Apple's system JavaScriptCore framework.
 The probe supports its original planner self-test and real image rendering with a verified private asset release.
 
@@ -69,18 +69,18 @@ Run `just planner-build` after intentionally changing the planner source or adap
 Commit the regenerated resource and metadata with the source change.
 
 Run `just statistics-test` when the private prototype map is available.
-These retained JavaScript cases, with `just statistics-golden`, provide the reference the native statistics are checked against.
+These retained JavaScript cases, with `just statistics-golden`, provide the reference the statistics implementation is checked against.
 
 ## Documentation
 
-- **Read the roadmap:** [approved native plan](docs/planning/macOS-Plan.md).
+- **Read the roadmap:** [approved plan](docs/planning/macOS-Plan.md).
 - **Build the app:** [app guide](docs/development/App.md) and [validation](docs/validation/App.md).
 - **Inspect evidence:** [foundation validation](docs/validation/Foundation.md).
-- **Use the codec:** [native interfaces](docs/development/Codec.md) and [validation](docs/validation/Codec.md).
+- **Use the codec:** [interfaces](docs/development/Codec.md) and [validation](docs/validation/Codec.md).
 - **Manage a library:** [CLI guide](docs/development/Library-CLI.md), [storage contract](docs/contracts/Storage.md), and [validation](docs/validation/Storage.md).
 - **Inspect command completion:** [organization and maintenance validation](docs/validation/Library-Commands.md).
 - **Prepare assets:** [local tooling guide](docs/development/Asset-Preparation.md).
-- **Render previews:** [native harness guide](docs/development/Preview.md) and [renderer validation](docs/validation/Renderer.md).
+- **Render previews:** [harness guide](docs/development/Preview.md) and [renderer validation](docs/validation/Renderer.md).
 - **Cache saved-item previews:** [library preview guide](docs/development/Library-Previews.md), [contract](docs/contracts/Preview-Cache.md), and [validation](docs/validation/Library-Previews.md).
 - **Calculate statistics:** [statistics guide](docs/development/Statistics.md), [contract](docs/contracts/Statistics.md), and [validation](docs/validation/Statistics.md).
 - **Check milestones:** [milestone 1](docs/validation/Milestone-1.md) and [milestone 2](docs/validation/Milestone-2.md) acceptance records.
@@ -94,5 +94,5 @@ Vendored fpsr code retains its [MIT notice](tools/vendor/fpsr/LICENSE).
 Copied files and adaptations are recorded in [the provenance inventory](tools/provenance.json).
 
 Factorio artwork is copyright Wube Software Ltd. and remains private.
-Game artwork is excluded from source control and native package resources.
+Game artwork is excluded from source control and package resources.
 This project is not affiliated with or endorsed by Wube Software.

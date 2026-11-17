@@ -1,10 +1,10 @@
-# Native app screens
+# App screens
 
 Date: 2026-11-14. Status: approved by the owner on 2026-11-14 (milestone 3, subtask A2). Amended for milestone 4
 (subtask R0, 2026-11-15): names and icons, the item list, inspector header, Statistics tab, previews (warnings, image
 copy and save), menus, and accessibility; approved by the owner on 2026-11-15. Statistics tab amended at the owner's
 request on 2026-11-16 (items by inventory tab, listed once).
-Behavior and acceptance criteria: [native app spec](Native-App.md) (criterion IDs below refer to it).
+Behavior and acceptance criteria: [app spec](App.md) (criterion IDs below refer to it).
 Plans: [milestone 3](../planning/Milestone-3.md), [milestone 4](../planning/Milestone-4.md).
 
 Owner decisions for this document (2026-11-14): books are browsed like folders in the item list, and the

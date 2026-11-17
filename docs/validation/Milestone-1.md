@@ -1,7 +1,7 @@
 # Milestone 1 acceptance
 
 Milestone 1 (foundation and feasibility) is accepted.
-Every criterion in the [native plan](../planning/macOS-Plan.md#acceptance-and-validation) was re-verified on commit `8daa40e`,
+Every criterion in the [plan](../planning/macOS-Plan.md#acceptance-and-validation) was re-verified on commit `8daa40e`,
 after the swift-format reformat (`a337ee1`), and the owner approved the representative images.
 Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 
@@ -11,7 +11,7 @@ Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 | --- | --- |
 | `just build` | Pass |
 | `just lint` | Strict swift-format lint reports no findings |
-| `just test` | 80 native tests across ten suites and four Python assembly tests pass |
+| `just test` | 80 tests across ten suites and four Python assembly tests pass |
 | Relocated isolation | Build, tests, and executables pass with the original checkout unreadable, networking denied, and no Node on PATH |
 | `just tools-check` | All 153 copied files, 42 planner inputs, and five pinned development dependencies remain valid |
 | `just planner-check` | Committed JavaScript resource matches its 42 pinned local inputs |
@@ -62,6 +62,6 @@ This approves the representative set; it is not pixel parity with the game rende
 These are outside milestone 1 by the plan's roadmap:
 
 - Full-corpus visual qualification, including connected-rail seams (milestone 4).
-- Native construction statistics (milestone 2).
+- Construction statistics (milestone 2).
 - The 1,000-root workload targets and power-loss durability (milestone 5 and separate acceptance work).
 - The macOS application (milestone 3).

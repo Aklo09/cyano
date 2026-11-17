@@ -1,6 +1,6 @@
 # Statistics validation
 
-Evidence for the native construction statistics ([contract](../contracts/Statistics.md),
+Evidence for construction statistics ([contract](../contracts/Statistics.md),
 [milestone 2](../planning/Milestone-2.md)). Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 
 ## Unit tests (S4)
@@ -9,7 +9,7 @@ Evidence for the native construction statistics ([contract](../contracts/Statist
 They cover every rule of the 13 reference Node tests (game-tile footprints, cardinal rotation, gaps and tiles,
 translation invariance, rail costs and oriented diagonal geometry, secondary collision boxes, qualities and modules,
 installed and requested equipment, fuel and logistics, off-grid vehicles, unknown prototypes, invalid data, robots)
-and the native behaviors: grouped warnings, byte-order sorting, not-applicable books and planners,
+and the app behaviors: grouped warnings, byte-order sorting, not-applicable books and planners,
 JavaScript-compatible rounding, and the result JSON shape.
 
 Deliberately removing secondary collision boxes failed the rail test; removing tile snapping failed six tests.
@@ -28,7 +28,7 @@ entities as one `UNKNOWN_ENTITY` warning with count 8, and the book root reports
 
 ## Parity with the reference calculator (S5)
 
-`StatisticsParityTests` compares the native calculator with `.cache/statistics-golden.json`
+`StatisticsParityTests` compares the calculator with `.cache/statistics-golden.json`
 (`just statistics-golden`) on all 348 reference cases: 234 blueprint leaves from the supplied and vendored fpsr
 fixtures, and 114 synthetic cases. It first requires that the outputs were generated from the same prototype map.
 

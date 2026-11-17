@@ -37,7 +37,7 @@ function with no I/O. In an optimized build a 6,814-entity leaf takes about 5 ms
 - `Sources/FactorioData/LibraryStatistics.swift`: the `NativeLibrary` extension.
 - `tools/reference/blueprint-statistics.mjs`: the JavaScript reference calculator the port started from.
 
-The reference is a starting point, not a specification. Where the native behavior differs on purpose,
+The reference is a starting point, not a specification. Where the app behavior differs on purpose,
 the contract lists the difference under "Differences from the web application".
 
 ## Tests

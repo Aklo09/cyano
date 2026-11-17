@@ -1,7 +1,7 @@
-# Native library storage and ownership
+# Library storage and ownership
 
 Preserve original strings and comments through interrupted writes without an authoritative database.
-This contract covers native source storage, organization, comments, maintenance, and recovery.
+This contract covers source storage, organization, comments, maintenance, and recovery.
 
 ## Library identity and layout
 
@@ -24,14 +24,14 @@ Chosen Library/
   cache/
 ```
 
-The native marker contains exactly `format`, `schemaVersion`, `id`, and `createdAt`.
+The library marker contains exactly `format`, `schemaVersion`, `id`, and `createdAt`.
 The format is `fb-native-library`; its current version is integer `1`.
 Identity uses a canonical lowercase UUID; dates use UTC with millisecond precision.
 The marker is immutable during ordinary library sessions.
 
 Initialization refuses unknown nonempty directories, including a bare foreign lockfile; a directory holding only
 Finder metadata counts as empty.
-A strict `.format.pending` record identifies an interrupted native bootstrap.
+A strict `.format.pending` record identifies an interrupted library bootstrap.
 Only this control record may be created before kernel ownership is acquired.
 Publishing the marker and creating managed directories happen under ownership.
 An interrupted marker publication can resume without changing its library identity.
@@ -145,7 +145,7 @@ Reads do not authorize concurrent external edits to a live library.
 
 The permanent `.owner.lock` inode carries a nonblocking exclusive `flock` lease.
 File existence, PID age, and timeout expiry never establish ownership.
-An existing native library must retain its lockfile; a missing lock is not recreated.
+An existing library must retain its lockfile; a missing lock is not recreated.
 Live sessions detect replaced lockfiles and changed directory identities.
 
 One `NativeLibrary` object owns a library until `close()` or deallocation.

@@ -1,4 +1,4 @@
-# Native renderer feasibility checkpoint
+# Renderer feasibility checkpoint
 
 The standalone harness produces real PNG previews through JavaScriptCore, Core Graphics, Core Text, and Image I/O.
 The completed library-command checkpoint was committed as `ee564db` before this work began.
@@ -9,7 +9,7 @@ This completes the standalone painter/worker checkpoint; the whole application a
 
 The pinned fpsr planner receives one JSON transfer per job, without filesystem/network callbacks.
 It returns ordered commands and explicit unsupported-content warnings.
-The native painter implements sprites, clipping/slices, flips/clockwise rotation, multiply tint,
+The painter implements sprites, clipping/slices, flips/clockwise rotation, multiply tint,
 rail pixel snapping/seam bleed, grouped shadows, icons/backings/alpha halos, wires,
 train-chain overlays, snap grids, rectangles, and embedded-font Core Text labels.
 Unknown commands, invalid frame references, nonfinite geometry, and exceeded limits cause refusal.
@@ -20,9 +20,9 @@ The child has no library mutation interface and writes only stdout/stderr.
 The owner reaps it before independently decoding the returned PNG and exclusively creating the requested output file.
 Output paths inside the selected asset release are refused.
 An stdin pipe lifeline ends the worker when its parent dies.
-The worker is not an OS sandbox boundary; no claim of hostile-native-code containment is made.
+The worker is not an OS sandbox boundary; no claim of hostile helper-code containment is made.
 
-Native sources adapted from fpsr are attributed in source headers and `tools/provenance.json`.
+Sources adapted from fpsr are attributed in source headers and `tools/provenance.json`.
 The MIT license remains in the planner resources and vendored source.
 No external runtime dependency or licensed artwork was added to package resources.
 
@@ -30,9 +30,9 @@ No external runtime dependency or licensed artwork was added to package resource
 
 | Check | Result |
 | --- | --- |
-| `just test` | 69 native tests across nine suites and four Python assembly tests pass |
+| `just test` | 69 tests across nine suites and four Python assembly tests pass |
 | `just renderer-test` | Planner, composition, process lifecycle, complete-job, and assembly coverage |
-| Relocated isolation check | Fresh native build and all 69 native tests pass with both original checkouts unreadable, networking denied, and no Node on PATH |
+| Relocated isolation check | Fresh build and all 69 tests pass with both original checkouts unreadable, networking denied, and no Node on PATH |
 | `just planner-check` | Regenerated bundle matches 42 local pinned inputs; no external imports |
 | `just tools-check` | All 153 copied files and five pinned development dependencies remain valid; Python sources included in reference checks |
 | CLI guide examples | Assembly, release verification, RS, large-leaf, and elevated-rail render workflows pass |
@@ -40,7 +40,7 @@ No external runtime dependency or licensed artwork was added to package resource
 
 The isolation command is `python3 tools/check-independence.py --deny-path /Users/aklo/Projects/fb`.
 It must run outside an enclosing sandbox to install its own restrictive policy.
-The native tests generate their own valid atlas/release data and need no private artwork.
+The tests generate their own valid atlas/release data and need no private artwork.
 They exercise real worker planning/painting/encoding plus independent host decoding.
 Python preparation tests cover exact inventories, existing-destination preservation, symlinks, shared files, and oversized inputs.
 
@@ -54,7 +54,7 @@ A renderer-loading regression test rejects even valid-JSON manifest bytes change
 ## Private representative images
 
 The same verified release contains 451 files and 211,964,616 bytes, with both 1x and 2x tiers.
-Native Image I/O successfully decodes its WebP atlases. Rendering uses copied private assets only.
+Image I/O successfully decodes its WebP atlases. Rendering uses copied private assets only.
 Measurements below are local debug-build observations, not release-performance guarantees.
 
 | Input / actual entry path | Output | Commands | Observed wall time | Worker peak RSS |
@@ -166,6 +166,6 @@ This is a standalone-source harness. Library-bound helper lease retention, owner
 render scheduling, retry/progress UI, and integration with library close are still pending.
 The subsequent [library preview checkpoint](Library-Previews.md) implements the helper lease, cache, and close integration.
 No helper receives a library path/lease or authoritative write interface in this checkpoint.
-Terrain/space backgrounds and coordinate overlays remain outside the native painter's current options.
+Terrain/space backgrounds and coordinate overlays remain outside the painter's current options.
 Source operations continue to work without assets.
-Native statistics, the 1,000-root workload, power-loss qualification, owner visual approval, and the macOS UI remain separate work.
+Statistics, the 1,000-root workload, power-loss qualification, owner visual approval, and the macOS UI remain separate work.

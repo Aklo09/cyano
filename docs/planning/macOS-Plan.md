@@ -1,4 +1,4 @@
-# Native macOS port: roadmap and first milestone
+# macOS port: roadmap and first milestone
 
 Date: 2026-11-13. Status: approved by the owner; milestones 1, 2, 3, and 4 are accepted.
 Based on the [initial assessment](macOS-Assessment.md), with the scope decisions recorded below.
@@ -7,21 +7,21 @@ Based on the [initial assessment](macOS-Assessment.md), with the scope decisions
 
 - [x] Independent Swift package, fixture preservation, local preparation tooling, and build/test commands.
 - [x] Planner resource executes through system JavaScriptCore without Node or private assets.
-- [x] Relocated native build passes with original checkouts unreadable and networking denied.
-- [x] Bounded native codec, exact-byte root exports, and selected-entry exports preserving unknown content.
-- [x] Native metadata, exclusive ownership, minimal CLI library operations, and process-interruption recovery.
+- [x] Relocated build passes with original checkouts unreadable and networking denied.
+- [x] Bounded codec, exact-byte root exports, and selected-entry exports preserving unknown content.
+- [x] Metadata, exclusive ownership, minimal CLI library operations, and process-interruption recovery.
 - [x] Complete library commands: organization, replacement, deletion, unpacking, cache maintenance, usage, and offline asset verification.
-- [x] Standalone real-image renderer feasibility, bounded native workers, process deadlines, and independent PNG decoding.
+- [x] Standalone real-image renderer feasibility, bounded workers, process deadlines, and independent PNG decoding.
 - [x] Library-bound helper lease retention, close/cancellation, and owned derived-cache publication/reuse.
 - [x] Owner visual approval and complete milestone 1 acceptance ([acceptance record](../validation/Milestone-1.md)).
 - [x] Core revisions after milestone 1 review ([decisions](Core-Revisions.md)).
-- [x] Native construction statistics: contract, strict prototype map, calculator, reference parity, library/CLI integration, and measurements ([validation](../validation/Statistics.md)).
+- [x] Construction statistics: contract, strict prototype map, calculator, reference parity, library/CLI integration, and measurements ([validation](../validation/Statistics.md)).
 - [x] Milestone 2 acceptance ([acceptance record](../validation/Milestone-2.md)).
 - [x] Milestone 4 acceptance: approved by the owner on 2026-11-16 ([acceptance record](../validation/Milestone-4.md)).
 
 See [foundation validation](../validation/Foundation.md) for evidence and limitations.
 The [codec validation](../validation/Codec.md) records the next completed checkpoint.
-The [storage validation](../validation/Storage.md) records native ownership and publication evidence.
+The [storage validation](../validation/Storage.md) records ownership and publication evidence.
 The [command validation](../validation/Library-Commands.md) records the owner's requested organization/maintenance checkpoint before renderer work.
 Milestone 2 is [accepted](../validation/Milestone-2.md). Milestone 3 is [accepted](../validation/Milestone-3.md). Milestone 4, rendering integration, is [accepted](../validation/Milestone-4.md) (2026-11-16).
 The [renderer validation](../validation/Renderer.md) records the standalone painter/worker checkpoint.
@@ -32,7 +32,7 @@ Power-loss durability and the full workload qualification remain separate accept
 
 Build an independent macOS application for managing a personal Factorio blueprint library, using SwiftUI, a shared Swift storage core, and a standalone CLI.
 
-Target this Apple Silicon Mac first. Preserve the useful workflows and data-safety guarantees of `fb`, while adopting native navigation and controls.
+Target this Apple Silicon Mac first. Preserve the useful workflows and data-safety guarantees of `fb`, while adopting macOS navigation and controls.
 
 The first milestone delivers a CLI and preview harness that prove storage, recovery, and renderer feasibility. It does not include the application UI.
 
@@ -42,7 +42,7 @@ The first milestone delivers a CLI and preview harness that prove storage, recov
 
 - **LibraryCore:** blueprint decoding, validation, filesystem storage, comments, organization, ownership, and interrupted-operation recovery. No dependency on SwiftUI or rendering.
 - **FactorioData:** versioned asset and prototype-map loading, compatibility checks, and construction statistics.
-- **PreviewRenderer:** planner bridge, native composition, worker lifecycle, and derived-result caching.
+- **PreviewRenderer:** planner bridge, composition, worker lifecycle, and derived-result caching.
 - **Executables:** `fb-native` for library operations and separate preview harness/worker products.
 - **Application:** SwiftUI navigation and editing, with AppKit for file panels and image inspection.
 
@@ -65,9 +65,9 @@ Make this repository self-contained:
 | --- | --- | --- |
 | **1. Foundation and feasibility** | Independent toolchain, minimal library CLI, recovery protocol, JavaScriptCore/Core Graphics preview harness | Storage and representative real images pass the checks below |
 | **2. Complete library core** | Replacement, folder/item organization, unpacked-book import, deletion, maintenance, and statistics | Shared operations preserve identities, comments, originals, and recovery guarantees |
-| **3. Native application** | Library selection, browsing, nested books, import/export, comments, organization, and image viewport | Everyday workflows work offline, including without renderer assets |
-| **4. Rendering integration** | Cache identity, cancellation, retry, and render warnings; entry icons in list rows and the inspector, icons for Factorio rich-text tags in names and for statistics items, and planet icons in the private release (owner decisions, 2026-11-14 and 2026-11-15); copying and saving preview images. Thumbnails, visible-item scheduling, and bounded queues were dropped (2026-11-15) | Full supplied corpus receives native rendering and visual qualification |
-| **5. Personal-use qualification** | App/CLI installation, lifecycle handling, documentation, and workload measurements | The 1,000-root library and 149-leaf book meet recorded native acceptance targets |
+| **3. Application** | Library selection, browsing, nested books, import/export, comments, organization, and image viewport | Everyday workflows work offline, including without renderer assets |
+| **4. Rendering integration** | Cache identity, cancellation, retry, and render warnings; entry icons in list rows and the inspector, icons for Factorio rich-text tags in names and for statistics items, and planet icons in the private release (owner decisions, 2026-11-14 and 2026-11-15); copying and saving preview images. Thumbnails, visible-item scheduling, and bounded queues were dropped (2026-11-15) | Full supplied corpus receives rendering and visual qualification |
+| **5. Personal-use qualification** | App/CLI installation, lifecycle handling, documentation, and workload measurements | The 1,000-root library and 149-leaf book meet recorded acceptance targets |
 
 Do not carry forward the assessment's full-rewrite estimate as a delivery commitment. Re-estimate after milestone 1 establishes renderer reuse costs.
 
@@ -81,11 +81,11 @@ Use the existing official Factorio 2.1.23 asset profile initially. Preserve the 
 
 ### Minimal library and CLI
 
-Use the assessment's ordinary-directory layout: explicit native format marker, permanent ownership lock, adjacent TXT/JSON pairs under `library/`, and separate operational staging and disposable caches.
+Use the assessment's ordinary-directory layout: explicit format marker, permanent ownership lock, adjacent TXT/JSON pairs under `library/`, and separate operational staging and disposable caches.
 
 Implement these CLI capabilities:
 
-- Initialize an empty native library.
+- Initialize an empty library.
 - Import TXT bytes, list saved roots, and add a root or selected-entry comment.
 - Export an original root exactly; export a selected nested entry as a standalone string.
 - Inspect ownership without activating the library.
@@ -95,7 +95,7 @@ Keep UUIDs, source hashes, dates, display-name overrides, and comments in strict
 
 Carry forward the existing codec admission limits: 16 MiB source, 64 MiB decompressed JSON, depth 128, book depth 32, 10,000 entries, 100,000 entities/tiles, and one million JSON nodes.
 
-Define a native versioned JSON result envelope and stable error categories. Raw exports write only source bytes to stdout; diagnostics go to stderr.
+Define a versioned JSON result envelope and stable error categories. Raw exports write only source bytes to stdout; diagnostics go to stderr.
 
 ### Ownership and recovery
 
@@ -131,7 +131,7 @@ Measure startup, planning, bridge transfer, painting, PNG encoding, peak memory,
 
 Milestone 1 passes when:
 
-- Given an empty directory, initialization creates a recognizable native library; unknown nonempty directories remain unchanged.
+- Given an empty directory, initialization creates a recognizable library; unknown nonempty directories remain unchanged.
 - Given TXT containing CRLF and surrounding whitespace, import → comment → close → reopen → export produces identical bytes.
 - Given sparse nested entry indices and unknown fields, selection and standalone export preserve their meaning.
 - Given competing processes or path aliases, only one acquires ownership; refusal changes no library content.

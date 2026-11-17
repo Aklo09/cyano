@@ -1,11 +1,11 @@
 # Milestone 3 acceptance
 
-Milestone 3 (the native macOS application) is **accepted**: the owner did the walkthrough below on their own library
+Milestone 3 (the macOS application) is **accepted**: the owner did the walkthrough below on their own library
 and release on 2026-11-15, reported that everything works, and approved it.
 Its exit condition, from the [milestone 3 plan](../planning/Milestone-3.md#scope), is that everyday workflows work
 offline, including without renderer assets. The checks below ran on 2026-11-15 on the A18 tree (parent commit
 `36cad92`). Per-subtask evidence is in the [app validation](App.md); the criteria are in the
-[app spec](../specs/Native-App.md) and the [screen specs](../specs/Native-App-Screens.md). People using the app
+[app spec](../specs/App.md) and the [screen specs](../specs/App-Screens.md). People using the app
 start from the [user guide](../User-Guide.md).
 
 ## Checks

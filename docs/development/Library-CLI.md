@@ -1,4 +1,4 @@
-# Native library CLI
+# Library CLI
 
 Manage saved sources and comments without the GUI, artwork, network, or a running game.
 Run commands from this repository using `just library`.
@@ -18,7 +18,7 @@ just library list "$library"
 ```
 
 The owner probe leaves a nonexistent target untouched.
-Initialization creates the native marker and managed directories.
+Initialization creates the library marker and managed directories.
 An initialized library can be reopened without importing any renderer assets.
 Unknown nonempty stores are refused.
 
@@ -126,7 +126,7 @@ just library cache-cleanup "$library" all --apply
 
 Cache cleanup defaults to the `abandoned` scope and a dry run.
 `--apply` recomputes its selection under ownership; it does not accept a saved deletion plan.
-Scoped cleanup recognizes native cache identity manifests, orphaned item results, and `.tmp-<UUID>` files.
+Scoped cleanup recognizes cache identity manifests, orphaned item results, and `.tmp-<UUID>` files.
 Unknown or damaged manifest formats remain protected; `all` explicitly selects all safe derived files.
 No cache cleanup scope deletes operations staging or authoritative library content.
 Unsafe links, shared file inodes, cross-device descendants, and overlapping selected assets cause refusal before deletion.
@@ -135,7 +135,7 @@ Unsafe links, shared file inodes, cross-device descendants, and overlapping sele
 It requires `--assets <release-directory>` and optionally accepts `--generator <identity>`.
 The default generator is `native-preview-v1`, selecting 2x/2048/transparent previews.
 Use the preview result's `generator` with `--generator` when comparing a different rendering variant.
-The native manifest format is intentionally separate from historical web caches.
+The library manifest format is intentionally separate from historical web caches.
 
 `usage` reports originals, metadata, other library members, cache, operations, controls, and optional assets.
 Supply `--assets <release-directory>` to include assets; without it, `complete` is false and an `ASSETS_NOT_SELECTED` issue is explicit.
@@ -224,12 +224,12 @@ The error includes `category`, `code`, `message`, and `exitCode`.
 | 2 | Invalid command arguments |
 | 3 | Ownership or unsupported library filesystem |
 | 4 | Integrity conflict or recovery required |
-| 5 | Unsupported or malformed native format/metadata |
+| 5 | Unsupported or malformed library format/metadata |
 | 6 | Filesystem or output failure |
 | 7 | Invalid content, names, paths, identifiers, or resource limits |
 | 8 | Preview execution, cancellation, timeout, or worker-result failure |
 
-`release` reports the available capabilities and native format version without opening a library.
+`release` reports the available capabilities and library format version without opening a library.
 Raw exports preserve their separate byte-oriented protocol.
 
 ## Verification

@@ -156,4 +156,4 @@ cleanup, staging cleanup, quarantine, and usage reports are CLI-only.
 
 Thumbnails and thumbnail grids were dropped: the inspector's preview of the selected item takes their place.
 
-All menu commands and shortcuts are listed in the [screen specs](specs/Native-App-Screens.md#menus-and-shortcuts).
+All menu commands and shortcuts are listed in the [screen specs](specs/App-Screens.md#menus-and-shortcuts).

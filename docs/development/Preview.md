@@ -1,4 +1,4 @@
-# Native preview harness
+# Preview harness
 
 Render a standalone TXT source or selected book leaf with the system JavaScriptCore planner,
 Core Graphics composition, Core Text labels, and Image I/O atlas decoding and PNG encoding.

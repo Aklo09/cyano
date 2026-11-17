@@ -1,13 +1,13 @@
-# Milestone 3: native application
+# Milestone 3: macOS application
 
 Date: 2026-11-13. Status: approved by the owner on 2026-11-14, with the decisions below;
 [accepted](../validation/Milestone-3.md) on 2026-11-15.
-A1, the [app spec](../specs/Native-App.md), is approved and A0 is done (2026-11-14). A2, the
-[screen specs](../specs/Native-App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
+A1, the [app spec](../specs/App.md), is approved and A0 is done (2026-11-14). A2, the
+[screen specs](../specs/App-Screens.md), is approved, and A3, the [app scaffold](../development/App.md), is done
 (2026-11-14). A4, the library session layer, A5, library selection, A6, browsing, A7, books and planners, A8, import, A9, export, A10, comments, and A11, organization, A14, settings, A12, previews, A13, statistics, A15, menus and lifecycle, A16, accessibility, and A17, tests and smoke runs, are done. A18, docs and acceptance, is
 done: the owner did the walkthrough and accepted milestone 3 on 2026-11-15 (see the
 [acceptance record](../validation/Milestone-3.md)).
-Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 3.
+Roadmap entry: [plan](macOS-Plan.md#delivery-roadmap), milestone 3.
 
 ## Scope
 
@@ -52,7 +52,7 @@ Closing the library closes its preview windows.
 | # | Subtask | Delivers | Done when | Depends on |
 | --- | --- | --- | --- | --- |
 | A0 | Core name and Finder-file fixes | LibraryCore collision keys use full Unicode case folding with normalization, independent of the volume; `.DS_Store` files are ignored in `operations/`, operation directories, and folder move/delete inventories; storage contract updated | Spec GEN-6–GEN-8 hold in core tests on case-sensitive and case-insensitive volumes; existing suites pass | — |
-| A1 | App spec | `docs/specs/Native-App.md`: given/when/then criteria per workflow, including empty and error cases | Owner approves | — |
+| A1 | App spec | `docs/specs/App.md`: given/when/then criteria per workflow, including empty and error cases | Owner approves | — |
 | A2 | Screen specs | Main window layout (folder sidebar, item list, detail inspector) and preview windows, states (empty, loading, library in use, recovery required, assets missing), focus order, shortcuts, accessibility | Owner approves | A1 |
 | A3 | App scaffold | Package UI target, thin Xcode app target, `just app-build` and `just app-run`, independence check extended to the app | The empty app builds and launches offline; existing checks pass | — |
 | A4 | Library session layer | Main-actor session running library calls off the main thread; every library error code mapped to a user message; library change notifications for open windows; opening reports operations completed by replay (spec REC-1) | Unit tests cover state changes and every error code | A3 |

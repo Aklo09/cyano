@@ -1,7 +1,7 @@
 # Milestone 2 acceptance
 
 Milestone 2 (complete library core) is accepted.
-Its exit condition, from the [native plan](../planning/macOS-Plan.md#delivery-roadmap), is that shared operations
+Its exit condition, from the [plan](../planning/macOS-Plan.md#delivery-roadmap), is that shared operations
 preserve identities, comments, originals, and recovery guarantees. It was re-verified on commit `9cf4980`,
 and the owner approved construction statistics for representative fixtures on 2026-11-13.
 Work items and decisions: [milestone 2 plan](../planning/Milestone-2.md). Recorded in the
@@ -13,7 +13,7 @@ Work items and decisions: [milestone 2 plan](../planning/Milestone-2.md). Record
 | --- | --- |
 | `just build` | Pass |
 | `just lint` | Strict swift-format lint reports no findings |
-| `just test` | 116 native tests and 4 Python assembly tests pass, including the 348-case statistics parity test and the private-map test |
+| `just test` | 116 tests and 4 Python assembly tests pass, including the 348-case statistics parity test and the private-map test |
 | `just statistics-golden` | 348 cases, 0 reference errors; byte-identical to the S2 output (`sha256 893197c7…`) |
 | `just statistics-test` | 13 of 13 retained JavaScript reference tests pass |
 | `just tools-check` | 153 copied files, 42 planner inputs, and 5 pinned development dependencies remain valid |

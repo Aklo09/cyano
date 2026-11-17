@@ -1,18 +1,18 @@
-# Resume native implementation
+# Resume implementation
 
-The owner approved the [native plan](planning/macOS-Plan.md) on 2026-11-13.
+The owner approved the [plan](planning/macOS-Plan.md) on 2026-11-13.
 Milestone 1 is [accepted](validation/Milestone-1.md): all criteria re-verified on `8daa40e` and the representative
 images approved by the owner. The approved [core revisions](planning/Core-Revisions.md) that followed are implemented.
-Milestone 2 is [accepted](validation/Milestone-2.md), including native construction statistics approved by the owner.
-Milestone 3, the native macOS app, is [accepted](validation/Milestone-3.md) after the owner's walkthrough (2026-11-15).
+Milestone 2 is [accepted](validation/Milestone-2.md), including construction statistics approved by the owner.
+Milestone 3, the macOS app, is [accepted](validation/Milestone-3.md) after the owner's walkthrough (2026-11-15).
 Milestone 4, rendering integration, is [accepted](validation/Milestone-4.md) after the owner's walkthrough (2026-11-16).
 
 ## Current state
 
-- **Build native targets:** shared libraries, the CLI, the preview worker, and the planner probe compile.
+- **Build targets:** shared libraries, the CLI, the preview worker, and the planner probe compile.
 - **Preserve supplied fixtures:** all nine TXT inputs retain their original hashes.
-- **Decode native strings:** bounded parsing preserves unknown fields and exact original exports.
-- **Own native libraries:** permanent kernel leases exclude competing app/CLI sessions.
+- **Decode strings:** bounded parsing preserves unknown fields and exact original exports.
+- **Own libraries:** permanent kernel leases exclude competing app/CLI sessions.
 - **Publish recoverably:** intents commit behind a drive barrier; replay rolls forward; refused operations can be
   quarantined; uncommitted staging can be cleaned up.
 - **Organize sources:** folder/item moves and renames, empty-folder and item deletion, replacement, unpacking, and
@@ -30,21 +30,21 @@ Milestone 4, rendering integration, is [accepted](validation/Milestone-4.md) aft
 - **Keep artwork private:** copied sprites, prototype data, and outputs derived from them stay in ignored directories.
 
 The CLI includes all original library command capabilities except deliberately excluded backup/restore.
-Native cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
+Cache identities differ from historical web caches; unknown formats are protected by scoped cleanup.
 The macOS app covers milestone 3's workflows offline, with and without assets (see the [user guide](User-Guide.md)).
 
 ## Next implementation
 
-Milestone 3, the native macOS application, is [approved](planning/Milestone-3.md) (2026-11-14) with its seven
+Milestone 3, the macOS application, is [approved](planning/Milestone-3.md) (2026-11-14) with its seven
 decisions settled: a package UI target with a thin Xcode app target, no App Sandbox, one library per app with
 preview windows for side-by-side comparison, on-demand previews rendered one at a time, a statistics panel with
 names as text, Recover as the only in-app maintenance, and session tests plus scripted screenshots instead of
 XCUITest.
 
-A1, the [native app spec](specs/Native-App.md), is approved (2026-11-14). A0, the two LibraryCore gaps found in
+A1, the [app spec](specs/App.md), is approved (2026-11-14). A0, the two LibraryCore gaps found in
 its review, is done: collision keys now match APFS case-insensitive equivalence on every volume (tested on an
 attached case-sensitive image too), and regular `.DS_Store` files are ignored throughout libraries (see the
-[storage contract](contracts/Storage.md)). A2, the [screen specs](specs/Native-App-Screens.md), is approved
+[storage contract](contracts/Storage.md)). A2, the [screen specs](specs/App-Screens.md), is approved
 (2026-11-14): books browse like folders, the inspector keeps the preview above Statistics/Details/Comments tabs, and
 dark mode uses a darker content background (`#121212`). A3, the [app scaffold](development/App.md), is done:
 `Sources/LibraryApp` holds the interface, `App/` the thin Xcode target (`local.fb.library`, ad-hoc signed, no
@@ -104,7 +104,7 @@ viewer state. Test cleanups no longer leave `local.fb.library.tests-*.plist` fil
 [milestone 3 acceptance record](validation/Milestone-3.md) with every check and the offline Release smoke runs (27 of
 27 with assets; 25 and 3 skipped without), REC-1a's test, the smoke run's everyday-workflow checks, and BRW-9 dropped
 by the owner. The owner did the walkthrough and accepted milestone 3
-on 2026-11-15. Next: milestone 4 (see the [native plan](planning/macOS-Plan.md#delivery-roadmap)).
+on 2026-11-15. Next: milestone 4 (see the [plan](planning/macOS-Plan.md#delivery-roadmap)).
 Cached row thumbnails (BRW-9) were dropped by the owner (2026-11-15).
 Alt-mode previews now mark each inserter's pickup (yellow line) and drop (yellow arrow) (2026-11-15). This needed
 new render-database fields, so the private assets were regenerated from Factorio 2.1.24 and the supported asset
@@ -127,7 +127,7 @@ icons added to the private release by regenerating `private-assets/2.1.24` (prof
 at runtime from the release and never embedded, render warnings shown, image copy/save, the 239-leaf corpus reviewed
 from contact sheets, and a `just test` check that no Factorio artwork reaches git, package resources, or the app
 bundle. Milestone 4 verification (owner, 2026-11-15): focused suites per subtask plus `just lint` and `just app-build`, full
-`just test` at the end (see the [plan](planning/Milestone-4.md#verification)). R0 is done (2026-11-15): the [app spec](specs/Native-App.md) and [screen specs](specs/Native-App-Screens.md) gained
+`just test` at the end (see the [plan](planning/Milestone-4.md#verification)). R0 is done (2026-11-15): the [app spec](specs/App.md) and [screen specs](specs/App-Screens.md) gained
 ICN-1–ICN-11, WRN-1–WRN-3, IMG-1–IMG-6, and GEN-9. The owner also revised decision 3 (a tagged label goes into
 `displayNameOverride`; file names unchanged) and added decision 9 (text form in titles, file names, sorting) and
 decision 10 (root entry icons in the derived source index, schema 2). R3 is done (2026-11-15): patch
@@ -165,7 +165,7 @@ everyday release must be reassembled (their script needs no version change; see 
 [validation](validation/App.md#statistics-by-inventory-tab-2026-11-16)). Statistics rows now show a quality by its
 icon alone (owner, 2026-11-16). The owner approved
 milestone 4 on 2026-11-16. Next: milestone 5, personal-use qualification (see the
-[native plan](planning/macOS-Plan.md#delivery-roadmap)); it has no plan yet.
+[plan](planning/macOS-Plan.md#delivery-roadmap)); it has no plan yet.
 
 Keep application scheduling/progress/retry and UI work separate from the completed library commands.
 Preserve sticky cancellation, worker isolation, and owner-only cache publication.
@@ -175,11 +175,11 @@ Preserve the [storage contract](contracts/Storage.md) and [statistics contract](
 Retain original bytes, sparse entry indices, and unknown blueprint fields.
 Application-managed backup and restore remain outside v1.
 Neither builds nor runtime should depend on the original web checkout.
-Strict conformance with the original web application is not required: prefer better native behavior and record the
+Strict conformance with the original web application is not required: prefer better macOS behavior and record the
 difference in the relevant contract.
 
 Run `just --list` for available commands.
-Use `just build`, `just lint`, and `just test` for native checks.
+Use `just build`, `just lint`, and `just test` for project checks.
 Use `just codec-test`, `just storage-test`, `just asset-test`, and `just renderer-test` for focused suites.
 Use the [preview guide](development/Preview.md) and [library preview guide](development/Library-Previews.md) for rendering,
 and the [statistics guide](development/Statistics.md) for statistics and their reference tooling.

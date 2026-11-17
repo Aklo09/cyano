@@ -139,7 +139,7 @@ Results are versioned JSON. Items are `{ "name", "quality", "count" }`, sorted b
 then of the quality.
 
 A root blueprint holding one wooden chest at (0.5, 0.5), as the reference calculator computes it
-with the 2.1.24 map, plus the native fields:
+with the 2.1.24 map, plus the app-specific fields:
 
 ```json
 {
@@ -197,7 +197,7 @@ surface, or building legality. Factorio has no blueprint-width API implementing 
 ## Differences from the web application
 
 The reference calculator (`tools/reference/blueprint-statistics.mjs`) is the starting point, not a constraint:
-the native app departs from it wherever a different behavior makes more sense. Current differences:
+the macOS app departs from it wherever a different behavior makes more sense. Current differences:
 
 - Warnings are structured and grouped with an occurrence count instead of one prose string per occurrence.
 - Items sort by UTF-8 bytes, not JavaScript `localeCompare`.
@@ -205,7 +205,7 @@ the native app departs from it wherever a different behavior makes more sense. C
 - Errors are typed library errors rather than JavaScript exceptions.
 - Malformed structure is an error; the reference would instead warn about an item or quality named `undefined`.
 
-Parity with reference outputs generated from the private map (subtask S5) is checked on these native semantics:
+Parity with reference outputs generated from the private map (subtask S5) is checked on these app semantics:
 identical items, completeness, and footprint, and the same warnings once reference strings are mapped to codes and
 counted. The reference itself was compared with the game's `cost_to_build` in the original project;
 milestone 2 does not repeat that comparison.

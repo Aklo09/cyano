@@ -1,13 +1,13 @@
 # Milestone 2: complete library core
 
 Date: 2026-11-13. Status: accepted ([acceptance record](../validation/Milestone-2.md)).
-Roadmap entry: [native plan](macOS-Plan.md#delivery-roadmap), milestone 2.
+Roadmap entry: [plan](macOS-Plan.md#delivery-roadmap), milestone 2.
 
 ## Scope
 
 Replacement, folder and item organization, unpacked-book import, deletion, and maintenance were delivered during
 milestone 1 ([command validation](../validation/Library-Commands.md)) and hardened by the
-[core revisions](Core-Revisions.md). The remaining work is native construction statistics and milestone acceptance.
+[core revisions](Core-Revisions.md). The remaining work is construction statistics and milestone acceptance.
 
 Statistics port the pure reference calculator in `tools/reference/blueprint-statistics.mjs` to Swift:
 
@@ -27,7 +27,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 | # | Question | Decision |
 | --- | --- | --- |
 | 1 | Where the golden outputs derived from the private map live | Outside git, under `.cache/`. The parity test runs only where private assets exist; committed unit tests use a small hand-written map and run everywhere |
-| 2 | Item ordering | Native output uses UTF-8 byte order of name, then quality. Parity compares item sets independently of order |
+| 2 | Item ordering | Output uses UTF-8 byte order of name, then quality. Parity compares item sets independently of order |
 | 3 | Re-validation against the running game | Not part of milestone 2. Rely on the original project's `cost_to_build` comparisons and exact parity with the JS reference |
 | 4 | Prototype map source | Only from a verified asset release (`statistics/prototype-map.json`), binding statistics to that release identity |
 
@@ -35,7 +35,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 
 | # | Subtask | Delivers | Done when | Depends on |
 | --- | --- | --- | --- | --- |
-| S1 | Done: native statistics contract | `docs/contracts/Statistics.md`: scope, requirement groups, footprint rules, completeness, result schema | Owner approves | — |
+| S1 | Done: statistics contract | `docs/contracts/Statistics.md`: scope, requirement groups, footprint rules, completeness, result schema | Owner approves | — |
 | S2 | Done: golden reference outputs | Node script running the JS calculator over all synthetic cases and every blueprint leaf in the fixtures and vendored visual tests, writing one JSON file under `.cache/` | Generation is reproducible; `just statistics-test` still passes | — |
 | S3 | Done: prototype map in `FactorioData` | Strict `PrototypeMap` model loaded from a verified release and bound to its identity | Tests cover valid, malformed, wrong-version, unknown-field, and oversized maps | — |
 | S4 | Done: calculator port | `BlueprintStatistics.calculate(entry, map)`, a pure function over codec `JSONValue`s | Unit tests with a committed synthetic map cover every rule exercised by the Node tests | S1, S3 |
@@ -47,7 +47,7 @@ Exit condition: shared operations preserve identities, comments, originals, and 
 
 ## Reference behaviors the port must reproduce
 
-The reference is a starting point: where the [contract](../contracts/Statistics.md) records a better native behavior,
+The reference is a starting point: where the [contract](../contracts/Statistics.md) records a better app behavior,
 that wins. Otherwise reproduce these details, each of which a careless port would silently change:
 
 - **Rounding:** JavaScript `Math.round` rounds halves toward +∞, including negatives; Swift's default rounds away

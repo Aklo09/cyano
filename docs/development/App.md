@@ -1,7 +1,7 @@
-# Native macOS app
+# macOS app
 
 Build and run the Factorio Blueprint Library app from this repository.
-Behavior is specified in the [app spec](../specs/Native-App.md) and the [screen specs](../specs/Native-App-Screens.md);
+Behavior is specified in the [app spec](../specs/App.md) and the [screen specs](../specs/App-Screens.md);
 the delivery plan is [milestone 3](../planning/Milestone-3.md).
 
 ## Structure
@@ -298,7 +298,7 @@ Rules the views follow (screen specs, "Accessibility"; checks in the
   `.commandsRemoved()` and `ListedInWindowMenu` lists its window through AppKit as "Library" (the library's name).
   Don't apply `.commandsRemoved()` to the selection scene: it also removes the standard Edit commands (Cut, Copy,
   Paste, Delete, Select All), and with them ⌘C in the list.
-- **Checking.** System Events reports some SwiftUI button titles as empty; read labels with the native accessibility
+- **Checking.** System Events reports some SwiftUI button titles as empty; read labels with the accessibility
   API (`AXUIElementCopyAttributeValue`) instead.
 
 ## Bundle identity and signing
@@ -367,7 +367,7 @@ keystrokes. Rows in sheets are selected with a real click (SwiftUI ignores setti
 the helper looks in an open sheet before the window behind it.
 
 It takes the keyboard and brings the app forward for a few minutes: the owner keeps hands off, and the terminal
-needs Accessibility and Screen Recording access. The clipboard text is saved and restored. A small native helper,
+needs Accessibility and Screen Recording access. The clipboard text is saved and restored. A small helper,
 compiled into the run directory, reads windows: the window-server list for the launch and captures (it also lists
 hidden windows, so captures prefer on-screen ones), and the accessibility API for visible titles, button presses, and
 static text (System Events reports some SwiftUI button labels as empty).

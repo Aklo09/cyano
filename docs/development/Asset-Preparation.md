@@ -1,7 +1,7 @@
 # Local asset and planner tooling
 
 Prepare private assets without depending on the original web repository.
-Native builds consume committed planner resources and require no Node runtime.
+Builds consume committed planner resources and require no Node runtime.
 
 ## Pinned sources
 
@@ -90,7 +90,7 @@ These dependencies belong to development tooling, outside the Swift package.
 
 The planner check rebuilds in memory and compares committed resources.
 The generated metadata identifies all 42 bundled source inputs by hash.
-The native resource includes fpsr's license.
+The resource includes fpsr's license.
 
 The asset check imports the vendored pipeline through tsx's Node loader.
 It neither launches the game nor regenerates assets.
@@ -110,15 +110,15 @@ private-assets/
 The earlier copied 2.1.23 inputs remain as `private-assets/2.1.23/` and `private-assets/statistics-reference-2.1.23/`
 for comparison; the tools no longer accept them.
 
-These files are ignored by Git and excluded from native package resources.
-Native build and planner-loading checks do not require them.
+These files are ignored by Git and excluded from package resources.
+Build and planner-loading checks do not require them.
 `just test` enforces this with `tools/check-artwork.py` (milestone 4, spec GEN-9): it fails when Git-tracked files,
 package resources, or a built app bundle under `.cache/xcode` hold a file named like release data (atlas images,
 render databases, `release.json`, `prototype-map.json`) or with the same bytes as a file in `private-assets/`. The
 staging folders `profile/` and `game-work/` hold an isolated game configuration with project-written mods, not
 artwork, and are not compared. `python3 tools/check-artwork.py --self-test` plants copies in a scratch tree and
 expects both to be found.
-For native image rendering, assemble these inputs into a new private release using the
+For image rendering, assemble these inputs into a new private release using the
 [preview harness guide](Preview.md#prepare-a-private-release).
 Run the retained statistics cases when the map is present:
 
@@ -126,7 +126,7 @@ Run the retained statistics cases when the map is present:
 just statistics-test
 ```
 
-Generate the reference outputs for the native statistics parity test (milestone 2, S5):
+Generate the reference outputs for the statistics parity test (milestone 2, S5):
 
 ```sh
 just statistics-golden

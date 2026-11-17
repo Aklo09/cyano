@@ -1,7 +1,7 @@
 # Owned preview lifetime and derived cache
 
 Library previews extend the existing storage queue without introducing an authoritative database.
-The native library marker and item metadata remain version 1; import/mutation intents retain their existing versions.
+The library marker and item metadata remain version 1; import/mutation intents retain their existing versions.
 
 ## Ownership and process boundary
 
@@ -44,7 +44,7 @@ Each entry uses the existing `LibraryCacheIdentity` schema 1:
 The filename key is SHA-256 of its canonical sorted-key JSON plus a newline.
 The source hash describes exact original root bytes; entry paths contain actual stored indices.
 The asset identity binds a verified immutable release.
-The generator binds native rendering/report compatibility and all output settings.
+The generator binds rendering/report compatibility and all output settings.
 Default 2x/2048/transparent rendering uses `native-preview-v1`; variants append tier, dimension, and checkerboard settings.
 Changes to renderer/report compatibility require a new generator version.
 Metadata-only name/comment changes do not alter image identity.
@@ -90,11 +90,11 @@ Unknown metadata is not silently replaced by a preview, including with `--refres
 `source-index.json` is the storage layer's derived kind and entry-icon index (see the storage contract). Scoped cleanup retains it,
 `all` removes it, and the next listing rebuilds it; an interrupted index write leaves a root `.tmp-<UUID>` that
 abandoned cleanup selects.
-`cache-cleanup` recognizes both identity-only and complete native cache metadata.
+`cache-cleanup` recognizes both identity-only and complete cache metadata.
 Default abandoned cleanup selects staging files and orphaned images without treating unknown metadata as permission to delete.
 Obsolete cleanup compares source, selected entry, assets, and the requested generator.
 Explicit all-cache cleanup and item replacement/deletion discard safely confined derived content.
 
 Source originals, authoritative metadata, and `operations/` are never changed by preview publication.
 Cache failures do not require authoritative replay and do not make source operations depend on artwork.
-Concurrent external editing, power-loss guarantees, hostile native helpers, and cache quotas are not established by this contract.
+Concurrent external editing, power-loss guarantees, hostile helpers, and cache quotas are not established by this contract.

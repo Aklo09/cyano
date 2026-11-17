@@ -1,6 +1,6 @@
-# Native app validation
+# App validation
 
-Evidence for the native app scaffold ([guide](../development/App.md)), milestone 3 subtask A3.
+Evidence for the app scaffold ([guide](../development/App.md)), milestone 3 subtask A3.
 
 ## App scaffold (2026-11-14)
 
@@ -252,7 +252,7 @@ Milestone 3 subtask A16. The owner allowed scripted keystrokes and clicks on a s
 library with folders, a book, an unpacked planner book, and a comment; separate preferences; the private 2.1.24
 release), and switching Increase Contrast for the run. Full Keyboard Access was already on and stayed on. The
 clipboard text was saved and restored. VoiceOver itself was not run (owner's choice): rows marked "AX tree" were read
-through the native accessibility API (`AXUIElementCopyAttributeValue`), which is what VoiceOver reads, and
+through the accessibility API (`AXUIElementCopyAttributeValue`), which is what VoiceOver reads, and
 announcements through an `AXObserver` on `AXAnnouncementRequested`. Contrast was measured on window captures
 (`screencapture -l`) from glyph-core pixels (98th percentile of per-pixel contrast) against each region's dominant
 background; dark mode is the system setting, light mode a scratch-copy `NSRequiresAquaSystemAppearance`.
@@ -281,7 +281,7 @@ background; dark mode is the system setting, light mode a scratch-copy `NSRequir
 | Item rows | AX tree | "(2026-06), book, updated 15 November 2026, 260 KB"; book entries add "entry 0"; kind symbols hidden |
 | Preview image and states | AX tree + observer | "Preview of (2026-06) — Entry 4"; "Preview ready" announced |
 | Toolbars | AX tree | Hide Sidebar, Import, Zoom Out/In, Zoom to Fit, Actual Size, Background labelled with help text; zoom level "Zoom 88 percent" |
-| Inspector, Settings, selection window | AX tree | Every button labelled (System Events reports these titles empty; the native API has them) |
+| Inspector, Settings, selection window | AX tree | Every button labelled (System Events reports these titles empty; the accessibility API has them) |
 | Comments | AX tree | **Fixed:** the list was unlabeled and each comment read only its date; now "Comments", and "Latch for the oil cracking setup, 15 Nov 2026 at 9:09" |
 | Import, Move To, Replace Source sheets | AX tree | **Fixed:** the name field, "Save in" pop-up, "Books" choice, and the Move To folder list ("Folders") were unlabeled; Replace Source was already labelled |
 | Banners and confirmations | Observer + code | Confirmations were already announced by the model. Banners now announce their text when shown and keep their action a separate button (`contain`, not `combine`); no banner state occurred in the run |
@@ -351,7 +351,7 @@ rename and replace with a window open, a release change, and one worker at most 
 Fixed in the tool during the runs (no app changes): the window-server list includes hidden windows (a closed library
 window stays listed, still showing "Loading library…"), so visible titles come from the accessibility API and
 captures prefer on-screen windows; System Events cannot find the Settings Clear button (it reports the label as
-empty), so buttons are pressed through the native accessibility API.
+empty), so buttons are pressed through the accessibility API.
 
 
 

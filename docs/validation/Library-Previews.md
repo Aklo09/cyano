@@ -8,8 +8,8 @@ Recorded: 2026-11-13 in the [foundation environment](Foundation.md#environment).
 
 | Check | Result |
 | --- | --- |
-| `just test` | 80 native tests across ten suites and four Python assembly tests pass |
-| Relocated isolation | Fresh build and all 80 native tests pass with original checkouts unreadable, networking denied, and no Node on PATH |
+| `just test` | 80 tests across ten suites and four Python assembly tests pass |
+| Relocated isolation | Fresh build and all 80 tests pass with original checkouts unreadable, networking denied, and no Node on PATH |
 | Focused integration/lifecycle run | All 11 library-preview and six supervisor tests pass |
 | `just tools-check` | All 153 copied files, 42 planner inputs, and five pinned development dependencies remain valid |
 | `just planner-check` | Committed JavaScript resource matches pinned local inputs |
@@ -90,7 +90,7 @@ No additional security scanner was installed or run.
 Tests operate on generated temporary libraries or the task's ignored demo library, never a real user library.
 
 The [contract](../contracts/Preview-Cache.md) and [usage guide](../development/Library-Previews.md) describe the implemented boundary.
-Native statistics, application scheduling/progress/retry, cache quotas, the macOS UI,
+Statistics, application scheduling/progress/retry, cache quotas, the macOS UI,
 owner visual approval, connected-rail/full-corpus image review, and the 1,000-root workload remain pending.
 Process termination tests do not establish hardware power-loss durability.
 Concurrent external file edits and hostile helpers remain unsupported.

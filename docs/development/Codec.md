@@ -1,4 +1,4 @@
-# Native blueprint codec
+# Blueprint codec
 
 Decode Factorio strings without rewriting their originals or dropping unknown JSON content.
 The codec lives in `LibraryCore` and requires no private game assets.
@@ -19,7 +19,7 @@ An empty entry path identifies the root.
 An internal path such as `[5, 0]` follows stored indices, independently of array positions.
 Invalid paths fail without selecting a different entry.
 
-The [native CLI](Library-CLI.md) uses these interfaces for imports and exports.
+The [CLI](Library-CLI.md) uses these interfaces for imports and exports.
 
 ## Input admission
 
@@ -85,5 +85,5 @@ Run the focused tests from the repository root:
 just codec-test
 ```
 
-Run all native checks with `just test`.
+Run all checks with `just test`.
 See [codec validation](../validation/Codec.md) for completed cases and limitations.
